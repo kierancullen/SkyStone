@@ -1,4 +1,5 @@
-package org.firstinspires.ftc.teamcode;
+package com.evolutionftc.autopilot;
+
 
 // IMU + dual-odometer tracker
 // Relies on IMU for rotation.
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-public class AutopilotTrackerDualOdo {
+public class AutopilotTrackerDualOdo extends AutopilotTracker {
 
     private DcMotor x;
     private DcMotor y;
