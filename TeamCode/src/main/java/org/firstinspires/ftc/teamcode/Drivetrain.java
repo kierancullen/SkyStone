@@ -57,4 +57,16 @@ public class Drivetrain {
         topRight.setPower(tr_power_raw);
     }
 
+    public DcMotor getXOdometer() {
+        return topLeft;
+    }
+
+    public DcMotor getYOdometerRight() {
+        return topRight;
+    }
+
+    public DcMotor getYOdometerLeft() {
+        return bottomLeft;
+    }
+
 }
