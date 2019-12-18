@@ -113,6 +113,7 @@ public class AutoTests extends LinearOpMode {
         while (opModeIsActive()) {
             autopilot.communicate(tracker);
             autopilot.telemetryUpdate();
+            telemetry.addData("xenc-raw", drivetrain.getXOdometer().getCurrentPosition());
             telemetry.update();
             AutopilotSystem.visualizerBroadcastRoutine(autopilot);
         }
