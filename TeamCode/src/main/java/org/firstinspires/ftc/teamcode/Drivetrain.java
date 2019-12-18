@@ -58,7 +58,7 @@ public class Drivetrain {
     }
 
     public DcMotor getXOdometer() {
-        return bottomLeft;
+        return topLeft;
     }
 
     public DcMotor getYOdometerRight() {
@@ -66,7 +66,7 @@ public class Drivetrain {
     }
 
     public DcMotor getYOdometerLeft() {
-        return topLeft;
+        return bottomLeft;
     }
 
 }

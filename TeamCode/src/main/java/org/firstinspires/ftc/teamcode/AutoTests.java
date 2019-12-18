@@ -8,6 +8,8 @@ import com.evolutionftc.autopilot.AutopilotTrackerDualOdo;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 
 import static org.firstinspires.ftc.teamcode.GlobalMovement.*;
 
@@ -29,8 +31,8 @@ public class AutoTests extends LinearOpMode {
     public static double DUALODO_TICKS_PER_UNIT = 1440 /  (1.88976 * Math.PI);
 
 
-    public static int AP_COUNTS_TO_STABLE = 3;
-    public static double AP_NAV_UNITS_TO_STABLE = 0.7; // inch +/-
+    public static int AP_COUNTS_TO_STABLE = 50;
+    public static double AP_NAV_UNITS_TO_STABLE = 0.5; // inch +/-
     public static double AP_ORIENT_UNITS_TO_STABLE = 0.05; // rad +/-
 
 
@@ -38,10 +40,10 @@ public class AutoTests extends LinearOpMode {
         AutopilotSegment seg = new AutopilotSegment();
         seg.navigationTarget = pos;
         seg.orientationTarget = hdg;
-        seg.navigationGain = 0.025;
-        seg.orientationGain = 1.80; //1.90
+        seg.navigationGain = 0.015;
+        seg.orientationGain = 1.25;
         seg.navigationMax = 0.50;
-        seg.navigationMin = 0.20;
+        seg.navigationMin = 0.15;
         seg.orientationMax = 0.50;
         seg.useOrientation = useOrientation;
         seg.useTranslation = useTranslation;
@@ -58,7 +60,8 @@ public class AutoTests extends LinearOpMode {
             if (yxh != null) {
                 /*GlobalMovement.*/movement_y = yxh[0];
                 /*GlobalMovement.*/movement_x = yxh[1];
-                /*GlobalMovement.*/movement_turn = -yxh[1];
+                /*GlobalMovement.*/movement_turn = yxh[2];
+                drivetrain.updatePowers();
             }
             autopilot.communicate(tracker);
 
@@ -66,9 +69,9 @@ public class AutoTests extends LinearOpMode {
             telemetry.addData("FPS", 1000.0 / (timeNow - lastTime));
             lastTime = timeNow;
 
+            AutopilotSystem.visualizerBroadcastRoutine(autopilot);
             autopilot.telemetryUpdate();
             telemetry.update();
-            AutopilotSystem.visualizerBroadcastRoutine(autopilot);
 
             yxh = autopilot.navigationTick();
         }
@@ -82,6 +85,10 @@ public class AutoTests extends LinearOpMode {
                 hardwareMap.dcMotor.get("bl"),
                 hardwareMap.dcMotor.get("br")
         );
+        drivetrain.topLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        drivetrain.topRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        drivetrain.bottomLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        drivetrain.bottomRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -109,6 +116,14 @@ public class AutoTests extends LinearOpMode {
         autopilot.communicate(tracker);
         tracker.setRobotAttitude(ROBOT_INIT_ATTITUDE);
         tracker.setRobotPosition(ROBOT_INIT_POSITION);
+
+
+        apGoTo(new double[]{0, 24, 0}, 0, false, true, true);
+
+        movement_x=0;
+        movement_y=0;
+        movement_turn=0;
+        drivetrain.updatePowers();
 
         while (opModeIsActive()) {
             autopilot.communicate(tracker);
