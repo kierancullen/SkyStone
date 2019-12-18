@@ -49,7 +49,7 @@ public class RobotOpModeTest extends OpMode {
 
         GlobalPosition.imu = imu;
 
-        tracker = new AutopilotTrackerDualOdo(br, bl, -4.3, -4.3, new double[]{0, 0, 0}, 1440/(1.89*Math.PI), imu);
+        tracker = new AutopilotTrackerDualOdo(br, bl, -4.3, -4.3, /*new double[]{0, 0, 0},*/ 1440/(1.89*Math.PI), imu);
         tracker.setInverts(false, true);
     }
 

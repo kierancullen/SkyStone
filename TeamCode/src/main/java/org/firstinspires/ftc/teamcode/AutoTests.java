@@ -6,10 +6,12 @@ import com.evolutionftc.autopilot.AutopilotSystem;
 import com.evolutionftc.autopilot.AutopilotTracker;
 import com.evolutionftc.autopilot.AutopilotTrackerDualOdo;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import static org.firstinspires.ftc.teamcode.GlobalMovement.*;
 
+@Autonomous(name="AutoTests")
 public class AutoTests extends LinearOpMode {
 
     Drivetrain drivetrain;
@@ -22,9 +24,8 @@ public class AutoTests extends LinearOpMode {
     public static double[] ROBOT_INIT_POSITION = new double[]{0, 0, 0};
     public static double[] ROBOT_INIT_ATTITUDE = new double[]{0, 0, 0};
 
-    public static double DUALODO_X_RADIUS = 3.25614173;
-    public static double DUALODO_Y_RADIUS = -0.25051181102;
-    public static double[] DUALODO_INTERSECT_POS = new double[]{7.184370079, -2.3134252,0};
+    public static double DUALODO_X_RADIUS = 3.25614173 - 2.3134252;
+    public static double DUALODO_Y_RADIUS = -0.25051181102 + 7.184370097;
     public static double DUALODO_TICKS_PER_UNIT = 1440 /  (1.88976 * Math.PI);
 
 
@@ -93,7 +94,7 @@ public class AutoTests extends LinearOpMode {
         tracker = new AutopilotTrackerDualOdo(
                 drivetrain.getXOdometer(),
                 drivetrain.getYOdometerRight(),
-                DUALODO_X_RADIUS, DUALODO_Y_RADIUS, DUALODO_INTERSECT_POS,
+                DUALODO_X_RADIUS, DUALODO_Y_RADIUS,
                 DUALODO_TICKS_PER_UNIT, imu
         );
 
@@ -111,6 +112,8 @@ public class AutoTests extends LinearOpMode {
 
         while (opModeIsActive()) {
             autopilot.communicate(tracker);
+            autopilot.telemetryUpdate();
+            telemetry.update();
             AutopilotSystem.visualizerBroadcastRoutine(autopilot);
         }
 
