@@ -5,6 +5,7 @@ import com.evolutionftc.autopilot.AutopilotSegment;
 import com.evolutionftc.autopilot.AutopilotSystem;
 import com.evolutionftc.autopilot.AutopilotTracker;
 import com.evolutionftc.autopilot.AutopilotTrackerDualOdo;
+import com.evolutionftc.autopilot.AutopilotTrackerTripleOdo;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -31,7 +32,7 @@ public class AutoTests extends LinearOpMode {
     public static double DUALODO_TICKS_PER_UNIT = 1440 /  (1.88976 * Math.PI);
 
 
-    public static int AP_COUNTS_TO_STABLE = 50;
+    public static int AP_COUNTS_TO_STABLE = 10;
     public static double AP_NAV_UNITS_TO_STABLE = 0.5; // inch +/-
     public static double AP_ORIENT_UNITS_TO_STABLE = 0.05; // rad +/-
 
@@ -44,7 +45,7 @@ public class AutoTests extends LinearOpMode {
         seg.orientationGain = 1.25;
         seg.navigationMax = 0.50;
         seg.navigationMin = 0.15;
-        seg.orientationMax = 0.50;
+        seg.orientationMax = 0.25;
         seg.useOrientation = useOrientation;
         seg.useTranslation = useTranslation;
         seg.fullStop = fullStop;
@@ -85,10 +86,10 @@ public class AutoTests extends LinearOpMode {
                 hardwareMap.dcMotor.get("bl"),
                 hardwareMap.dcMotor.get("br")
         );
-        drivetrain.topLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        /*drivetrain.topLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         drivetrain.topRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         drivetrain.bottomLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        drivetrain.bottomRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        drivetrain.bottomRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -98,14 +99,15 @@ public class AutoTests extends LinearOpMode {
         imu.initialize(parameters);
 
         autopilot = new AutopilotHost(telemetry);
-        tracker = new AutopilotTrackerDualOdo(
+        tracker = new AutopilotTrackerTripleOdo(
                 drivetrain.getXOdometer(),
+                drivetrain.getYOdometerLeft(),
                 drivetrain.getYOdometerRight(),
                 DUALODO_X_RADIUS, DUALODO_Y_RADIUS,
-                DUALODO_TICKS_PER_UNIT, imu
+                DUALODO_TICKS_PER_UNIT
         );
 
-        ((AutopilotTrackerDualOdo)tracker).setInverts(false, false);
+        ((AutopilotTrackerTripleOdo)tracker).setInverts(false, true, false);
         autopilot.setCountsToStable(AP_COUNTS_TO_STABLE);
         autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
         autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
@@ -118,7 +120,7 @@ public class AutoTests extends LinearOpMode {
         tracker.setRobotPosition(ROBOT_INIT_POSITION);
 
 
-        apGoTo(new double[]{0, 24, 0}, 0, false, true, true);
+        apGoTo(new double[]{0, 0, 0}, Math.PI, true, false, true);
 
         movement_x=0;
         movement_y=0;
@@ -128,7 +130,6 @@ public class AutoTests extends LinearOpMode {
         while (opModeIsActive()) {
             autopilot.communicate(tracker);
             autopilot.telemetryUpdate();
-            telemetry.addData("xenc-raw", drivetrain.getXOdometer().getCurrentPosition());
             telemetry.update();
             AutopilotSystem.visualizerBroadcastRoutine(autopilot);
         }
