@@ -42,11 +42,22 @@ public class AutopilotHost {
 
     private double[] robotPosition = new double[3];
 
+    // for translation velocity I-controller
+    private double robotPositionRateMagnitude;
+    private double positionRateErrorIntegral;
+    private double positionRateAtFull;
+    private double positionKi;
+
     private boolean[] navigationTargetInverts = null;
     private boolean orientationTargetInvert = false;
 
     public AutopilotHost(Telemetry telemetry) {
         this.telemetry = telemetry;
+    }
+
+    public void setIntegralControlParams(double positionRateAtFull, double positionKi) {
+        this.positionRateAtFull = positionRateAtFull;
+        this.positionKi = positionKi;
     }
 
     public void setCountsToStable(int countsToStable) {
@@ -91,6 +102,7 @@ public class AutopilotHost {
 
         robotAttitude = tracker.getRobotAttitude();
         robotPosition = tracker.getRobotPosition();
+        robotPositionRateMagnitude = tracker.getRobotPositionRateMagnitude();
     }
 
     public NavigationStatus getNavigationStatus() {
@@ -213,6 +225,13 @@ public class AutopilotHost {
 
         double distance = Math.sqrt(Math.pow(xErr, 2) + Math.pow(yErr, 2));
         double chosenPower = Math.max(navigationMin, Math.min(navigationMax, distance * navigationGain));
+
+        // chosenPower is desired translation velocity
+        double translationRateError = (robotPositionRateMagnitude/positionRateAtFull) - chosenPower;
+        positionRateErrorIntegral += translationRateError;
+        chosenPower -= positionRateErrorIntegral * positionKi;
+        // Don't inadvertently trigger zero-power behavior
+        if (chosenPower == 0.0) {chosenPower = 0.001;}
 
         double xCorr = chosenPower * -Math.sin(finalAngle);
         double yCorr = chosenPower * Math.cos(finalAngle);
