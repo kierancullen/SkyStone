@@ -12,7 +12,7 @@ public class DiscreteIntegralAdjuster {
         this.Ki = Ki;
     }
 
-    public double tick(double desired, double actual) {
+    public double adjust(double desired, double actual) {
         long timeNow = System.currentTimeMillis();
         if (desired == 0) {
             integral = 0;

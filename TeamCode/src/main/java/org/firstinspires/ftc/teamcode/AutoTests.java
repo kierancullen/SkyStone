@@ -6,6 +6,7 @@ import com.evolutionftc.autopilot.AutopilotSystem;
 import com.evolutionftc.autopilot.AutopilotTracker;
 import com.evolutionftc.autopilot.AutopilotTrackerDualOdo;
 import com.evolutionftc.autopilot.AutopilotTrackerTripleOdo;
+import com.evolutionftc.autopilot.DiscreteIntegralAdjuster;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -36,6 +37,12 @@ public class AutoTests extends LinearOpMode {
     public static double AP_NAV_UNITS_TO_STABLE = 0.5; // inch +/-
     public static double AP_ORIENT_UNITS_TO_STABLE = 0.05; // rad +/-
 
+    public static double XY_KI;
+    public static double H_KI;
+    public static double MAX_RATE_X;
+    public static double MAX_RATE_Y;
+    public static double MAX_RATE_H;
+
 
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop) {
         AutopilotSegment seg = new AutopilotSegment();
@@ -56,12 +63,16 @@ public class AutoTests extends LinearOpMode {
         double [] yxh = null;
         long lastTime = System.currentTimeMillis();
 
+        DiscreteIntegralAdjuster adjY = new DiscreteIntegralAdjuster(XY_KI);
+        DiscreteIntegralAdjuster adjX = new DiscreteIntegralAdjuster(XY_KI);
+        DiscreteIntegralAdjuster adjH = new DiscreteIntegralAdjuster(H_KI);
+
         while (autopilot.getNavigationStatus() == AutopilotHost.NavigationStatus.RUNNING && opModeIsActive()) {
 
             if (yxh != null) {
-                /*GlobalMovement.*/movement_y = yxh[0];
-                /*GlobalMovement.*/movement_x = yxh[1];
-                /*GlobalMovement.*/movement_turn = yxh[2];
+                /*GlobalMovement.*/movement_y = adjY.adjust(yxh[0], tracker.getRateY() / MAX_RATE_X);
+                /*GlobalMovement.*/movement_x = adjX.adjust(yxh[1], tracker.getRateX() / MAX_RATE_Y);
+                /*GlobalMovement.*/movement_turn = adjH.adjust(yxh[2], tracker.getRateH() / MAX_RATE_H);
                 drivetrain.updatePowers();
             }
             autopilot.communicate(tracker);
