@@ -70,9 +70,9 @@ public class AutoTests extends LinearOpMode {
         while (autopilot.getNavigationStatus() == AutopilotHost.NavigationStatus.RUNNING && opModeIsActive()) {
 
             if (yxh != null) {
-                /*GlobalMovement.*/movement_y = adjY.adjust(yxh[0], tracker.getRateY() / MAX_RATE_X);
-                /*GlobalMovement.*/movement_x = adjX.adjust(yxh[1], tracker.getRateX() / MAX_RATE_Y);
-                /*GlobalMovement.*/movement_turn = adjH.adjust(yxh[2], tracker.getRateH() / MAX_RATE_H);
+                /*GlobalMovement.*/movement_y = adjY.adjust(yxh[0], tracker.getDeltaY(), MAX_RATE_X);
+                /*GlobalMovement.*/movement_x = adjX.adjust(yxh[1], tracker.getDeltaX(), MAX_RATE_Y);
+                /*GlobalMovement.*/movement_turn = adjH.adjust(yxh[2], tracker.getDeltaH(), MAX_RATE_H);
                 drivetrain.updatePowers();
             }
             autopilot.communicate(tracker);
