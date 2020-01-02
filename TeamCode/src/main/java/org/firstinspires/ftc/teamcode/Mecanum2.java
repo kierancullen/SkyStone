@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoControllerEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -26,12 +28,24 @@ public class Mecanum2 extends RobotOpMode {
          winchLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
          winchRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-         swing = hardwareMap.get(Servo.class, "swing");
-         tilt = hardwareMap.get(Servo.class, "tilt");
+         swing = hardwareMap.get(Servo.class, "swingLeft");
+         swing.setDirection(Servo.Direction.REVERSE);
+         tilt = hardwareMap.get(Servo.class, "swingRight");
          grab = hardwareMap.get(Servo.class, "grab");
+
+        setServoExtendedRange(swing, 500, 2500);
+        setServoExtendedRange(tilt, 500, 2500);
+        setServoExtendedRange(grab, 500, 2500);
 
         //g = new GrabLiftPlaceController(winchLeft, winchRight, swing, tilt, grab);
 
+    }
+
+    public void setServoExtendedRange(Servo servo, int min, int max) {
+        ServoControllerEx controller = (ServoControllerEx) servo.getController();
+        int servoPort = servo.getPortNumber();
+        PwmControl.PwmRange range = new PwmControl.PwmRange(min, max);
+        controller.setServoPwmRange(servoPort, range);
     }
 
     public void start() {
@@ -52,12 +66,12 @@ public class Mecanum2 extends RobotOpMode {
         telemetry.addData("Right:", winchRight.getCurrentPosition());
 
         //g.tick();
-
-         Servo[] servos = {swing, tilt, grab};
+        */
+       Servo[] servos = {swing, tilt, grab};
         if (gamepad1.b) servoIndex++;
         if (servoIndex > 2) servoIndex=0;
-        if (gamepad1.y) pwm+= 0.01;
-        if (gamepad1.x) pwm-= 0.01;
+        if (gamepad1.y) pwm+= 0.002;
+        if (gamepad1.x) pwm-= 0.002;
 
         if (pwm>1) pwm=1;
         if (pwm<0) pwm =0;
@@ -66,6 +80,7 @@ public class Mecanum2 extends RobotOpMode {
         telemetry.addData("Servo:", servoIndex);
         telemetry.addData("Servo Pos:", pwm);
 
+        /*
         DcMotor[] motors = {winchLeft, winchRight};
         if (gamepad1.right_bumper) {
             motors[motorIndex].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

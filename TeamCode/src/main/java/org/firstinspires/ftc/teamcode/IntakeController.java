@@ -6,12 +6,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class IntakeController {
 
-    double SWINGLEFT_STOW_POSITION;
+    double SWINGLEFT_STOW_POSITION = 0.70;
     double SWINGRIGHT_STOW_POSITION;
-    double SWINGLEFT_IDLE_POSITION;
-    double SWINGRIGHT_IDLE_POSITION;
-    double SWINGLEFT_INTAKE_POSITION;
-    double SWINGRIGHT_INTAKE_POSITION;
+    double SWINGLEFT_IDLE_POSITION = 0.18;
+    double SWINGRIGHT_IDLE_POSITION = 0.20;
+    double SWINGLEFT_INTAKE_POSITION = 0.13;
+    double SWINGRIGHT_INTAKE_POSITION = 0.15;
 
     double IDLE_POWER;
     double INTAKE_POWER;

@@ -37,7 +37,7 @@ public class RobotOpMode extends OpMode {
 
         myDrivetrain = new Drivetrain (tl, tr, bl, br);
 
-        myIntake = new Intake (tl, tr);
+
 
         //The OFS is plugged into motor encoder ports, so we need to do this:
         GlobalPosition.OFS_x = br;
@@ -63,6 +63,7 @@ public class RobotOpMode extends OpMode {
         GlobalPosition.updatePosition();
         GlobalPosition.sendDebugPosition();
         telemetry.update();
+
 
 
     }
