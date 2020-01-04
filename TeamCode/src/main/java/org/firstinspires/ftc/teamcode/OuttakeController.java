@@ -6,22 +6,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class OuttakeController {
 
-    double GRAB_GRABBING_POSITION;
-    double GRAB_OPEN_POSITION;
+    double GRAB_GRABBING_POSITION = 0.51;
+    double GRAB_OPEN_POSITION = 0;
 
-    int LIFT_LOWER_BOUND;
-    int LIFT_UPPER_BOUND;
-    int RELEASE_LIFT; // extra height on release
+    int LIFT_LOWER_BOUND = 0;
+    int LIFT_UPPER_BOUND = 1000;
+    int RELEASE_LIFT = 0; // extra height on release
 
-    double SLIDE_EXTENDING_POWER;
-    double SLIDE_RETRACTING_POWER; // negative
+    double SLIDE_EXTENDING_POWER = 0.5;
+    double SLIDE_RETRACTING_POWER = -0.5; // negative
 
-    double HUMAN_UP_POWER;
+    double HUMAN_UP_POWER = 0.75;
 
-    long GRABBING_MS;
-    long EXTENDING_MS;
-    long RELEASING_MS;
-    long RETRACTING_MS;
+    long GRABBING_MS = 500;
+    long EXTENDING_MS = 500;
+    long RELEASING_MS = 1000;
+    long RETRACTING_MS = 500;
 
 
     DcMotor winchLeft;
@@ -53,7 +53,6 @@ public class OuttakeController {
         winchRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         winchLeft.setPower(0);
         winchRight.setPower(0);
-        grab.setPosition(GRAB_GRABBING_POSITION);
 
         this.winchLeft = winchLeft;
         this.winchRight = winchRight;
@@ -92,6 +91,7 @@ public class OuttakeController {
     ) {
 
         if (currentState == OuttakeState.READY) {
+            grab.setPosition(GRAB_OPEN_POSITION);
             winchLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             winchRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             winchLeft.setPower(0);

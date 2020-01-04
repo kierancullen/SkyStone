@@ -16,6 +16,7 @@ public class Mecanum2 extends RobotOpMode {
     Servo swing;
     Servo tilt;
     Servo grab;
+    Servo turn;
     GrabLiftPlaceController g;
 
     @Override
@@ -32,10 +33,10 @@ public class Mecanum2 extends RobotOpMode {
          swing.setDirection(Servo.Direction.REVERSE);
          tilt = hardwareMap.get(Servo.class, "swingRight");
          grab = hardwareMap.get(Servo.class, "grab");
+         turn = hardwareMap.get(Servo.class, "turn");
 
         setServoExtendedRange(swing, 500, 2500);
         setServoExtendedRange(tilt, 500, 2500);
-        setServoExtendedRange(grab, 500, 2500);
 
         //g = new GrabLiftPlaceController(winchLeft, winchRight, swing, tilt, grab);
 
@@ -67,9 +68,9 @@ public class Mecanum2 extends RobotOpMode {
 
         //g.tick();
         */
-       Servo[] servos = {swing, tilt, grab};
+       Servo[] servos = {tilt, swing};
         if (gamepad1.b) servoIndex++;
-        if (servoIndex > 2) servoIndex=0;
+        if (servoIndex > 1) servoIndex=0;
         if (gamepad1.y) pwm+= 0.002;
         if (gamepad1.x) pwm-= 0.002;
 

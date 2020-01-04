@@ -31,13 +31,25 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 //@Disabled
 public class PixelPopTests extends LinearOpMode {
 
-    public static int[][] STONE_LOCATIONS = new int[][]{
-            {83, 369},
-            {364, 372},
-            {619, 375},
-            {838, 379},
-            {1039, 384},
-            {1215, 392},
+    public static int[][] STONE_LOCATIONS_BLUE = new int[][]{
+            {120, 381},
+            {168, 381},
+            {245, 382},
+            {354, 381},
+            {489, 385},
+            {622, 387},
+
+
+    };
+
+
+    public static int[][] STONE_LOCATIONS_RED = new int[][]{
+            {907, 375},
+            {821, 378},
+            {728, 380},
+            {611, 381},
+            {479, 383},
+            {350, 386},
     };
 
     private static final String VUFORIA_KEY =
@@ -51,9 +63,9 @@ public class PixelPopTests extends LinearOpMode {
 
         waitForStart();
 
-        //sleep(5000);
+        /*sleep(5000);
 
-            /*vuforia.getFrameOnce(Continuation.create(ThreadPool.getDefault(), new Consumer<Frame>() {
+            vuforia.getFrameOnce(Continuation.create(ThreadPool.getDefault(), new Consumer<Frame>() {
                 @Override
                 public void accept(Frame frame) {
                     Bitmap bitmap = vuforia.convertFrameToBitmap(frame);
@@ -74,7 +86,9 @@ public class PixelPopTests extends LinearOpMode {
                         }
                     }
                 }
-            }));*/
+            }));
+
+            while(opModeIsActive()) {sleep(1);telemetry.update();} */
 
         while (opModeIsActive()) {
 
@@ -99,12 +113,13 @@ public class PixelPopTests extends LinearOpMode {
         int bestSecondLocation = -1;
         double bestDifference = 0;
         for (int firstLocation = 0; firstLocation < 6; firstLocation++) {
-            int firstPixel = frame.getPixel(STONE_LOCATIONS[firstLocation][0], STONE_LOCATIONS[firstLocation][1]);
+            int firstPixel = frame.getPixel(STONE_LOCATIONS_RED[firstLocation][0], STONE_LOCATIONS_RED[firstLocation][1]);
             int firstR = Color.red(firstPixel);
             int firstG = Color.green(firstPixel);
             int firstB = Color.blue(firstPixel);
             for (int secondLocation = 0; secondLocation < 6; secondLocation++) {
-                int secondPixel = frame.getPixel(STONE_LOCATIONS[secondLocation][0], STONE_LOCATIONS[secondLocation][1]);
+                if (secondLocation == firstLocation) { continue; }
+                int secondPixel = frame.getPixel(STONE_LOCATIONS_RED[secondLocation][0], STONE_LOCATIONS_RED[secondLocation][1]);
                 int secondR = Color.red(secondPixel);
                 int secondG = Color.green(secondPixel);
                 int secondB = Color.blue(secondPixel);
@@ -118,7 +133,7 @@ public class PixelPopTests extends LinearOpMode {
                 for (int i = 0; i < 6; i++) {
                     if (i != firstLocation && i != secondLocation) {
                         nOth++;
-                        int thisPixel = frame.getPixel(STONE_LOCATIONS[i][0], STONE_LOCATIONS[i][1]);
+                        int thisPixel = frame.getPixel(STONE_LOCATIONS_RED[i][0], STONE_LOCATIONS_RED[i][1]);
                         othAvgR += Color.red(thisPixel);
                         othAvgG += Color.green(thisPixel);
                         othAvgB += Color.blue(thisPixel);

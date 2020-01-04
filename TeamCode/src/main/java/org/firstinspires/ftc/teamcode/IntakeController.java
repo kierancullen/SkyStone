@@ -6,17 +6,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class IntakeController {
 
-    double SWINGLEFT_STOW_POSITION = 0.70;
-    double SWINGRIGHT_STOW_POSITION;
-    double SWINGLEFT_IDLE_POSITION = 0.18;
-    double SWINGRIGHT_IDLE_POSITION = 0.20;
-    double SWINGLEFT_INTAKE_POSITION = 0.13;
-    double SWINGRIGHT_INTAKE_POSITION = 0.15;
+    boolean readyForGrab = false;
 
-    double IDLE_POWER;
-    double INTAKE_POWER;
+    double SWINGLEFT_IDLE_POSITION = 0.25;
+    double SWINGRIGHT_IDLE_POSITION = 0.19;
+    double SWINGLEFT_INTAKE_POSITION = 0.15;
+    double SWINGRIGHT_INTAKE_POSITION = 0.09;
 
-    long INTAKING_MS;
+    double IDLE_POWER = 0.2;
+    double INTAKE_POWER = 0.4;
+
+    long INTAKING_MS = 1000;
 
     DcMotor intakeLeft;
     DcMotor intakeRight;
@@ -44,9 +44,6 @@ public class IntakeController {
                             AnalogInput rangefinder,
                             OuttakeController outtake) {
 
-        swingLeft.setPosition(SWINGLEFT_STOW_POSITION);
-        swingRight.setPosition(SWINGRIGHT_STOW_POSITION);
-
         this.intakeLeft = intakeLeft;
         this.intakeRight = intakeRight;
         this.swingLeft = swingLeft;
@@ -70,20 +67,20 @@ public class IntakeController {
         timeAtStateStart = System.currentTimeMillis();
     }
 
-    public void tick() {
+    public void tick(boolean go) {
 
         if (currentState == IntakeState.READY) {
             intakeLeft.setPower(IDLE_POWER);
             intakeRight.setPower(IDLE_POWER);
             swingLeft.setPosition(SWINGLEFT_IDLE_POSITION);
             swingRight.setPosition(SWINGRIGHT_IDLE_POSITION);
-            if (rangefinderAlmost()) {
+            if (rangefinderAlmost() || go) {
                 currentState = IntakeState.ALMOST;
             }
         }
 
         else if (currentState == IntakeState.ALMOST) {
-            if (rangefinderFull() && outtake.currentState == OuttakeController.OuttakeState.READY) {
+            if ((rangefinderFull() || go) && outtake.currentState == OuttakeController.OuttakeState.READY) {
                 currentState = IntakeState.INTAKING;
             }
         }
@@ -95,7 +92,7 @@ public class IntakeController {
             swingRight.setPosition(SWINGRIGHT_INTAKE_POSITION);
             if (System.currentTimeMillis() - timeAtStateStart > INTAKING_MS) {
                 currentState = IntakeState.READY;
-                outtake.currentState = OuttakeController.OuttakeState.GRABBING;
+                readyForGrab = true;
             }
         }
 

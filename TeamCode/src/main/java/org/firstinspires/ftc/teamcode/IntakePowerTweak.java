@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
+import com.qualcomm.robotcore.hardware.ServoImpl;
 
 @TeleOp(name="IntakePowerTweak")
 public class IntakePowerTweak extends RobotOpMode {
@@ -13,6 +15,8 @@ public class IntakePowerTweak extends RobotOpMode {
     Servo swingRight;
     DcMotor intakeL;
     DcMotor intakeR;
+    CRServo slide;
+
 
     double currentPower = 0;
     public void init() {
@@ -25,11 +29,14 @@ public class IntakePowerTweak extends RobotOpMode {
         swingLeft = hardwareMap.get(Servo.class, "swingLeft");
         swingLeft.setDirection(Servo.Direction.REVERSE);
         swingRight = hardwareMap.get(Servo.class, "swingRight");
+        slide = hardwareMap.get(CRServo.class, "slide");
+
 
         setServoExtendedRange(swingLeft, 500, 2500);
         setServoExtendedRange(swingRight, 500, 2500);
+        //setServoExtendedRange((ServoImpl)slide, 500, 2500);
         swingLeft.setPosition(0.12);
-        swingRight.setPosition(0.14);
+        swingRight.setPosition(0.10);
     }
 
     public void setServoExtendedRange(Servo servo, int min, int max) {
@@ -51,5 +58,8 @@ public class IntakePowerTweak extends RobotOpMode {
 
         telemetry.addData("Intake Power:", currentPower);
 
+        if (gamepad1.x) slide.setPower(0.5);
+        else if (gamepad1.b) slide.setPower(-0.5);
+        else slide.setPower(0);
     }
 }
