@@ -27,9 +27,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
 
-@TeleOp(name = "PixelPopTests")
-//@Disabled
-public class PixelPopTests extends LinearOpMode {
+public class PixelPopTests {
 
     public static int[][] STONE_LOCATIONS_BLUE = new int[][]{
             {120, 381},
@@ -57,7 +55,7 @@ public class PixelPopTests extends LinearOpMode {
 
     private VuforiaLocalizer vuforia;
 
-    public void runOpMode() {
+    /*public void runOpMode() {
 
         initVuforia();
 
@@ -88,7 +86,7 @@ public class PixelPopTests extends LinearOpMode {
                 }
             }));
 
-            while(opModeIsActive()) {sleep(1);telemetry.update();} */
+            while(opModeIsActive()) {sleep(1);telemetry.update();}
 
         while (opModeIsActive()) {
 
@@ -106,20 +104,41 @@ public class PixelPopTests extends LinearOpMode {
             }));
         }
 
+    }*/
+
+    public int[] locations;
+
+    public void storeLocations(int[] locations) {
+        this.locations = locations;
     }
 
-    public int[] getLocations(Bitmap frame){
+    public void captureLocations(final int[][] coordsArr){
+        int[] locations;
+        vuforia.getFrameOnce(Continuation.create(ThreadPool.getDefault(), new Consumer<Frame>() {
+            @Override
+            public void accept(Frame frame) {
+                Bitmap bitmap = vuforia.convertFrameToBitmap(frame);
+                if (bitmap != null) {
+                    storeLocations(getLocations(bitmap, coordsArr));
+                }
+            }
+        }));
+    }
+
+
+
+    public int[] getLocations(Bitmap frame, int[][] coordsArr){
         int bestFirstLocation = -1;
         int bestSecondLocation = -1;
         double bestDifference = 0;
         for (int firstLocation = 0; firstLocation < 6; firstLocation++) {
-            int firstPixel = frame.getPixel(STONE_LOCATIONS_RED[firstLocation][0], STONE_LOCATIONS_RED[firstLocation][1]);
+            int firstPixel = frame.getPixel(coordsArr[firstLocation][0], coordsArr[firstLocation][1]);
             int firstR = Color.red(firstPixel);
             int firstG = Color.green(firstPixel);
             int firstB = Color.blue(firstPixel);
             for (int secondLocation = 0; secondLocation < 6; secondLocation++) {
                 if (secondLocation == firstLocation) { continue; }
-                int secondPixel = frame.getPixel(STONE_LOCATIONS_RED[secondLocation][0], STONE_LOCATIONS_RED[secondLocation][1]);
+                int secondPixel = frame.getPixel(coordsArr[secondLocation][0], coordsArr[secondLocation][1]);
                 int secondR = Color.red(secondPixel);
                 int secondG = Color.green(secondPixel);
                 int secondB = Color.blue(secondPixel);
@@ -133,7 +152,7 @@ public class PixelPopTests extends LinearOpMode {
                 for (int i = 0; i < 6; i++) {
                     if (i != firstLocation && i != secondLocation) {
                         nOth++;
-                        int thisPixel = frame.getPixel(STONE_LOCATIONS_RED[i][0], STONE_LOCATIONS_RED[i][1]);
+                        int thisPixel = frame.getPixel(coordsArr[i][0], coordsArr[i][1]);
                         othAvgR += Color.red(thisPixel);
                         othAvgG += Color.green(thisPixel);
                         othAvgB += Color.blue(thisPixel);
@@ -158,7 +177,7 @@ public class PixelPopTests extends LinearOpMode {
     }
 
 
-    private void initVuforia() {
+    public void initVuforia() {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;

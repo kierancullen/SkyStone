@@ -27,6 +27,8 @@ public class AutoCommon extends LinearOpMode {
     public boolean controlDown;
     public boolean triggerRelease;
 
+    PixelPopTests popper;
+
     Drivetrain myDrivetrain;
 
     DcMotor winchLeft;
@@ -88,11 +90,7 @@ public class AutoCommon extends LinearOpMode {
 
         while (autopilot.getNavigationStatus() == AutopilotHost.NavigationStatus.RUNNING && opModeIsActive()) {
 
-            in.tick(intakeGo, false);
-            if (intakeGo) { intakeGo = false; }
-            out.tick(triggerGrab, controlUp, controlDown, triggerRelease);
-            if (triggerGrab) { triggerGrab = false; }
-            if (triggerRelease) {triggerRelease = false; }
+            idleStateMachines();
 
             if (yxh != null) {
                 /*GlobalMovement.*/movement_y = yxh[0];
@@ -181,7 +179,21 @@ public class AutoCommon extends LinearOpMode {
             autopilot.setOrientationTargetInvert(true);
         }
 
-        waitForStart();
+        popper = new PixelPopTests();
+        popper.initVuforia();
+        while (!opModeIsActive()) {
+            if (!invert) {
+                popper.captureLocations(popper.STONE_LOCATIONS_RED);
+            }
+            else {
+                popper.captureLocations(popper.STONE_LOCATIONS_BLUE);
+            }
+            if (popper.locations != null) {
+                telemetry.addData("first", popper.locations[1]);
+                telemetry.addData("second", popper.locations[0]);
+                telemetry.update();
+            }
+        }
 
         in.start();
         out.start();
@@ -192,14 +204,40 @@ public class AutoCommon extends LinearOpMode {
         tracker.setRobotPosition(ROBOT_INIT_POSITION);
 
 
-        // 2
-        apGoTo(new double[]{20, 32, 0}, 0, true, true, false);
-        apGoTo(new double[]{20, 38, 0}, 0, true, true, false);
+        int location = popper.locations[1];
+        if (location == 0) {
+            //special case
+        }
+        if (location == 1) {
+            apGoTo(new double[]{12, 32, 0}, 0, true, true, false);
+            apGoTo(new double[]{12, 38, 0}, 0, true, true, false);
+        }
+        if (location == 2) {
+            apGoTo(new double[]{20, 32, 0}, 0, true, true, false);
+            apGoTo(new double[]{20, 38, 0}, 0, true, true, false);
+        }
+        if (location == 3) {
+            apGoTo(new double[]{28, 32, 0}, 0, true, true, false);
+            apGoTo(new double[]{28, 38, 0}, 0, true, true, false);
+        }
+        if (location == 4) {
+            apGoTo(new double[]{36, 32, 0}, 0, true, true, false);
+            apGoTo(new double[]{36, 38, 0}, 0, true, true, false);
+        }
+        if (location == 5) {
+            apGoTo(new double[]{44, 32, 0}, 0, true, true, false);
+            apGoTo(new double[]{44, 38, 0}, 0, true, true, false);
+        }
+
         intakeGo = true;
         apGoTo(new double[]{20, 32, 0}, 0, true, true, false);
-        apGoTo(new double[]{72, 24, 0}, Math.PI/2, true, true, false);
-        triggerGrab = true;
+        apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false);
+        apGoTo(new double[]{5*24, 32, 0}, Math.PI/2, true, true, false);
         apGoTo(new double[]{5*24, 42, 0}, Math.PI, true, true, true);
+        triggerGrab = true;
+        while (out.currentState != OuttakeController.OuttakeState.HUMAN) {
+            idleStateMachines();
+        }
         triggerRelease = true;
 
 
@@ -209,8 +247,15 @@ public class AutoCommon extends LinearOpMode {
             autopilot.communicate(tracker);
             autopilot.telemetryUpdate();
             telemetry.update();
-            in.tick(intakeGo, false);
-            out.tick(triggerGrab, controlUp, controlDown, triggerRelease);
+            idleStateMachines();
         }
+    }
+
+    public void idleStateMachines() {
+        in.tick(intakeGo, false);
+        if (intakeGo) { intakeGo = false; }
+        out.tick(triggerGrab, controlUp, controlDown, triggerRelease);
+        if (triggerGrab) { triggerGrab = false; }
+        if (triggerRelease) {triggerRelease = false; }
     }
 }
