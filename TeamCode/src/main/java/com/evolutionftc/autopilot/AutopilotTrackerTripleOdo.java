@@ -169,7 +169,12 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
             robotAttitude[i] -= rao[i];
         }
 
-        robotPosition = transform(robotPosition, translationDelta, robotAttitude);
+        double updRobotAttitude = robotAttitude[0] + dA / 2;
+        if (updRobotAttitude < -Math.PI) {updRobotAttitude += 2*Math.PI;}
+        if (updRobotAttitude > Math.PI) {updRobotAttitude -= 2*Math.PI;}
+        updRobotAttitude -= rao[0];
+
+        robotPosition = transform(robotPosition, translationDelta, new double[] {updRobotAttitude, 0, 0});
     }
 
     public double[] getRobotPosition() {

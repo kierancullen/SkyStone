@@ -4,17 +4,17 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class IntakeController {
+public class AutoIntakeController {
 
     boolean readyForGrab = false;
 
-    double SWINGLEFT_IDLE_POSITION = 0.17;//0.25
-    double SWINGRIGHT_IDLE_POSITION = 0.11;//0.19
-    double SWINGLEFT_INTAKE_POSITION = 0.15;
-    double SWINGRIGHT_INTAKE_POSITION = 0.09;
+    double SWINGLEFT_IDLE_POSITION = 0.29;//0.25
+    double SWINGRIGHT_IDLE_POSITION = 0.23;//0.19
+    double SWINGLEFT_INTAKE_POSITION = 0.17;
+    double SWINGRIGHT_INTAKE_POSITION = 0.11;
 
-    double IDLE_POWER = 0.3;//0.3/1.5
-    double INTAKE_POWER = 0.3;
+    double IDLE_POWER = 0;//0.3/1.5
+    double INTAKE_POWER = 0.4;
 
     long INTAKING_MS = 1000;
 
@@ -37,12 +37,12 @@ public class IntakeController {
 
     OuttakeController outtake;
 
-    public IntakeController(DcMotor intakeLeft,
-                            DcMotor intakeRight,
-                            Servo swingLeft,
-                            Servo swingRight,
-                            AnalogInput rangefinder,
-                            OuttakeController outtake) {
+    public AutoIntakeController(DcMotor intakeLeft,
+                                DcMotor intakeRight,
+                                Servo swingLeft,
+                                Servo swingRight,
+                                AnalogInput rangefinder,
+                                OuttakeController outtake) {
 
         this.intakeLeft = intakeLeft;
         this.intakeRight = intakeRight;
