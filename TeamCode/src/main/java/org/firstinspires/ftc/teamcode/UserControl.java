@@ -6,6 +6,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name="UserControl")
 public class UserControl extends RobotOpMode2 {
 
+    static double LP_HORIZ_M = .5;
+    static double LP_DIFF_M = .5;
+    static double HP_HORIZ_M = .75;
+    static double HP_DIFF_M = .75;
+
     @Override
     public void init() {
         super.init();
@@ -21,12 +26,25 @@ public class UserControl extends RobotOpMode2 {
     public void loop() {
         super.loop();
 
-        double horiz = (gamepad1.right_trigger * 0.5) - (gamepad1.left_trigger * 0.5);
-        GlobalMovement.movement_x = horiz;
-        GlobalMovement.movement_y = (-gamepad1.left_stick_y * 0.5 + -gamepad1.right_stick_y * 0.5) / 2.0;
-        GlobalMovement.movement_turn = (-gamepad1.right_stick_y * 0.5) - (-gamepad1.left_stick_y * 0.5);
+        double horiz;
+        double l;
+        double r;
+        if (gamepad1.left_bumper || gamepad1.right_bumper) {
+            horiz = (gamepad1.right_trigger * LP_HORIZ_M) - (gamepad1.left_trigger * LP_HORIZ_M);
+            l = -gamepad1.left_stick_y * LP_DIFF_M;
+            r = -gamepad1.right_stick_y * LP_DIFF_M;
+        }
+        else {
+            horiz = (gamepad1.right_trigger * HP_HORIZ_M) - (gamepad1.left_trigger * HP_HORIZ_M);
+            l = -gamepad1.left_stick_y * HP_DIFF_M;
+            r = -gamepad1.right_stick_y * HP_DIFF_M;
+        }
 
-        in.tick(false);
+        GlobalMovement.movement_x = horiz;
+        GlobalMovement.movement_y = (l + r) / 2.0;
+        GlobalMovement.movement_turn = r - l;
+
+        in.tick(false, gamepad2.back);
         out.tick(gamepad2.right_bumper, gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.left_bumper);
         if (in.readyForGrab) { in.readyForGrab = false; } // reset; triggering done
     }

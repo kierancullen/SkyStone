@@ -8,8 +8,8 @@ public class IntakeController {
 
     boolean readyForGrab = false;
 
-    double SWINGLEFT_IDLE_POSITION = 0.15;//0.25
-    double SWINGRIGHT_IDLE_POSITION = 0.09;//0.19
+    double SWINGLEFT_IDLE_POSITION = 0.17;//0.25
+    double SWINGRIGHT_IDLE_POSITION = 0.11;//0.19
     double SWINGLEFT_INTAKE_POSITION = 0.15;
     double SWINGRIGHT_INTAKE_POSITION = 0.09;
 
@@ -67,12 +67,18 @@ public class IntakeController {
         timeAtStateStart = System.currentTimeMillis();
     }
 
-    public void tick(boolean go) {
+    public void tick(boolean go, boolean reverse) {
 
         if (currentState == IntakeState.READY) {
             if (outtake.currentState == OuttakeController.OuttakeState.READY) {
-                intakeLeft.setPower(IDLE_POWER);
-                intakeRight.setPower(IDLE_POWER);
+                if (!reverse) {
+                    intakeLeft.setPower(IDLE_POWER);
+                    intakeRight.setPower(IDLE_POWER);
+                }
+                else {
+                    intakeLeft.setPower(-IDLE_POWER);
+                    intakeRight.setPower(-IDLE_POWER);
+                }
             }
             else {
                 intakeLeft.setPower(0);
@@ -92,8 +98,14 @@ public class IntakeController {
         }
 
         else if (currentState == IntakeState.INTAKING) {
-            intakeLeft.setPower(INTAKE_POWER);
-            intakeRight.setPower(INTAKE_POWER);
+            if (!reverse) {
+                intakeLeft.setPower(INTAKE_POWER);
+                intakeRight.setPower(INTAKE_POWER);
+            }
+            else {
+                intakeLeft.setPower(-INTAKE_POWER);
+                intakeRight.setPower(-INTAKE_POWER);
+            }
             swingLeft.setPosition(SWINGLEFT_INTAKE_POSITION);
             swingRight.setPosition(SWINGRIGHT_INTAKE_POSITION);
             if (System.currentTimeMillis() - timeAtStateStart > INTAKING_MS) {
