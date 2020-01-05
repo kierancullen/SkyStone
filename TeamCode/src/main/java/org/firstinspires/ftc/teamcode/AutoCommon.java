@@ -204,33 +204,44 @@ public class AutoCommon extends LinearOpMode {
         tracker.setRobotPosition(ROBOT_INIT_POSITION);
 
 
-        int location = popper.locations[1];
+        int location = popper.locations[0];
         if (location == 0) {
-            //special case
+            apGoTo(new double[]{20, 32, 0}, Math.PI/6, true, true, false);
+            apGoTo(new double[]{18, 37, 0}, Math.PI/6, true, true, false);
+            intakeGo = true;
+            apGoTo(new double[]{15, 32, 0}, 0, true, true, false);
         }
         if (location == 1) {
             apGoTo(new double[]{12, 32, 0}, 0, true, true, false);
-            apGoTo(new double[]{12, 38, 0}, 0, true, true, false);
+            apGoTo(new double[]{12, 37, 0}, 0, true, true, false);
+            intakeGo = true;
+            apGoTo(new double[]{12, 32, 0}, 0, true, true, false);
         }
         if (location == 2) {
             apGoTo(new double[]{20, 32, 0}, 0, true, true, false);
-            apGoTo(new double[]{20, 38, 0}, 0, true, true, false);
+            apGoTo(new double[]{20, 37, 0}, 0, true, true, false);
+            intakeGo = true;
+            apGoTo(new double[]{20, 32, 0}, 0, true, true, false);
         }
         if (location == 3) {
             apGoTo(new double[]{28, 32, 0}, 0, true, true, false);
-            apGoTo(new double[]{28, 38, 0}, 0, true, true, false);
+            apGoTo(new double[]{28, 37, 0}, 0, true, true, false);
+            intakeGo = true;
+            apGoTo(new double[]{28, 32, 0}, 0, true, true, false);
         }
         if (location == 4) {
             apGoTo(new double[]{36, 32, 0}, 0, true, true, false);
-            apGoTo(new double[]{36, 38, 0}, 0, true, true, false);
+            apGoTo(new double[]{36, 37, 0}, 0, true, true, false);
+            intakeGo = true;
+            apGoTo(new double[]{36, 32, 0}, 0, true, true, false);
         }
         if (location == 5) {
             apGoTo(new double[]{44, 32, 0}, 0, true, true, false);
-            apGoTo(new double[]{44, 38, 0}, 0, true, true, false);
+            apGoTo(new double[]{44, 37, 0}, 0, true, true, false);
+            intakeGo = true;
+            apGoTo(new double[]{44, 32, 0}, 0, true, true, false);
         }
 
-        intakeGo = true;
-        apGoTo(new double[]{20, 32, 0}, 0, true, true, false);
         apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false);
         apGoTo(new double[]{5*24, 32, 0}, Math.PI/2, true, true, false);
         apGoTo(new double[]{5*24, 42, 0}, Math.PI, true, true, true);
@@ -239,7 +250,8 @@ public class AutoCommon extends LinearOpMode {
             idleStateMachines();
         }
         triggerRelease = true;
-
+        apGoTo(new double[]{5*24, 32, 0}, Math.PI, true, true, true);
+        apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, true);
 
 
 
