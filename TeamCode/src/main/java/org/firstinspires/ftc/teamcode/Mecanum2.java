@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
@@ -24,6 +25,7 @@ public class Mecanum2 extends RobotOpMode {
 
         super.init();
          winchLeft = hardwareMap.get(DcMotor.class, "winchLeft");
+         winchLeft.setDirection(DcMotorSimple.Direction.REVERSE);
          winchRight = hardwareMap.get(DcMotor.class,"winchRight");
 
          winchLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -32,7 +34,7 @@ public class Mecanum2 extends RobotOpMode {
          swing = hardwareMap.get(Servo.class, "swingLeft");
          swing.setDirection(Servo.Direction.REVERSE);
          tilt = hardwareMap.get(Servo.class, "swingRight");
-         grab = hardwareMap.get(Servo.class, "grab");
+         //grab = hardwareMap.get(Servo.class, "grab");
          turn = hardwareMap.get(Servo.class, "turn");
 
         setServoExtendedRange(swing, 500, 2500);
@@ -51,6 +53,8 @@ public class Mecanum2 extends RobotOpMode {
 
     public void start() {
         //g.start();
+        winchLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        winchRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     int servoIndex = 0;
@@ -68,7 +72,7 @@ public class Mecanum2 extends RobotOpMode {
 
         //g.tick();
         */
-       Servo[] servos = {tilt, swing};
+       /*Servo[] servos = {tilt, swing};
         if (gamepad1.b) servoIndex++;
         if (servoIndex > 1) servoIndex=0;
         if (gamepad1.y) pwm+= 0.002;
@@ -79,7 +83,10 @@ public class Mecanum2 extends RobotOpMode {
 
         servos[servoIndex].setPosition(pwm);
         telemetry.addData("Servo:", servoIndex);
-        telemetry.addData("Servo Pos:", pwm);
+        telemetry.addData("Servo Pos:", pwm);*/
+        telemetry.addData("wl:", winchLeft.getCurrentPosition());
+        telemetry.addData("wr:", winchRight.getCurrentPosition());
+        telemetry.update();
 
         /*
         DcMotor[] motors = {winchLeft, winchRight};

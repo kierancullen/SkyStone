@@ -34,6 +34,7 @@ public class RobotOpMode2 extends OpMode  {
 
 
         winchLeft = hardwareMap.get(DcMotor.class, "winchLeft");
+        winchLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         winchRight = hardwareMap.get(DcMotor.class,"winchRight");
 
         winchLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -48,6 +49,7 @@ public class RobotOpMode2 extends OpMode  {
         swingRight = hardwareMap.get(Servo.class, "swingRight");
         grab = hardwareMap.get(Servo.class, "grab");
         turn = hardwareMap.get(Servo.class, "turn");
+        turn.setPosition(0.112);
 
         slide = hardwareMap.get(CRServo.class, "slide");
 

@@ -6,22 +6,24 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class OuttakeController {
 
-    double GRAB_GRABBING_POSITION = 0.51;
+    double GRAB_GRABBING_POSITION = 0.55;
     double GRAB_OPEN_POSITION = 0;
 
-    int LIFT_LOWER_BOUND = 0;
+    int LIFT_LOWER_BOUND = 5;
     int LIFT_UPPER_BOUND = 1000;
-    int RELEASE_LIFT = 0; // extra height on release
+    int RELEASE_LIFT = 55; // extra height on release
 
     double SLIDE_EXTENDING_POWER = 0.5;
     double SLIDE_RETRACTING_POWER = -0.5; // negative
 
-    double HUMAN_UP_POWER = 0.75;
+    double HUMAN_UP_POWER = 0.50;
+    double HUMAN_DOWN_POWER = 0;
+    double FALLING_DOWN_POWER = 0;
 
     long GRABBING_MS = 500;
-    long EXTENDING_MS = 500;
+    long EXTENDING_MS = 400;
     long RELEASING_MS = 1000;
-    long RETRACTING_MS = 500;
+    long RETRACTING_MS = 400;
 
 
     DcMotor winchLeft;
@@ -37,6 +39,7 @@ public class OuttakeController {
         HUMAN,
         RELEASING,
         RETRACTING,
+        FALLING,
     }
 
     OuttakeState currentState;
@@ -47,10 +50,8 @@ public class OuttakeController {
 
         // Also ensure that winch directions get set correctly somewhere (here or in opmode class)
         // Positive direction is assumed to be up.
-        winchLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        winchRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        winchLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        winchRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        winchLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        winchRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         winchLeft.setPower(0);
         winchRight.setPower(0);
 
@@ -75,6 +76,11 @@ public class OuttakeController {
         return liftPosition < LIFT_UPPER_BOUND;
     }
 
+    public boolean liftIsNearBottom() {
+        int liftPosition = getLiftPosition();
+        return liftPosition < 20;
+    }
+
 
     public void start() {
         // Call once before calling calling tick. (In start() is the best place to do this)
@@ -91,9 +97,10 @@ public class OuttakeController {
     ) {
 
         if (currentState == OuttakeState.READY) {
+            winchLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            winchRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             grab.setPosition(GRAB_OPEN_POSITION);
-            winchLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            winchRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            slide.setPower(0);
             winchLeft.setPower(0);
             winchRight.setPower(0);
             if (triggerGrab) {
@@ -117,25 +124,29 @@ public class OuttakeController {
 
         else if (currentState == OuttakeState.HUMAN) {
             slide.setPower(0);
-            if (controlUp) { // up
-                winchLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                winchRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            if (controlUp && liftCanGoUp()) {
+                if (winchLeft.getMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+                    winchLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    winchRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                }
                 winchLeft.setPower(HUMAN_UP_POWER);
                 winchRight.setPower(HUMAN_UP_POWER);
             }
-            else if (controlDown) { // fall
-                winchLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                winchRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                winchLeft.setPower(0);
-                winchRight.setPower(0);
+            else if (controlDown && liftCanGoDown()) {
+                if (winchLeft.getMode() != DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+                    winchLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    winchRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                }
+                winchLeft.setPower(HUMAN_DOWN_POWER);
+                winchRight.setPower(HUMAN_DOWN_POWER);
             }
             else if (triggerRelease) {
                 currentState = OuttakeState.RELEASING;
             }
             else { // stay put
-                if (winchLeft.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
-                    winchLeft.setTargetPosition(getLiftPosition());
-                    winchRight.setTargetPosition(getLiftPosition());
+                if (winchLeft.getMode() == DcMotor.RunMode.RUN_USING_ENCODER || winchLeft.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+                    winchLeft.setTargetPosition(winchLeft.getCurrentPosition());
+                    winchRight.setTargetPosition(winchRight.getCurrentPosition());
                     winchLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     winchRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     winchLeft.setPower(1);
@@ -146,8 +157,8 @@ public class OuttakeController {
 
         else if (currentState == OuttakeState.RELEASING) {
             grab.setPosition(GRAB_OPEN_POSITION);
-            winchLeft.setTargetPosition(getLiftPosition() + RELEASE_LIFT);
-            winchRight.setTargetPosition(getLiftPosition() + RELEASE_LIFT);
+            winchLeft.setTargetPosition(winchLeft.getCurrentPosition() + RELEASE_LIFT);
+            winchRight.setTargetPosition(winchRight.getCurrentPosition() + RELEASE_LIFT);
             winchLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             winchRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             winchLeft.setPower(1);
@@ -158,8 +169,25 @@ public class OuttakeController {
         }
 
         else if (currentState == OuttakeState.RETRACTING) {
+            grab.setPosition(GRAB_GRABBING_POSITION);
             slide.setPower(SLIDE_RETRACTING_POWER);
             if (System.currentTimeMillis() - timeAtStateStart > RETRACTING_MS) {
+                currentState = OuttakeState.FALLING;
+            }
+        }
+
+        else if (currentState == OuttakeState.FALLING) {
+            grab.setPosition(GRAB_OPEN_POSITION);
+            winchLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            winchRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            winchLeft.setPower(FALLING_DOWN_POWER);
+            winchRight.setPower(FALLING_DOWN_POWER);
+            slide.setPower(0);
+            if (liftIsNearBottom()) {
+                winchLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                winchRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
+            if (!liftCanGoDown()) {
                 currentState = OuttakeState.READY;
             }
         }
