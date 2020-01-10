@@ -51,6 +51,8 @@ public class AutoCommon extends LinearOpMode {
 
     public static double[] ROBOT_INIT_POSITION = new double[]{36, 9.2, 0};
     public static double[] ROBOT_INIT_ATTITUDE = new double[]{0, 0, 0};
+    public static double[] INVERT_ROBOT_INIT_POSITION = new double[]{-36, 9.2, 0};
+    public static double[] INVERT_ROBOT_INIT_ATTITUDE = new double[]{0, 0, 0};
 
     public static double DUALODO_X_RADIUS = 3.25614173 - 2.3134252;
     public static double DUALODO_Y_RADIUS = -0.25051181102 + 7.184370097;
@@ -175,7 +177,7 @@ public class AutoCommon extends LinearOpMode {
         autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
 
         if (invert) {
-            autopilot.setNavigationTargetInverts(new boolean[]{true, true, false});
+            autopilot.setNavigationTargetInverts(new boolean[]{true, false, false});
             autopilot.setOrientationTargetInvert(true);
         }
 
@@ -200,11 +202,17 @@ public class AutoCommon extends LinearOpMode {
 
         // record any drift that happened while waiting, and zero it out
         autopilot.communicate(tracker);
-        tracker.setRobotAttitude(ROBOT_INIT_ATTITUDE);
-        tracker.setRobotPosition(ROBOT_INIT_POSITION);
+        if (!invert) {
+            tracker.setRobotAttitude(ROBOT_INIT_ATTITUDE);
+            tracker.setRobotPosition(ROBOT_INIT_POSITION);
+        }
+        else {
+            tracker.setRobotAttitude(INVERT_ROBOT_INIT_ATTITUDE);
+            tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
+        }
 
 
-        int location = popper.locations[0];
+        int location = popper.locations[1];
         if (location == 0) {
             apGoTo(new double[]{20, 32, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{18, 37, 0}, Math.PI/6, true, true, false);

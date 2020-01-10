@@ -6,12 +6,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class OuttakeController {
 
-    double GRAB_GRABBING_POSITION = 0.53;
+    boolean set;
+
+    double GRAB_GRABBING_POSITION = 0.7;
     double GRAB_OPEN_POSITION = 0;
 
-    int LIFT_LOWER_BOUND = 5;
+    int LIFT_LOWER_BOUND = 15;
     int LIFT_UPPER_BOUND = 1000;
-    int RELEASE_LIFT = 55; // extra height on release
+    int RELEASE_LIFT = 100; // extra height on release
 
     double SLIDE_EXTENDING_POWER = 0.5;
     double SLIDE_RETRACTING_POWER = -0.5; // negative
@@ -146,11 +148,12 @@ public class OuttakeController {
             }
             else if (triggerRelease) {
                 currentState = OuttakeState.RELEASING;
+                set = false;
             }
             else { // stay put
                 if (winchLeft.getMode() == DcMotor.RunMode.RUN_USING_ENCODER || winchLeft.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
-                    winchLeft.setTargetPosition(winchLeft.getCurrentPosition());
-                    winchRight.setTargetPosition(winchRight.getCurrentPosition());
+                    winchLeft.setTargetPosition(winchLeft.getCurrentPosition() + 10);
+                    winchRight.setTargetPosition(winchRight.getCurrentPosition() + 10);
                     winchLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     winchRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     winchLeft.setPower(1);
@@ -161,12 +164,15 @@ public class OuttakeController {
 
         else if (currentState == OuttakeState.RELEASING) {
             grab.setPosition(GRAB_OPEN_POSITION);
-            winchLeft.setTargetPosition(winchLeft.getCurrentPosition() + RELEASE_LIFT);
-            winchRight.setTargetPosition(winchRight.getCurrentPosition() + RELEASE_LIFT);
-            winchLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            winchRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            winchLeft.setPower(1);
-            winchRight.setPower(1);
+            if (!set) {
+                winchLeft.setTargetPosition(winchLeft.getCurrentPosition() + RELEASE_LIFT);
+                winchRight.setTargetPosition(winchRight.getCurrentPosition() + RELEASE_LIFT);
+                winchLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                winchRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                winchLeft.setPower(1);
+                winchRight.setPower(1);
+                set = true;
+            }
             if (System.currentTimeMillis() - timeAtStateStart > RELEASING_MS) {
                 currentState = OuttakeState.RETRACTING;
             }
