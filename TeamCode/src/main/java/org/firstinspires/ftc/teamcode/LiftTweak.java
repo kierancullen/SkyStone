@@ -26,9 +26,27 @@ public class LiftTweak extends RobotOpMode {
         winchLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         winchRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+    int position;
 
     public void loop() {
-        winchLeft.setPower(-gamepad1.right_stick_y);
-        winchRight.setPower(-gamepad1.right_stick_y);
+
+        position = (winchLeft.getCurrentPosition() + winchRight.getCurrentPosition()) / 2;
+
+        if (position > 900) {
+            winchLeft.setPower(0);
+            winchRight.setPower(0);
+        }
+        else if (gamepad1.dpad_up) {
+            winchLeft.setPower(0.8);
+            winchRight.setPower(0.8);
+        }
+        else if (gamepad1.dpad_down) {
+            winchLeft.setPower(-0.3);
+            winchRight.setPower(-0.3);
+        }
+        else {
+            winchLeft.setPower(0);
+            winchRight.setPower(0);
+        }
     }
 }

@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 
-public class RobotOpMode2 extends OpMode  {
+public class RobotOpModeSwing extends OpMode  {
 
     Drivetrain myDrivetrain;
 
@@ -19,13 +19,15 @@ public class RobotOpMode2 extends OpMode  {
     DcMotor intakeLeft;
     DcMotor intakeRight;
 
+    Servo arm1;
+    Servo arm2;
     Servo swingLeft;
     Servo swingRight;
-    Servo grab;
+
+    Servo grip;
     Servo turn;
     IntakeController in;
-    OuttakeController out;
-    CRServo slide;
+    OuttakeController2 out;
     AnalogInput scotty;
 
 
@@ -44,17 +46,22 @@ public class RobotOpMode2 extends OpMode  {
         intakeRight = hardwareMap.get(DcMotor.class, "intakeRight");
         intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        arm1 = hardwareMap.get(Servo.class, "arm1");
+        arm1.setDirection(Servo.Direction.REVERSE);
+        arm2 = hardwareMap.get(Servo.class, "arm2");
+
+
+        setServoExtendedRange(arm1, 500, 2500);
+        setServoExtendedRange(arm2, 500, 2500);
+
         swingLeft = hardwareMap.get(Servo.class, "swingLeft");
         swingLeft.setDirection(Servo.Direction.REVERSE);
         swingRight = hardwareMap.get(Servo.class, "swingRight");
-        grab = hardwareMap.get(Servo.class, "grab");
-        turn = hardwareMap.get(Servo.class, "turn");
-        turn.setPosition(0.112);
 
-        slide = hardwareMap.get(CRServo.class, "slide");
 
         setServoExtendedRange(swingLeft, 500, 2500);
         setServoExtendedRange(swingRight, 500, 2500);
+
 
         DcMotor tl = hardwareMap.get(DcMotor.class, "tl");
         DcMotor tr = hardwareMap.get(DcMotor.class, "tr");
@@ -70,8 +77,8 @@ public class RobotOpMode2 extends OpMode  {
 
         scotty = hardwareMap.get(AnalogInput.class, "scotty");
 
-        out = new OuttakeController(winchRight, winchLeft, slide, grab);
-        //in = new IntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
+        out = new OuttakeController2(winchRight, winchLeft, arm1, arm2);
+        in = new IntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
 
 
     }

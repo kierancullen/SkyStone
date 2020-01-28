@@ -18,6 +18,10 @@ public class Mecanum2 extends RobotOpMode {
     Servo tilt;
     Servo grab;
     Servo turn;
+    Servo arm1, arm2, arm3, arm4;
+    Servo grip;
+
+
     GrabLiftPlaceController g;
 
     @Override
@@ -33,12 +37,22 @@ public class Mecanum2 extends RobotOpMode {
 
          swing = hardwareMap.get(Servo.class, "swingLeft");
          swing.setDirection(Servo.Direction.REVERSE);
+         grip = hardwareMap.get(Servo.class, "grip");
          tilt = hardwareMap.get(Servo.class, "swingRight");
-         //grab = hardwareMap.get(Servo.class, "grab");
-         turn = hardwareMap.get(Servo.class, "turn");
+         arm1 = hardwareMap.get(Servo.class, "arm1");
+         arm2 = hardwareMap.get(Servo.class, "arm2");
+         arm1.setDirection(Servo.Direction.REVERSE);
+        setServoExtendedRange(arm1, 500, 2500);
+        setServoExtendedRange(arm2, 500, 2500);
+         arm1.setPosition(0.5);
+         arm2.setPosition(0.5);
+         grip.setPosition(0);
 
-        setServoExtendedRange(swing, 500, 2500);
-        setServoExtendedRange(tilt, 500, 2500);
+
+         //grab = hardwareMap.get(Servo.class, "grab");
+         //turn = hardwareMap.get(Servo.class, "turn");
+
+
 
         //g = new GrabLiftPlaceController(winchLeft, winchRight, swing, tilt, grab);
 
@@ -60,10 +74,11 @@ public class Mecanum2 extends RobotOpMode {
     int servoIndex = 0;
     int motorIndex = 0;
 
-    double pwm = 0;
+    double pwm = 0.33;
     double motorPower = 0.2;
     int targetPos = 0;
 
+    double gripPos = 0;
     @Override
     public void loop() {
         /*GlobalMovement.updateFromGamepad(gamepad1);
@@ -72,7 +87,7 @@ public class Mecanum2 extends RobotOpMode {
 
         //g.tick();
         */
-       /*Servo[] servos = {tilt, swing};
+        /*Servo[] servos = {arm1, arm2};
         if (gamepad1.b) servoIndex++;
         if (servoIndex > 1) servoIndex=0;
         if (gamepad1.y) pwm+= 0.002;
@@ -81,9 +96,32 @@ public class Mecanum2 extends RobotOpMode {
         if (pwm>1) pwm=1;
         if (pwm<0) pwm =0;
 
-        servos[servoIndex].setPosition(pwm);
+        servos[servoIndex].setPosition(pwm); */
+
+        if (gamepad1.y) pwm +=0.002;
+        if (gamepad1.x) pwm -= 0.002;
+        if (pwm>1) pwm=1;
+        if (pwm<0) pwm =0;
+
+        arm1.setPosition(pwm);
+        arm2.setPosition(pwm);
+
+
+
+        if (gamepad1.right_bumper) {
+            gripPos += 0.02;
+        }
+        if (gamepad1.left_bumper) {
+            gripPos -= 0.02;
+        }
+
+        grip.setPosition(gripPos);
+
+
+
+
         telemetry.addData("Servo:", servoIndex);
-        telemetry.addData("Servo Pos:", pwm);*/
+        telemetry.addData("Servo Pos:", pwm);
         telemetry.addData("wl:", winchLeft.getCurrentPosition());
         telemetry.addData("wr:", winchRight.getCurrentPosition());
         telemetry.update();

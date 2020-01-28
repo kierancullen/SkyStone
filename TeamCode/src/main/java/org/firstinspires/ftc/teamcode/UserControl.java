@@ -4,11 +4,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name="UserControl")
-public class UserControl extends RobotOpMode2 {
+public class UserControl extends RobotOpModeSwing {
 
     static double LP_HORIZ_M = .25;
     static double LP_DIFF_M = .35;
-    static double HP_HORIZ_M = .75;
+    static double HP_HORIZ_M = 1.0; //0.75
     static double HP_DIFF_M = .75;
 
     @Override
@@ -44,7 +44,7 @@ public class UserControl extends RobotOpMode2 {
         GlobalMovement.movement_y = (l + r) / 2.0;
         GlobalMovement.movement_turn = r - l;
 
-        in.tick(false, gamepad2.back);
+        in.tick(false, gamepad2.back, gamepad2.right_trigger);
         out.tick(gamepad2.right_bumper, gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.left_bumper);
         if (in.readyForGrab) { in.readyForGrab = false; } // reset; triggering done
     }
