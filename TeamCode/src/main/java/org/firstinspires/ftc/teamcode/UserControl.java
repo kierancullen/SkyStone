@@ -11,6 +11,8 @@ public class UserControl extends RobotOpModeSwing {
     static double HP_HORIZ_M = 1.0; //0.75
     static double HP_DIFF_M = .75;
 
+    final boolean CONDENSED = true;
+
     @Override
     public void init() {
         super.init();
@@ -29,20 +31,34 @@ public class UserControl extends RobotOpModeSwing {
         double horiz;
         double l;
         double r;
-        if (gamepad1.left_bumper || gamepad1.right_bumper) {
-            horiz = (gamepad1.right_trigger * LP_HORIZ_M) - (gamepad1.left_trigger * LP_HORIZ_M);
-            l = -gamepad1.left_stick_y * LP_DIFF_M;
-            r = -gamepad1.right_stick_y * LP_DIFF_M;
+        if (!CONDENSED) {
+            if (gamepad1.left_bumper || gamepad1.right_bumper) {
+                horiz = (gamepad1.right_trigger * LP_HORIZ_M) - (gamepad1.left_trigger * LP_HORIZ_M);
+                l = -gamepad1.left_stick_y * LP_DIFF_M;
+                r = -gamepad1.right_stick_y * LP_DIFF_M;
+            } else {
+                horiz = (gamepad1.right_trigger * HP_HORIZ_M) - (gamepad1.left_trigger * HP_HORIZ_M);
+                l = -gamepad1.left_stick_y * HP_DIFF_M;
+                r = -gamepad1.right_stick_y * HP_DIFF_M;
+            }
         }
+
         else {
-            horiz = (gamepad1.right_trigger * HP_HORIZ_M) - (gamepad1.left_trigger * HP_HORIZ_M);
-            l = -gamepad1.left_stick_y * HP_DIFF_M;
-            r = -gamepad1.right_stick_y * HP_DIFF_M;
+            if (gamepad2.left_bumper || gamepad2.right_bumper) {
+                horiz = (gamepad2.right_trigger * LP_HORIZ_M) - (gamepad2.left_trigger * LP_HORIZ_M);
+                l = -gamepad2.left_stick_y * LP_DIFF_M;
+                r = -gamepad2.right_stick_y * LP_DIFF_M;
+            } else {
+                horiz = (gamepad2.right_trigger * HP_HORIZ_M) - (gamepad2.left_trigger * HP_HORIZ_M);
+                l = -gamepad2.left_stick_y * HP_DIFF_M;
+                r = -gamepad2.right_stick_y * HP_DIFF_M;
+            }
         }
+
 
         GlobalMovement.movement_x = horiz;
         GlobalMovement.movement_y = (l + r) / 2.0;
-        GlobalMovement.movement_turn = r - l;
+        GlobalMovement.movement_turn = (r - l) / 2;
 
         in.tick(false, gamepad2.back, gamepad2.right_trigger);
         out.tick(gamepad2.right_bumper, gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.left_bumper, gamepad2.x, gamepad2.b);

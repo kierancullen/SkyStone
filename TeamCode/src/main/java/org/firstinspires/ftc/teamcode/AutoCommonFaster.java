@@ -80,8 +80,52 @@ public class AutoCommonFaster extends LinearOpMode {
         seg.navigationGain = 0.015;
         seg.orientationGain = 1.25;
         seg.navigationMax = 1.0;
-        seg.navigationMin = 0.15;
-        seg.orientationMax = 0.25;
+        seg.navigationMin = 0.25;
+        seg.orientationMax = 0.5;
+        seg.useOrientation = useOrientation;
+        seg.useTranslation = useTranslation;
+        seg.fullStop = fullStop;
+
+        autopilot.setNavigationTarget(seg);
+        autopilot.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
+
+        double [] yxh = null;
+        long lastTime = System.currentTimeMillis();
+
+        while (autopilot.getNavigationStatus() == AutopilotHost.NavigationStatus.RUNNING && opModeIsActive()) {
+
+            idleStateMachines();
+
+            if (yxh != null) {
+                /*GlobalMovement.*/movement_y = yxh[0];
+                /*GlobalMovement.*/movement_x = yxh[1];
+                /*GlobalMovement.*/movement_turn = yxh[2];
+                myDrivetrain.updatePowers();
+            }
+            autopilot.communicate(tracker);
+
+            long timeNow = System.currentTimeMillis();
+            telemetry.addData("FPS", 1000.0 / (timeNow - lastTime));
+            lastTime = timeNow;
+
+            //AutopilotSystem.visualizerBroadcastRoutine(autopilot);
+            autopilot.telemetryUpdate();
+            telemetry.update();
+
+            yxh = autopilot.navigationTick();
+        }
+
+    }
+
+    public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain) {
+        AutopilotSegment seg = new AutopilotSegment();
+        seg.navigationTarget = pos;
+        seg.orientationTarget = hdg;
+        seg.navigationGain = navigationGain;
+        seg.orientationGain = 1.25;
+        seg.navigationMax = navigationMax;
+        seg.navigationMin = navigationMin;
+        seg.orientationMax = 0.5;
         seg.useOrientation = useOrientation;
         seg.useTranslation = useTranslation;
         seg.fullStop = fullStop;
@@ -221,7 +265,7 @@ public class AutoCommonFaster extends LinearOpMode {
 
 
         int location = popper.locations[1];
-        /*if (location == 0) {
+        if (location == 0) {
             apGoTo(new double[]{20, 32, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{18, 37, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
@@ -240,10 +284,11 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{20, 32, 0}, 0, true, true, false);
         }
         if (location == 3) {
-            apGoTo(new double[]{28, 32, 0}, 0, true, true, false);
-            apGoTo(new double[]{28, 37, 0}, 0, true, true, false);
+            apGoTo(new double[]{36, 36, 0}, Math.PI/6, true, true, false);
+            apGoTo(new double[]{32, 40, 0}, Math.PI/6, true, true, false);
+            apGoTo(new double[]{36, 32, 0}, Math.PI/2, true, true, false);
             intakeGo = true;
-            apGoTo(new double[]{28, 32, 0}, 0, true, true, false);
+
         }
         if (location == 4) {
             apGoTo(new double[]{36, 32, 0}, 0, true, true, false);
@@ -256,12 +301,12 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{44, 37, 0}, 0, true, true, false);
             intakeGo = true;
             apGoTo(new double[]{44, 32, 0}, 0, true, true, false);
-        } */
+        }
 
+        //apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.005);
+        apGoTo(new double[]{5*24, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.001;
+        apGoTo(new double[]{5*24, 38, 0}, Math.PI, true, true, true, 0.5, 0.15, 0.015);
         /*
-        apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false);
-        apGoTo(new double[]{5*24, 32, 0}, Math.PI/2, true, true, false);
-        apGoTo(new double[]{5*24, 42, 0}, Math.PI, true, true, true);
         triggerGrab = true;
         while (out.currentState != OuttakeController2.OuttakeState.HUMAN) {
             idleStateMachines();
@@ -271,7 +316,7 @@ public class AutoCommonFaster extends LinearOpMode {
         apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, true);
         */
 
-        apGoTo(new double[]{50, 9.2, 0}, 0, true, true, false);
+
 
 
         while (opModeIsActive()) {
