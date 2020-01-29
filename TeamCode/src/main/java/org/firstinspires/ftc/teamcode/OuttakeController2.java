@@ -8,7 +8,7 @@ public class OuttakeController2 {
 
     boolean set;
 
-    double GRAB_GRABBING_POSITION = 0.7;
+    double GRAB_GRABBING_POSITION = 1.0;
     double GRAB_OPEN_POSITION = 0;
 
     int LIFT_LOWER_BOUND = 15;
@@ -17,11 +17,11 @@ public class OuttakeController2 {
 
     double PRIME_POS = 0.89;
     double GRIP_POS = 1.0;
-    double PLACE_POS = 0.005;
+    double armTravel = 0.0;
     double RELEASE_POS = 0.33;
-    double HUMAN_UP_POWER = 0.50;
+    double HUMAN_UP_POWER = 0.7;
     double HUMAN_DOWN_POWER = 0;
-    double FALLING_DOWN_POWER = -0.1;
+    double FALLING_DOWN_POWER = 0;
 
     long GRABBING_MS = 500;
     long EXTENDING_MS = 400;
@@ -36,6 +36,7 @@ public class OuttakeController2 {
     Servo arm1;
     Servo arm2;
 
+
     Servo grip;
 
     //CRServo slide;
@@ -43,6 +44,7 @@ public class OuttakeController2 {
 
     enum OuttakeState {
         READY,
+        DOWN,
         GRABBING,
         EXTENDING,
         HUMAN,
@@ -55,7 +57,7 @@ public class OuttakeController2 {
     OuttakeState lastState;
     long timeAtStateStart;
 
-    public OuttakeController2 (DcMotor winchLeft, DcMotor winchRight, Servo arm1, Servo arm2) {
+    public OuttakeController2 (DcMotor winchLeft, DcMotor winchRight, Servo arm1, Servo arm2, Servo grip) {
 
         // Also ensure that winch directions get set correctly somewhere (here or in opmode class)
         // Positive direction is assumed to be up.
@@ -66,6 +68,7 @@ public class OuttakeController2 {
 
         this.arm1 = arm1;
         this.arm2 = arm2;
+        this.grip  = grip;
 
         this.winchLeft = winchLeft;
         this.winchRight = winchRight;
@@ -105,30 +108,42 @@ public class OuttakeController2 {
             boolean triggerGrab, // Start sequence by grabbing brick inside robot
             boolean controlUp,
             boolean controlDown,
-            boolean triggerRelease
+            boolean triggerRelease,
+            boolean armUp,
+            boolean armDown
     ) {
 
         if (currentState == OuttakeState.READY) {
             winchLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             winchRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            //grab.setPosition(GRAB_OPEN_POSITION);
+            grip.setPosition(GRAB_OPEN_POSITION);
             //slide.setPower(0);
             arm1.setPosition(PRIME_POS);
             arm2.setPosition(PRIME_POS);
             winchLeft.setPower(0);
             winchRight.setPower(0);
             if (triggerGrab) {
+                currentState = OuttakeState.DOWN;
+            }
+        }
+
+        else if (currentState == OuttakeState.DOWN) {
+            arm1.setPosition(GRIP_POS);
+            arm2.setPosition(GRIP_POS);
+            if (System.currentTimeMillis() - timeAtStateStart > GRABBING_MS) {
                 currentState = OuttakeState.GRABBING;
             }
         }
 
         else if (currentState == OuttakeState.GRABBING) {
-            arm1.setPosition(GRIP_POS);
-            arm2.setPosition(GRIP_POS);
+
+            grip.setPosition(GRAB_GRABBING_POSITION);
             if (System.currentTimeMillis() - timeAtStateStart > GRABBING_MS) {
                 currentState = OuttakeState.HUMAN;
             }
         }
+
+
 
         /*else if (currentState == OuttakeState.EXTENDING) {
             //slide.setPower(SLIDE_EXTENDING_POWER);
@@ -172,13 +187,26 @@ public class OuttakeController2 {
                     winchLeft.setPower(1);
                     winchRight.setPower(1);
                 }
+
+                if (armUp) {
+                   armTravel += 0.01;
+
+                }
+                if (armDown) {
+                    armTravel -= 0.01;
+                }
+
+                arm1.setPosition(GRIP_POS + armTravel);
+                arm2.setPosition(GRIP_POS + armTravel);
+
             }
         }
 
         else if (currentState == OuttakeState.RELEASING) {
-            //grab.setPosition(GRAB_OPEN_POSITION);
-            arm1.setPosition(PLACE_POS);
-            arm2.setPosition(PLACE_POS);
+            armTravel = 0.0;
+            grip.setPosition(GRAB_OPEN_POSITION);
+            arm1.setPosition(RELEASE_POS);
+            arm2.setPosition(RELEASE_POS);
             if (!set) {
                 winchLeft.setTargetPosition(winchLeft.getCurrentPosition() + RELEASE_LIFT);
                 winchRight.setTargetPosition(winchRight.getCurrentPosition() + RELEASE_LIFT);

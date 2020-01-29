@@ -26,6 +26,10 @@ public class RobotOpModeSwing extends OpMode  {
 
     Servo grip;
     Servo turn;
+
+    Servo grab1;
+    Servo grab2;
+
     IntakeController in;
     OuttakeController2 out;
     AnalogInput scotty;
@@ -62,6 +66,17 @@ public class RobotOpModeSwing extends OpMode  {
         setServoExtendedRange(swingLeft, 500, 2500);
         setServoExtendedRange(swingRight, 500, 2500);
 
+        grip = hardwareMap.get(Servo.class, "grip");
+
+        setServoExtendedRange(grip, 500, 2500);
+
+        grab1 = hardwareMap.get(Servo.class, "grab1");
+        grab1.setDirection(Servo.Direction.REVERSE);
+        grab2 = hardwareMap.get(Servo.class, "grab2");
+
+        grab1.setPosition(0.0);
+        grab2.setPosition(0.0);
+
 
         DcMotor tl = hardwareMap.get(DcMotor.class, "tl");
         DcMotor tr = hardwareMap.get(DcMotor.class, "tr");
@@ -77,7 +92,7 @@ public class RobotOpModeSwing extends OpMode  {
 
         scotty = hardwareMap.get(AnalogInput.class, "scotty");
 
-        out = new OuttakeController2(winchRight, winchLeft, arm1, arm2);
+        out = new OuttakeController2(winchRight, winchLeft, arm1, arm2, grip);
         in = new IntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
 
 
@@ -96,10 +111,24 @@ public class RobotOpModeSwing extends OpMode  {
 
     }
 
+    double pwm = 0.0;
     public void loop() {
 
         myDrivetrain.updatePowers();
         telemetry.update();
+        if (gamepad2.a) {
+            pwm+= 0.02;
+        }
+        if (gamepad2.y) {
+            pwm-=0.02;
+        }
+
+        grab1.setPosition(pwm);
+        grab2.setPosition(pwm);
+
+        telemetry.addData("Grab:", pwm);
+
+
 
 
     }

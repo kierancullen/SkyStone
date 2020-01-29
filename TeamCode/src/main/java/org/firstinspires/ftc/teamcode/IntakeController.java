@@ -8,13 +8,13 @@ public class IntakeController {
 
     boolean readyForGrab = false;
 
-    double SWINGLEFT_IDLE_POSITION = 0.15;//0.25
-    double SWINGRIGHT_IDLE_POSITION = 0.15;//0.19
-    double SWINGLEFT_INTAKE_POSITION = 0.15;
-    double SWINGRIGHT_INTAKE_POSITION = 0.15;
+    double SWINGLEFT_IDLE_POSITION = 0.1;//0.25
+    double SWINGRIGHT_IDLE_POSITION = 0.1;//0.19
+    double SWINGLEFT_INTAKE_POSITION = 0.1;
+    double SWINGRIGHT_INTAKE_POSITION = 0.1;
 
-    double IDLE_POWER = 0.5;//0.3/1.5
-    double INTAKE_POWER = 0.5;
+    double IDLE_POWER = 0.3;//0.3/1.5
+    double INTAKE_POWER = 0.3;
 
     long INTAKING_MS = 1000;
 

@@ -20,7 +20,7 @@ import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_turn;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_x;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_y;
 
-public class AutoCommon extends LinearOpMode {
+public class AutoCommonFaster extends LinearOpMode {
     public boolean intakeGo;
     public boolean triggerGrab;
     public boolean controlUp;
@@ -79,7 +79,7 @@ public class AutoCommon extends LinearOpMode {
         seg.orientationTarget = hdg;
         seg.navigationGain = 0.015;
         seg.orientationGain = 1.25;
-        seg.navigationMax = 0.50;
+        seg.navigationMax = 1.0;
         seg.navigationMin = 0.15;
         seg.orientationMax = 0.25;
         seg.useOrientation = useOrientation;
@@ -108,8 +108,8 @@ public class AutoCommon extends LinearOpMode {
             telemetry.addData("FPS", 1000.0 / (timeNow - lastTime));
             lastTime = timeNow;
 
-            /*AutopilotSystem.visualizerBroadcastRoutine(autopilot);
-            autopilot.telemetryUpdate();*/
+            //AutopilotSystem.visualizerBroadcastRoutine(autopilot);
+            autopilot.telemetryUpdate();
             telemetry.update();
 
             yxh = autopilot.navigationTick();
@@ -138,7 +138,9 @@ public class AutoCommon extends LinearOpMode {
         swingLeft.setDirection(Servo.Direction.REVERSE);
         swingRight = hardwareMap.get(Servo.class, "swingRight");
         arm1 = hardwareMap.get(Servo.class, "arm1");
+        arm1.setDirection(Servo.Direction.REVERSE);
         arm2 = hardwareMap.get(Servo.class, "arm2");
+
 
         grip = hardwareMap.get(Servo.class, "grip");
 
@@ -219,7 +221,7 @@ public class AutoCommon extends LinearOpMode {
 
 
         int location = popper.locations[1];
-        if (location == 0) {
+        /*if (location == 0) {
             apGoTo(new double[]{20, 32, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{18, 37, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
@@ -254,8 +256,9 @@ public class AutoCommon extends LinearOpMode {
             apGoTo(new double[]{44, 37, 0}, 0, true, true, false);
             intakeGo = true;
             apGoTo(new double[]{44, 32, 0}, 0, true, true, false);
-        }
+        } */
 
+        /*
         apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false);
         apGoTo(new double[]{5*24, 32, 0}, Math.PI/2, true, true, false);
         apGoTo(new double[]{5*24, 42, 0}, Math.PI, true, true, true);
@@ -266,7 +269,9 @@ public class AutoCommon extends LinearOpMode {
         triggerRelease = true;
         apGoTo(new double[]{5*24, 32, 0}, Math.PI, true, true, true);
         apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, true);
+        */
 
+        apGoTo(new double[]{50, 9.2, 0}, 0, true, true, false);
 
 
         while (opModeIsActive()) {

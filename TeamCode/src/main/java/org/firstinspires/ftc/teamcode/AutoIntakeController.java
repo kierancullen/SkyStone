@@ -35,14 +35,14 @@ public class AutoIntakeController {
     IntakeState lastState;
     long timeAtStateStart;
 
-    OuttakeController outtake;
+    OuttakeController2 outtake;
 
     public AutoIntakeController(DcMotor intakeLeft,
                                 DcMotor intakeRight,
                                 Servo swingLeft,
                                 Servo swingRight,
                                 AnalogInput rangefinder,
-                                OuttakeController outtake) {
+                                OuttakeController2 outtake) {
 
         this.intakeLeft = intakeLeft;
         this.intakeRight = intakeRight;
@@ -70,7 +70,7 @@ public class AutoIntakeController {
     public void tick(boolean go, boolean reverse) {
 
         if (currentState == IntakeState.READY) {
-            if (outtake.currentState == OuttakeController.OuttakeState.READY) {
+            if (outtake.currentState == OuttakeController2.OuttakeState.READY) {
                 if (!reverse) {
                     intakeLeft.setPower(IDLE_POWER);
                     intakeRight.setPower(IDLE_POWER);

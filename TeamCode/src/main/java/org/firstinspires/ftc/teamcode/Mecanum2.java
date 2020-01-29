@@ -98,8 +98,8 @@ public class Mecanum2 extends RobotOpMode {
 
         servos[servoIndex].setPosition(pwm); */
 
-        if (gamepad1.y) pwm +=0.002;
-        if (gamepad1.x) pwm -= 0.002;
+        if (gamepad1.y) pwm +=0.02;
+        if (gamepad1.x) pwm -= 0.02;
         if (pwm>1) pwm=1;
         if (pwm<0) pwm =0;
 
@@ -122,6 +122,7 @@ public class Mecanum2 extends RobotOpMode {
 
         telemetry.addData("Servo:", servoIndex);
         telemetry.addData("Servo Pos:", pwm);
+        telemetry.addData("Grip Pos:", gripPos);
         telemetry.addData("wl:", winchLeft.getCurrentPosition());
         telemetry.addData("wr:", winchRight.getCurrentPosition());
         telemetry.update();
