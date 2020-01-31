@@ -8,13 +8,13 @@ public class AutoIntakeController {
 
     boolean readyForGrab = false;
 
-    double SWINGLEFT_IDLE_POSITION = 0.1;//0.25
-    double SWINGRIGHT_IDLE_POSITION = 0.1;//0.19
-    double SWINGLEFT_INTAKE_POSITION = 0.1;
-    double SWINGRIGHT_INTAKE_POSITION = 0.1;
+    double SWINGLEFT_IDLE_POSITION = 0.72;//0.25
+    double SWINGRIGHT_IDLE_POSITION = 0.72;//0.19
+    double SWINGLEFT_INTAKE_POSITION = 0.72;
+    double SWINGRIGHT_INTAKE_POSITION = 0.72;
 
-    double IDLE_POWER = 0.4;//0.3/1.5
-    double INTAKE_POWER = 0.4;
+    double IDLE_POWER = 0.3;//0.3/1.5
+    double INTAKE_POWER = 0.3;
 
     long INTAKING_MS = 1000;
 
@@ -28,6 +28,7 @@ public class AutoIntakeController {
     enum IntakeState {
         READY,
         ALMOST,
+        STOP,
         INTAKING,
     }
 
@@ -70,6 +71,8 @@ public class AutoIntakeController {
     public void tick(boolean go, boolean reverse) {
 
         if (currentState == IntakeState.READY) {
+            swingLeft.setPosition(SWINGLEFT_IDLE_POSITION);
+            swingRight.setPosition(SWINGRIGHT_IDLE_POSITION);
             if (outtake.currentState == OuttakeController2.OuttakeState.READY) {
                 if (!reverse) {
                     intakeLeft.setPower(IDLE_POWER);
@@ -98,6 +101,8 @@ public class AutoIntakeController {
         }
 
         else if (currentState == IntakeState.INTAKING) {
+            swingLeft.setPosition(SWINGLEFT_INTAKE_POSITION);
+            swingRight.setPosition(SWINGRIGHT_INTAKE_POSITION);
             if (!reverse) {
                 intakeLeft.setPower(INTAKE_POWER);
                 intakeRight.setPower(INTAKE_POWER);
@@ -109,9 +114,15 @@ public class AutoIntakeController {
             //swingLeft.setPosition(SWINGLEFT_INTAKE_POSITION);
             //swingRight.setPosition(SWINGRIGHT_INTAKE_POSITION);
             if (System.currentTimeMillis() - timeAtStateStart > INTAKING_MS) {
-                currentState = IntakeState.READY;
+                currentState = IntakeState.STOP;
                 readyForGrab = true;
             }
+        }
+
+        else if (currentState == IntakeState.STOP) {
+            intakeLeft.setPower(0);
+            intakeRight.setPower(0);
+            if (System.currentTimeMillis() - timeAtStateStart > INTAKING_MS) currentState = IntakeState.READY;
         }
 
 

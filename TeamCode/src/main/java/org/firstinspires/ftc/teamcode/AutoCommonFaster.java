@@ -179,15 +179,15 @@ public class AutoCommonFaster extends LinearOpMode {
         intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         swingLeft = hardwareMap.get(Servo.class, "swingLeft");
-        swingLeft.setDirection(Servo.Direction.REVERSE);
         swingRight = hardwareMap.get(Servo.class, "swingRight");
+        swingRight.setDirection(Servo.Direction.REVERSE);
         arm1 = hardwareMap.get(Servo.class, "arm1");
         arm1.setDirection(Servo.Direction.REVERSE);
         arm2 = hardwareMap.get(Servo.class, "arm2");
 
 
         grip = hardwareMap.get(Servo.class, "grip");
-
+        grip.setDirection(Servo.Direction.REVERSE);
         setServoExtendedRange(grip, 500, 2500);
 
 
@@ -286,8 +286,9 @@ public class AutoCommonFaster extends LinearOpMode {
         if (location == 3) {
             apGoTo(new double[]{36, 36, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{32, 40, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{36, 32, 0}, Math.PI/2, true, true, false);
             intakeGo = true;
+            apGoTo(new double[]{36, 28, 0}, Math.PI/2, true, true, false);
+
 
         }
         if (location == 4) {
@@ -304,10 +305,11 @@ public class AutoCommonFaster extends LinearOpMode {
         }
 
         //apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.005);
-        apGoTo(new double[]{5*24, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.001;
+        apGoTo(new double[]{5*24, 28, 0}, Math.PI/2, true, true, false, 1.0, 0.5, 0.001);
+        triggerGrab = true;
         apGoTo(new double[]{5*24, 38, 0}, Math.PI, true, true, true, 0.5, 0.15, 0.015);
         /*
-        triggerGrab = true;
+
         while (out.currentState != OuttakeController2.OuttakeState.HUMAN) {
             idleStateMachines();
         }
@@ -330,7 +332,7 @@ public class AutoCommonFaster extends LinearOpMode {
     public void idleStateMachines() {
         in.tick(intakeGo, false);
         if (intakeGo) { intakeGo = false; }
-        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown);
+        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, false);
         if (triggerGrab) { triggerGrab = false; }
         if (triggerRelease) {triggerRelease = false; }
     }

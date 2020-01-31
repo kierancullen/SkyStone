@@ -61,7 +61,7 @@ public class UserControl extends RobotOpModeSwing {
         GlobalMovement.movement_turn = (r - l) / 2;
 
         in.tick(false, gamepad2.back, gamepad2.right_trigger);
-        out.tick(gamepad2.right_bumper, gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.left_bumper, gamepad2.x, gamepad2.b);
+        out.tick(gamepad2.right_bumper, gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.left_bumper, gamepad2.x, gamepad2.b, false);
         if (in.readyForGrab) { in.readyForGrab = false; } // reset; triggering done
     }
 }

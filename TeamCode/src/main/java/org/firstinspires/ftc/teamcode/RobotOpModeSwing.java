@@ -59,12 +59,16 @@ public class RobotOpModeSwing extends OpMode  {
         setServoExtendedRange(arm2, 500, 2500);
 
         swingLeft = hardwareMap.get(Servo.class, "swingLeft");
-        swingLeft.setDirection(Servo.Direction.REVERSE);
         swingRight = hardwareMap.get(Servo.class, "swingRight");
+        swingRight.setDirection(Servo.Direction.REVERSE);
+
 
 
         setServoExtendedRange(swingLeft, 500, 2500);
         setServoExtendedRange(swingRight, 500, 2500);
+
+        //swingLeft.setPosition(0.06);
+        //swingRight.setPosition(0.06);
 
         grip = hardwareMap.get(Servo.class, "grip");
 

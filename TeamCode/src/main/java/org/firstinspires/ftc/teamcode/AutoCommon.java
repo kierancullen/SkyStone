@@ -135,8 +135,8 @@ public class AutoCommon extends LinearOpMode {
         intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         swingLeft = hardwareMap.get(Servo.class, "swingLeft");
-        swingLeft.setDirection(Servo.Direction.REVERSE);
         swingRight = hardwareMap.get(Servo.class, "swingRight");
+        swingRight.setDirection(Servo.Direction.REVERSE);
         arm1 = hardwareMap.get(Servo.class, "arm1");
         arm2 = hardwareMap.get(Servo.class, "arm2");
 
@@ -166,6 +166,8 @@ public class AutoCommon extends LinearOpMode {
 
         out = new OuttakeController2 (winchRight, winchLeft, arm1, arm2, grip);
         in = new AutoIntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
+        swingLeft.setPosition(0.72);
+        swingRight.setPosition(0.72);
 
 
         autopilot = new AutopilotHost(telemetry);
@@ -280,7 +282,7 @@ public class AutoCommon extends LinearOpMode {
     public void idleStateMachines() {
         in.tick(intakeGo, false);
         if (intakeGo) { intakeGo = false; }
-        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown);
+        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, false);
         if (triggerGrab) { triggerGrab = false; }
         if (triggerRelease) {triggerRelease = false; }
     }
