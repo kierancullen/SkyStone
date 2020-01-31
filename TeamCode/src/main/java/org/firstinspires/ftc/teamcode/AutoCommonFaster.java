@@ -28,6 +28,7 @@ public class AutoCommonFaster extends LinearOpMode {
     public boolean triggerRelease;
     public boolean armUp;
     public boolean armDown;
+    public boolean autoPlace = false;
 
     PixelPopTests popper;
 
@@ -288,6 +289,7 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{32, 40, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
             apGoTo(new double[]{36, 28, 0}, Math.PI/2, true, true, false);
+            triggerGrab = true;
 
 
         }
@@ -305,9 +307,11 @@ public class AutoCommonFaster extends LinearOpMode {
         }
 
         //apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.005);
-        apGoTo(new double[]{5*24, 28, 0}, Math.PI/2, true, true, false, 1.0, 0.5, 0.001);
-        triggerGrab = true;
-        apGoTo(new double[]{5*24, 38, 0}, Math.PI, true, true, true, 0.5, 0.15, 0.015);
+        apGoTo(new double[]{5*24, 28, 0}, Math.PI/2, true, true, false, 0.7, 0.15, 0.05);
+        autoPlace=true;
+        triggerRelease=true;
+        apGoTo(new double[]{5*24, 38, 0}, Math.PI, true, true, true, 0.5, 0.1, 0.010);
+
         /*
 
         while (out.currentState != OuttakeController2.OuttakeState.HUMAN) {
@@ -332,7 +336,7 @@ public class AutoCommonFaster extends LinearOpMode {
     public void idleStateMachines() {
         in.tick(intakeGo, false);
         if (intakeGo) { intakeGo = false; }
-        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, false);
+        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace);
         if (triggerGrab) { triggerGrab = false; }
         if (triggerRelease) {triggerRelease = false; }
     }

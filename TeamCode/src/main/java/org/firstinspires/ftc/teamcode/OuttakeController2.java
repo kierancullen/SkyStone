@@ -175,7 +175,7 @@ public class OuttakeController2 {
                 winchLeft.setPower(HUMAN_DOWN_POWER);
                 winchRight.setPower(HUMAN_DOWN_POWER);
             }
-            else if (triggerRelease) {
+            else if (triggerRelease && System.currentTimeMillis() - timeAtStateStart > 1000) { //Ensure that auto doesn't go through this state too fast
                 currentState = OuttakeState.RELEASING;
                 set = false;
             }
@@ -197,7 +197,7 @@ public class OuttakeController2 {
                     armTravel -= 0.01;
                 }
                 if (autoPlace) {
-                    armTravel = 0.5;
+                    armTravel = -0.8;
                 }
 
                 arm1.setPosition(GRIP_POS + armTravel);
