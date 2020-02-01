@@ -15,7 +15,7 @@ public class OuttakeController2 {
     int LIFT_UPPER_BOUND = 1000;
     int RELEASE_LIFT = 100; // extra height on release
 
-    double PRIME_POS = 0.89;
+    double PRIME_POS = 0.88;
     double GRIP_POS = 1.0;
     double armTravel = 0.0;
     double RELEASE_POS = 0.33;
@@ -23,7 +23,7 @@ public class OuttakeController2 {
     double HUMAN_DOWN_POWER = 0;
     double FALLING_DOWN_POWER = -0.1;
 
-    long GRABBING_MS = 500;
+    long GRABBING_MS = 1500;
     long EXTENDING_MS = 400;
     long RELEASING_MS = 1000;
     long RETRACTING_MS = 400;
@@ -141,6 +141,8 @@ public class OuttakeController2 {
             grip.setPosition(GRAB_GRABBING_POSITION);
             if (System.currentTimeMillis() - timeAtStateStart > GRABBING_MS) {
                 currentState = OuttakeState.HUMAN;
+                arm1.setPosition(PRIME_POS);
+                arm2.setPosition(PRIME_POS);
             }
         }
 
@@ -197,11 +199,11 @@ public class OuttakeController2 {
                     armTravel -= 0.01;
                 }
                 if (autoPlace) {
-                    armTravel = -0.8;
+                    armTravel = -0.95;
                 }
 
-                arm1.setPosition(GRIP_POS + armTravel);
-                arm2.setPosition(GRIP_POS + armTravel);
+                arm1.setPosition(PRIME_POS + armTravel);
+                arm2.setPosition(PRIME_POS + armTravel);
 
             }
         }

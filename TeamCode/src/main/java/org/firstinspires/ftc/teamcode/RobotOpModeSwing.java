@@ -123,14 +123,15 @@ public class RobotOpModeSwing extends OpMode  {
         myDrivetrain.updatePowers();
         telemetry.update();
         if (gamepad2.a) {
-            pwm+= 0.02;
+            grab1.setPosition(0.5);
+            grab2.setPosition(0.5);
         }
         if (gamepad2.y) {
-            pwm-=0.02;
+            grab1.setPosition(0.25);
+            grab2.setPosition(0.25);
         }
 
-        grab1.setPosition(pwm);
-        grab2.setPosition(pwm);
+
 
         telemetry.addData("Grab:", pwm);
 
