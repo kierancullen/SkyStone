@@ -370,14 +370,14 @@ public class AutoCommonFaster extends LinearOpMode {
         //apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.005);
         apGoTo(new double[]{5*24 , 28, 0}, Math.PI/2, true, true, false, 0.7, 0.15, 0.03);
         autoPlace=true;
-        apGoTo(new double[]{5*24 , 40, 0}, Math.PI, true, true, true, 0.5, 0.15, 0.02); //38
+        apGoTo(new double[]{5*24 , 42, 0}, Math.PI, true, true, true, 0.5, 0.15, 0.03); //40!
         grab1.setPosition(0.53);
         grab2.setPosition(0.53);
         triggerRelease=true;
         sleep(1000);
         apGoToNoStrafe(new double[]{4*24 + 1 , 14, 0}, Math.PI, false, true, false, 0.7, 0.3, 0.02);
         apGoTo(new double[]{4*24 +1 , 14, 0}, Math.PI/2, true, false, false, 0.7, 0.3, 0.02);
-        apGoTo(new double[]{5*24 - 4 , 14, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.015);
+        apGoTo(new double[]{5*24 - 6 , 14, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.015); //-4!
         grab1.setPosition(0.25);
         grab2.setPosition(0.25);
         sleep(1000);
