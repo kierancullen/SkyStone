@@ -17,7 +17,6 @@ public class AutoIntakeController {
     double INTAKE_POWER = 0.35;
 
     long INTAKING_MS = 1000;
-    long REVERSE_MS = 500;
 
     DcMotor intakeLeft;
     DcMotor intakeRight;
@@ -31,7 +30,6 @@ public class AutoIntakeController {
         ALMOST,
         STOP,
         INTAKING,
-        REVERSE
     }
 
     IntakeState currentState;
@@ -116,19 +114,9 @@ public class AutoIntakeController {
             //swingLeft.setPosition(SWINGLEFT_INTAKE_POSITION);
             //swingRight.setPosition(SWINGRIGHT_INTAKE_POSITION);
             if (System.currentTimeMillis() - timeAtStateStart > INTAKING_MS) {
-                currentState = IntakeState.REVERSE;
-
-            }
-        }
-
-        else if (currentState == IntakeState.REVERSE) {
-            intakeLeft.setPower(-INTAKE_POWER);
-            intakeRight.setPower(-INTAKE_POWER);
-            if (System.currentTimeMillis() - timeAtStateStart > REVERSE_MS) {
-                currentState = IntakeState.READY;
+                currentState = IntakeState.STOP;
                 readyForGrab = true;
             }
-
         }
 
         else if (currentState == IntakeState.STOP) {
