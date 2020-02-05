@@ -15,7 +15,7 @@ public class OuttakeController2 {
     int LIFT_UPPER_BOUND = 1000;
     int RELEASE_LIFT = 100; // extra height on release
 
-    double PRIME_POS = 0.90;
+    double PRIME_POS = 0.88;
     double GRIP_POS = 1.0;
     double armTravel = 0.0;
     double RELEASE_POS = 0.33;
