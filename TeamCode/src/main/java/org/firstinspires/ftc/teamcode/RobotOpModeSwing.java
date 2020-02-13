@@ -26,8 +26,8 @@ public class RobotOpModeSwing extends OpMode  {
     Servo grip;
     Servo turn;
 
-    Servo grab1;
-    Servo grab2;
+    Servo hook1;
+    Servo hook2;
 
     Servo redGripSwing;
     Servo redGrip;
@@ -70,27 +70,20 @@ public class RobotOpModeSwing extends OpMode  {
         setServoExtendedRange(swingLeft, 500, 2500);
         setServoExtendedRange(swingRight, 500, 2500);
 
-        //swingLeft.setPosition(0.06);
-        //swingRight.setPosition(0.06);
-
         grip = hardwareMap.get(Servo.class, "grip");
-
         grip.setDirection(Servo.Direction.REVERSE);
-
         setServoExtendedRange(grip, 500, 2500);
 
-        grab1 = hardwareMap.get(Servo.class, "grab1");
-        grab1.setDirection(Servo.Direction.REVERSE);
-        grab2 = hardwareMap.get(Servo.class, "grab2");
-
-        grab1.setPosition(0.0);
-        grab2.setPosition(0.0);
+        hook1 = hardwareMap.get(Servo.class, "hook1");
+        hook1.setDirection(Servo.Direction.REVERSE);
+        hook2 = hardwareMap.get(Servo.class, "hook2");
+        hook1.setPosition(0.0);
+        hook2.setPosition(0.0);
 
         redGrip = hardwareMap.get(Servo.class, "redGrip");
         redGripSwing = hardwareMap.get(Servo.class, "redGripSwing");
         redGripSwing.setDirection(Servo.Direction.REVERSE);
         redGrip.setDirection(Servo.Direction.REVERSE);
-        redGrip.setPosition(0.158);
 
         setServoExtendedRange(redGrip, 500, 2500);
         setServoExtendedRange(redGripSwing, 500, 2500);
@@ -135,12 +128,12 @@ public class RobotOpModeSwing extends OpMode  {
         myDrivetrain.updatePowers();
         telemetry.update();
         if (gamepad2.a) {
-            grab1.setPosition(0.5);
-            grab2.setPosition(0.5);
+            hook1.setPosition(0.5);
+            hook2.setPosition(0.5);
         }
         if (gamepad2.y) {
-            grab1.setPosition(0.25);
-            grab2.setPosition(0.25);
+            hook1.setPosition(0.25);
+            hook2.setPosition(0.25);
         }
 
         if (gamepad2.dpad_left) redGripSwing.setPosition(0);

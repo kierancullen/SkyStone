@@ -250,9 +250,9 @@ public class AutoCommonFaster extends LinearOpMode {
         setServoExtendedRange(arm1, 500, 2500);
         setServoExtendedRange(arm2, 500, 2500);
 
-        grab1 = hardwareMap.get(Servo.class, "grab1");
+        grab1 = hardwareMap.get(Servo.class, "hook1");
         grab1.setDirection(Servo.Direction.REVERSE);
-        grab2 = hardwareMap.get(Servo.class, "grab2");
+        grab2 = hardwareMap.get(Servo.class, "hook2");
 
         DcMotor tl = hardwareMap.get(DcMotor.class, "tl");
         DcMotor tr = hardwareMap.get(DcMotor.class, "tr");

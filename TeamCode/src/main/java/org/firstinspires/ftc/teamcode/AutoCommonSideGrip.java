@@ -2,14 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.evolutionftc.autopilot.AutopilotHost;
 import com.evolutionftc.autopilot.AutopilotSegment;
-import com.evolutionftc.autopilot.AutopilotSystem;
 import com.evolutionftc.autopilot.AutopilotTracker;
 import com.evolutionftc.autopilot.AutopilotTrackerTripleOdo;
-import com.evolutionftc.autopilot.DiscreteIntegralAdjuster;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PwmControl;
@@ -21,8 +17,17 @@ import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_x;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_y;
 
 public class AutoCommonSideGrip extends LinearOpMode {
-    public boolean grip;
-    public boolean release;
+    public boolean intakeGo = false;
+    public boolean triggerGrab = false;
+    public boolean controlUp = false;
+    public boolean controlDown = false;
+    public boolean triggerRelease = false;
+    public boolean armUp = false;
+    public boolean armDown = false;
+    public boolean autoPlace = false;
+
+    public boolean triggerSideGrab = false;
+    public boolean triggerSideRelease = false;
 
     PixelPopTests popper;
 
@@ -40,11 +45,17 @@ public class AutoCommonSideGrip extends LinearOpMode {
     Servo arm2;
     Servo grip;
 
-    Servo grab1;
-    Servo grab2;
+    Servo hook1;
+    Servo hook2;
+
+    Servo redGrip;
+    Servo redGripSwing;
+    Servo blueGrip;
+    Servo blueGripSwing;
 
     AutoIntakeController in;
     OuttakeController2 out;
+    SideGripController side;
     AnalogInput scotty;
 
     AutopilotHost autopilot;
@@ -215,6 +226,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
 
     public void runOpMode(boolean invert) {
 
+        //Winches
         winchLeft = hardwareMap.get(DcMotor.class, "winchLeft");
         winchLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         winchRight = hardwareMap.get(DcMotor.class,"winchRight");
@@ -222,6 +234,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
         winchLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         winchRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        //Intake
         intakeLeft = hardwareMap.get(DcMotor.class, "intakeLeft");
         intakeRight = hardwareMap.get(DcMotor.class, "intakeRight");
         intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -229,25 +242,40 @@ public class AutoCommonSideGrip extends LinearOpMode {
         swingLeft = hardwareMap.get(Servo.class, "swingLeft");
         swingRight = hardwareMap.get(Servo.class, "swingRight");
         swingRight.setDirection(Servo.Direction.REVERSE);
+        setServoExtendedRange(swingLeft, 500, 2500);
+        setServoExtendedRange(swingRight, 500, 2500);
+
+        scotty = hardwareMap.get(AnalogInput.class, "scotty");
+
+        //Arm
         arm1 = hardwareMap.get(Servo.class, "arm1");
         arm2 = hardwareMap.get(Servo.class, "arm2");
         arm2.setDirection(Servo.Direction.REVERSE);
+        setServoExtendedRange(arm1, 500, 2500);
+        setServoExtendedRange(arm2, 500, 2500);
 
 
+        //Grip
         grip = hardwareMap.get(Servo.class, "grip");
         grip.setDirection(Servo.Direction.REVERSE);
         setServoExtendedRange(grip, 500, 2500);
 
+        //Foundation Hooks
+        hook1 = hardwareMap.get(Servo.class, "hook1");
+        hook1.setDirection(Servo.Direction.REVERSE);
+        hook2 = hardwareMap.get(Servo.class, "hook2");
 
-        setServoExtendedRange(swingLeft, 500, 2500);
-        setServoExtendedRange(swingRight, 500, 2500);
-        setServoExtendedRange(arm1, 500, 2500);
-        setServoExtendedRange(arm2, 500, 2500);
+        //Side Grabbers
+        redGrip = hardwareMap.get(Servo.class, "redGrip");
+        redGripSwing = hardwareMap.get(Servo.class, "redGripSwing");
+        redGripSwing.setDirection(Servo.Direction.REVERSE);
+        redGrip.setDirection(Servo.Direction.REVERSE);
 
-        grab1 = hardwareMap.get(Servo.class, "grab1");
-        grab1.setDirection(Servo.Direction.REVERSE);
-        grab2 = hardwareMap.get(Servo.class, "grab2");
+        blueGrip = hardwareMap.get(Servo.class, "blueGrip");
+        blueGripSwing = hardwareMap.get(Servo.class, "blueGripSwing");
 
+
+        //Drivetrain
         DcMotor tl = hardwareMap.get(DcMotor.class, "tl");
         DcMotor tr = hardwareMap.get(DcMotor.class, "tr");
         DcMotor bl = hardwareMap.get(DcMotor.class, "bl");
@@ -260,10 +288,11 @@ public class AutoCommonSideGrip extends LinearOpMode {
 
         myDrivetrain = new Drivetrain (tl, tr, bl, br);
 
-        scotty = hardwareMap.get(AnalogInput.class, "scotty");
 
+        //State Machines
         out = new OuttakeController2 (winchRight, winchLeft, arm1, arm2, grip);
         in = new AutoIntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
+        side = new SideGripController(redGrip, redGripSwing, blueGrip, blueGripSwing, invert);
 
 
         autopilot = new AutopilotHost(telemetry);
@@ -306,6 +335,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
 
         in.start();
         out.start();
+        side.start();
 
         // record any drift that happened while waiting, and zero it out
         autopilot.communicate(tracker);
@@ -362,15 +392,15 @@ public class AutoCommonSideGrip extends LinearOpMode {
         apGoTo(new double[]{5*24 , 28, 0}, Math.PI/2, true, true, false, 0.7, 0.15, 0.03);
         autoPlace=true;
         apGoTo(new double[]{5*24 , 40, 0}, Math.PI, true, true, true, 0.5, 0.15, 0.02); //38
-        grab1.setPosition(0.53);
-        grab2.setPosition(0.53);
+        hook1.setPosition(0.53);
+        hook2.setPosition(0.53);
         triggerRelease=true;
         sleep(1000);
         apGoToNoStrafe(new double[]{4*24 + 1 , 14, 0}, Math.PI, false, true, false, 0.7, 0.3, 0.02);
         apGoTo(new double[]{4*24 +1 , 14, 0}, Math.PI/2, true, false, false, 0.7, 0.3, 0.02);
         apGoTo(new double[]{5*24 - 4 , 14, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.015);
-        grab1.setPosition(0.25);
-        grab2.setPosition(0.25);
+        hook1.setPosition(0.25);
+        hook2.setPosition(0.25);
         sleep(1000);
         apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true);
 
@@ -467,8 +497,15 @@ public class AutoCommonSideGrip extends LinearOpMode {
     public void idleStateMachines() {
         in.tick(intakeGo, false);
         if (intakeGo) { intakeGo = false; }
+
         out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace);
         if (triggerGrab) { triggerGrab = false; }
         if (triggerRelease) {triggerRelease = false; }
+
+        side.tick(triggerSideGrab, triggerSideRelease);
+        if (triggerSideGrab) {triggerSideGrab = false; }
+        if (triggerSideRelease) {triggerSideRelease = false; }
+
+
     }
 }
