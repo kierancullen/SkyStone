@@ -324,7 +324,8 @@ public class AutoCommonSideGrip extends LinearOpMode {
             tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
         }
 
-        apGoTo(new double[]{36, 81.2, 0}, 0, true, true, true, 1.0, 0.15, 0.0005);
+        //apGoTo(new double[]{36, 81.2, 0}, 0, true, true, true, 1.0, 0.15, 0.03);
+        apGoTo(new double[]{12.25, 39.75, 0}, 3*Math.PI/2, true, true, true, 1.0, 0.15, 0.02);
 
         /*
         int location = popper.locations[1];
