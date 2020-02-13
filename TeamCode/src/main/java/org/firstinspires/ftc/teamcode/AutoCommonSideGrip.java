@@ -21,14 +21,8 @@ import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_x;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_y;
 
 public class AutoCommonSideGrip extends LinearOpMode {
-    public boolean intakeGo = false;
-    public boolean triggerGrab = false;
-    public boolean controlUp = false;
-    public boolean controlDown = false;
-    public boolean triggerRelease = false;
-    public boolean armUp = false;
-    public boolean armDown = false;
-    public boolean autoPlace = false;
+    public boolean grip;
+    public boolean release;
 
     PixelPopTests popper;
 
