@@ -42,7 +42,7 @@ public class PIDVelocityAdjuster {
 
             if (Ki != 0) {
                 integral += error * elapsed;
-                integral = Math.max(-desired, Math.min(1.0 - desired, integral)) / Ki;
+                integral = Math.max(-desired, Math.min(1.0 - desired, integral * Ki)) / Ki;
                 output -= integral * Ki;
             }
 
