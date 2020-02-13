@@ -21,13 +21,13 @@ import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_x;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_y;
 
 public class AutoCommonSideGrip extends LinearOpMode {
-    public boolean intakeGo;
-    public boolean triggerGrab;
-    public boolean controlUp;
-    public boolean controlDown;
-    public boolean triggerRelease;
-    public boolean armUp;
-    public boolean armDown;
+    public boolean intakeGo = false;
+    public boolean triggerGrab = false;
+    public boolean controlUp = false;
+    public boolean controlDown = false;
+    public boolean triggerRelease = false;
+    public boolean armUp = false;
+    public boolean armDown = false;
     public boolean autoPlace = false;
 
     PixelPopTests popper;
@@ -117,7 +117,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
             autopilot.telemetryUpdate();
             telemetry.update();
 
-            yxh = autopilot.navigationTick();
+            yxh = autopilot.navigationTick(tracker.getDeltaPos());
         }
 
     }
@@ -158,10 +158,10 @@ public class AutoCommonSideGrip extends LinearOpMode {
             lastTime = timeNow;
 
             //AutopilotSystem.visualizerBroadcastRoutine(autopilot);
-            //autopilot.telemetryUpdate();
-            //telemetry.update();
+            autopilot.telemetryUpdate();
+            telemetry.update();
 
-            yxh = autopilot.navigationTick();
+            yxh = autopilot.navigationTick(tracker.getDeltaPos());
         }
 
     }
@@ -210,7 +210,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
             //autopilot.telemetryUpdate();
             //telemetry.update();
 
-            yxh = autopilot.navigationTick();
+            yxh = autopilot.navigationTick(tracker.getDeltaPos());
         }
 
     }
@@ -236,8 +236,8 @@ public class AutoCommonSideGrip extends LinearOpMode {
         swingRight = hardwareMap.get(Servo.class, "swingRight");
         swingRight.setDirection(Servo.Direction.REVERSE);
         arm1 = hardwareMap.get(Servo.class, "arm1");
-        arm1.setDirection(Servo.Direction.REVERSE);
         arm2 = hardwareMap.get(Servo.class, "arm2");
+        arm2.setDirection(Servo.Direction.REVERSE);
 
 
         grip = hardwareMap.get(Servo.class, "grip");
@@ -291,6 +291,9 @@ public class AutoCommonSideGrip extends LinearOpMode {
             autopilot.setOrientationTargetInvert(true);
         }
 
+        autopilot.setupVelocityPID(0,0,0,60);
+
+
         popper = new PixelPopTests();
         popper.initVuforia();
         while (!opModeIsActive()) {
@@ -321,7 +324,9 @@ public class AutoCommonSideGrip extends LinearOpMode {
             tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
         }
 
+        apGoTo(new double[]{36, 81.2, 0}, 0, true, true, true, 1.0, 0.15, 0.0005);
 
+        /*
         int location = popper.locations[1];
         if (location == 0) {
             apGoTo(new double[]{12, 36, 0}, 3*Math.PI/2, true, true, false);
@@ -331,18 +336,30 @@ public class AutoCommonSideGrip extends LinearOpMode {
             apGoTo(new double[]{20, 36, 0}, 3*Math.PI/2, true, true, false);
         }
         if (location == 2) {
-            apGoTo(new double[]{28, 36, 0}, 3*Math.PI/2, true, true, false);
+            apGoTo(new double[]{2, 36, 0}, 3*Math.PI/2, true, true, false);
         }
         if (location == 3) {
-            apGoTo(new double[]{28, 36, 0}, 3*Math.PI/2, true, true, false);
+            apGoTo(new double[]{36, 36, 0}, Math.PI/6, true, true, false);
+            apGoTo(new double[]{34, 40, 0}, Math.PI/6, true, true, false);
+            intakeGo = true;
+            apGoTo(new double[]{36, 28, 0}, Math.PI/2, true, true, false);
+            triggerGrab = true;
 
 
         }
         if (location == 4) {
-            apGoTo(new double[]{44, 36, 0}, 3*Math.PI/2, true, true, false);
+            apGoTo(new double[]{44, 36, 0}, Math.PI/6, true, true, false);
+            apGoTo(new double[]{42, 40, 0}, Math.PI/6, true, true, false);
+            intakeGo = true;
+            apGoTo(new double[]{44, 28, 0}, Math.PI/2, true, true, false);
+            triggerGrab = true;
         }
         if (location == 5) {
-            apGoTo(new double[]{52, 36, 0}, 3*Math.PI/2, true, true, false);
+            apGoTo(new double[]{52, 36, 0}, Math.PI/6, true, true, false);
+            apGoTo(new double[]{50, 40, 0}, Math.PI/6, true, true, false);
+            intakeGo = true;
+            apGoTo(new double[]{52, 28, 0}, Math.PI/2, true, true, false);
+            triggerGrab = true;
         }
 
         /*

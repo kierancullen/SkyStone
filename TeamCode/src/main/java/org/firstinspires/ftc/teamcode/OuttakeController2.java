@@ -8,22 +8,22 @@ public class OuttakeController2 {
 
     boolean set;
 
-    double GRAB_GRABBING_POSITION = 0;
-    double GRAB_OPEN_POSITION = 1.0;
+    double GRAB_GRABBING_POSITION = 0.71;
+    double GRAB_OPEN_POSITION = 0.46;
 
     int LIFT_LOWER_BOUND = 15;
     int LIFT_UPPER_BOUND = 1000;
-    int RELEASE_LIFT = 100; // extra height on release
+    int RELEASE_LIFT = 200; // extra height on release
 
-    double PRIME_POS = 0.88;
-    double GRIP_POS = 1.0;
+    double PRIME_POS = 0.075;
+    double GRIP_POS = 0.01;
     double armTravel = 0.0;
-    double RELEASE_POS = 0.33;
+    double RELEASE_POS = 0.66;
     double HUMAN_UP_POWER = 0.7;
     double HUMAN_DOWN_POWER = 0;
     double FALLING_DOWN_POWER = -0.1;
 
-    long GRABBING_MS = 1500;
+    long GRABBING_MS = 500;
     long EXTENDING_MS = 400;
     long RELEASING_MS = 1000;
     long RETRACTING_MS = 400;
@@ -211,8 +211,6 @@ public class OuttakeController2 {
         else if (currentState == OuttakeState.RELEASING) {
             armTravel = 0.0;
             grip.setPosition(GRAB_OPEN_POSITION);
-            arm1.setPosition(RELEASE_POS);
-            arm2.setPosition(RELEASE_POS);
             if (!set) {
                 winchLeft.setTargetPosition(winchLeft.getCurrentPosition() + RELEASE_LIFT);
                 winchRight.setTargetPosition(winchRight.getCurrentPosition() + RELEASE_LIFT);
@@ -230,8 +228,8 @@ public class OuttakeController2 {
         else if (currentState == OuttakeState.RETRACTING) {
             //grab.setPosition(GRAB_GRABBING_POSITION);
             //slide.setPower(SLIDE_RETRACTING_POWER);
-            arm1.setPosition(PRIME_POS);
-            arm2.setPosition(PRIME_POS);
+            arm1.setPosition(RELEASE_POS);
+            arm2.setPosition(RELEASE_POS);
             if (System.currentTimeMillis() - timeAtStateStart > RETRACTING_MS) {
                 currentState = OuttakeState.FALLING;
             }

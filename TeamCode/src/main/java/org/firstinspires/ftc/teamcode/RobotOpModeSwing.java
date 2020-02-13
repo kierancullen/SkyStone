@@ -53,8 +53,8 @@ public class RobotOpModeSwing extends OpMode  {
         intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         arm1 = hardwareMap.get(Servo.class, "arm1");
-        arm1.setDirection(Servo.Direction.REVERSE);
         arm2 = hardwareMap.get(Servo.class, "arm2");
+        arm2.setDirection(Servo.Direction.REVERSE);
 
 
         setServoExtendedRange(arm1, 500, 2500);
