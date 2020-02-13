@@ -57,6 +57,13 @@ public class Drivetrain {
         topRight.setPower(tr_power_raw);
     }
 
+    public void updatePowersRaw(double tl_power_raw, double bl_power_raw, double br_power_raw, double tr_power_raw) {
+        topLeft.setPower(tl_power_raw);
+        bottomLeft.setPower(bl_power_raw);
+        bottomRight.setPower(br_power_raw);
+        topRight.setPower(tr_power_raw);
+    }
+
     public DcMotor getXOdometer() {
         return topLeft;
     }

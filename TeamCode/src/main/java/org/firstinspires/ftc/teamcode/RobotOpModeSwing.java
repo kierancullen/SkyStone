@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PwmControl;
@@ -29,6 +28,9 @@ public class RobotOpModeSwing extends OpMode  {
 
     Servo grab1;
     Servo grab2;
+
+    Servo redGripSwing;
+    Servo redGrip;
 
     IntakeController in;
     OuttakeController2 out;
@@ -64,6 +66,7 @@ public class RobotOpModeSwing extends OpMode  {
 
 
 
+
         setServoExtendedRange(swingLeft, 500, 2500);
         setServoExtendedRange(swingRight, 500, 2500);
 
@@ -82,6 +85,15 @@ public class RobotOpModeSwing extends OpMode  {
 
         grab1.setPosition(0.0);
         grab2.setPosition(0.0);
+
+        redGrip = hardwareMap.get(Servo.class, "redGrip");
+        redGripSwing = hardwareMap.get(Servo.class, "redGripSwing");
+        redGripSwing.setDirection(Servo.Direction.REVERSE);
+        redGrip.setDirection(Servo.Direction.REVERSE);
+        redGrip.setPosition(0.158);
+
+        setServoExtendedRange(redGrip, 500, 2500);
+        setServoExtendedRange(redGripSwing, 500, 2500);
 
 
         DcMotor tl = hardwareMap.get(DcMotor.class, "tl");
@@ -130,6 +142,14 @@ public class RobotOpModeSwing extends OpMode  {
             grab1.setPosition(0.25);
             grab2.setPosition(0.25);
         }
+
+        if (gamepad2.dpad_left) redGripSwing.setPosition(0);
+        if (gamepad2.dpad_right) redGripSwing.setPosition(0.32);
+
+        if (gamepad2.right_stick_button) redGrip.setPosition(0);
+        if (gamepad2.left_stick_button) redGrip.setPosition(0.158);
+
+
 
 
 

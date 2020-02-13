@@ -38,10 +38,11 @@ public class Mecanum2 extends RobotOpMode {
          swing = hardwareMap.get(Servo.class, "swingLeft");
          swing.setDirection(Servo.Direction.REVERSE);
          grip = hardwareMap.get(Servo.class, "grip");
+         grip.setDirection(Servo.Direction.REVERSE);
          tilt = hardwareMap.get(Servo.class, "swingRight");
          arm1 = hardwareMap.get(Servo.class, "arm1");
          arm2 = hardwareMap.get(Servo.class, "arm2");
-         arm1.setDirection(Servo.Direction.REVERSE);
+         arm2.setDirection(Servo.Direction.REVERSE);
         setServoExtendedRange(arm1, 500, 2500);
         setServoExtendedRange(arm2, 500, 2500);
          arm1.setPosition(0.5);
@@ -74,7 +75,7 @@ public class Mecanum2 extends RobotOpMode {
     int servoIndex = 0;
     int motorIndex = 0;
 
-    double pwm = 0.33;
+    double pwm = 0.5;
     double motorPower = 0.2;
     int targetPos = 0;
 
