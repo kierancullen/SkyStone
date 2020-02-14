@@ -31,9 +31,12 @@ public class RobotOpModeSwing extends OpMode  {
 
     Servo redGripSwing;
     Servo redGrip;
+    Servo blueGrip;
+    Servo blueGripSwing;
 
     IntakeController in;
     OuttakeController2 out;
+    SideGripController side;
     AnalogInput scotty;
 
 
@@ -88,6 +91,10 @@ public class RobotOpModeSwing extends OpMode  {
         setServoExtendedRange(redGrip, 500, 2500);
         setServoExtendedRange(redGripSwing, 500, 2500);
 
+        blueGrip = hardwareMap.get(Servo.class, "blueGrip");
+        blueGripSwing = hardwareMap.get(Servo.class, "blueGripSwing");
+
+
 
         DcMotor tl = hardwareMap.get(DcMotor.class, "tl");
         DcMotor tr = hardwareMap.get(DcMotor.class, "tr");
@@ -105,6 +112,7 @@ public class RobotOpModeSwing extends OpMode  {
 
         out = new OuttakeController2(winchRight, winchLeft, arm1, arm2, grip);
         in = new IntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
+        side = new SideGripController(redGrip, redGripSwing, blueGrip, blueGripSwing, false);
 
 
     }
@@ -119,6 +127,7 @@ public class RobotOpModeSwing extends OpMode  {
     public void start() {
         in.start();
         out.start();
+        side.start();
 
     }
 
@@ -136,11 +145,13 @@ public class RobotOpModeSwing extends OpMode  {
             hook2.setPosition(0.25);
         }
 
-        if (gamepad2.dpad_left) redGripSwing.setPosition(0);
+        side.tick(gamepad2.left_stick_button, gamepad2.right_stick_button);
+
+        /*if (gamepad2.dpad_left) redGripSwing.setPosition(0);
         if (gamepad2.dpad_right) redGripSwing.setPosition(0.32);
 
         if (gamepad2.right_stick_button) redGrip.setPosition(0);
-        if (gamepad2.left_stick_button) redGrip.setPosition(0.158);
+        if (gamepad2.left_stick_button) redGrip.setPosition(0.158);*/
 
 
 

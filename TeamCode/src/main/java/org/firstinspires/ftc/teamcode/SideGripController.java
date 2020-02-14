@@ -6,14 +6,14 @@ public class SideGripController {
 
     boolean invert = false;
 
-    double GRIP_OPEN_POS = 0.35;
+    double GRIP_OPEN_POS = 0.3;
     double GRIP_CLOSED_POS = 0;
-    double SWING_IN_POS = 0;
-    double SWING_DOWN_POS = 0.4;
+    double SWING_IN_POS = 0.025;
+    double SWING_DOWN_POS = 0.35;
     double SWING_RELEASE_POS = 0.15;
 
-    double SWING_DOWN_MS = 1000;
-    double GRIP_MS = 2000;
+    double SWING_DOWN_MS = 300;
+    double GRIP_MS = 300;
     double SWING_UP_MS = 1000;
     double RELEASING_MS = 1000;
 
