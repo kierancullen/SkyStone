@@ -191,7 +191,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
         seg.navigationTarget = pos;
         seg.orientationTarget = hdg;
         seg.navigationGain = navigationGain;
-        seg.orientationGain = 1.25;
+        seg.orientationGain = 1.0; //1.25
         seg.navigationMax = navigationMax;
         seg.navigationMin = navigationMin;
         seg.orientationMax = 0.9; //0.5
@@ -329,7 +329,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
             autopilot.setOrientationTargetInvert(true);
         }
 
-        autopilot.setupVelocityPID(0,0,0,60);
+        //autopilot.setupVelocityPID(0.1,0,0,60);
 
 
         popper = new PixelPopTests();
@@ -363,8 +363,11 @@ public class AutoCommonSideGrip extends LinearOpMode {
             tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
         }
 
-        //apGoTo(new double[]{36, 81.2, 0}, 0, true, true, true, 1.0, 0.15, 0.03);
+        apGoTo(new double[]{36, 81.2, 0}, 0, true, true, true, 1.0, 0.15, 0.03);
 
+
+
+        /*
         int[] pickingOrder = new int[6];
         pickingOrder[0] = popper.locations[0];
         pickingOrder[1] = popper.locations[1];
@@ -435,7 +438,20 @@ public class AutoCommonSideGrip extends LinearOpMode {
             telemetry.update();
             idleStateMachines();
         }
+
+         */
+
+        while (opModeIsActive()) {
+            autopilot.communicate(tracker);
+            autopilot.telemetryUpdate();
+            telemetry.update();
+            idleStateMachines();
+            telemetry.addData("x odometer:", myDrivetrain.getXOdometer().getCurrentPosition());
+        }
+
     }
+
+
 
     public void idleStateMachines() {
         in.tick(intakeGo, false, intakeRetract);
