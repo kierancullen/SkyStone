@@ -31,6 +31,8 @@ public class AutoCommonSideGrip extends LinearOpMode {
 
 
     public boolean intakeGo = false;
+    public boolean intakeRetract = true;
+
     public boolean triggerGrab = false;
     public boolean controlUp = false;
     public boolean controlDown = false;
@@ -436,7 +438,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
     }
 
     public void idleStateMachines() {
-        in.tick(intakeGo, false);
+        in.tick(intakeGo, false, intakeRetract);
         if (intakeGo) { intakeGo = false; }
 
         out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace);

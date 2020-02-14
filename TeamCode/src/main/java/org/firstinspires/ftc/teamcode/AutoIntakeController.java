@@ -12,6 +12,8 @@ public class AutoIntakeController {
     double SWINGRIGHT_IDLE_POSITION = 0.72;//0.19
     double SWINGLEFT_INTAKE_POSITION = 0.72;
     double SWINGRIGHT_INTAKE_POSITION = 0.72;
+    double SWINGLEFT_STOW_POSITION = 0.06;
+    double SWINGRIGHT_STOW_POSITION = 0.06;
 
     double IDLE_POWER = 0.35;//0.3/1.5
     double INTAKE_POWER = 0.35;
@@ -30,6 +32,7 @@ public class AutoIntakeController {
         ALMOST,
         STOP,
         INTAKING,
+        RETRACTED
     }
 
     IntakeState currentState;
@@ -63,12 +66,23 @@ public class AutoIntakeController {
 
     public void start() {
         // Call once before calling calling tick. (In start() is the best place to do this)
-        currentState = IntakeState.READY;
-        lastState = IntakeState.READY;
+        currentState = IntakeState.RETRACTED;
+        lastState = IntakeState.RETRACTED;
         timeAtStateStart = System.currentTimeMillis();
     }
 
-    public void tick(boolean go, boolean reverse) {
+    public void tick(boolean go, boolean reverse, boolean retract) {
+        if (retract) currentState = IntakeState.RETRACTED;
+
+        if (currentState == IntakeState.RETRACTED) {
+            intakeLeft.setPower(0);
+            intakeRight.setPower(0);
+            swingLeft.setPosition(SWINGLEFT_STOW_POSITION);
+            swingRight.setPosition(SWINGRIGHT_STOW_POSITION);
+            if (!retract) {
+                currentState = IntakeState.READY;
+            }
+        }
 
         if (currentState == IntakeState.READY) {
             swingLeft.setPosition(SWINGLEFT_IDLE_POSITION);
