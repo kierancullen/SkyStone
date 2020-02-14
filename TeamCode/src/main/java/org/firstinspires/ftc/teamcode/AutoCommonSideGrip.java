@@ -18,16 +18,16 @@ import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_y;
 
 public class AutoCommonSideGrip extends LinearOpMode {
 
-    double GRABBING_Y = 39.75;
+    double GRABBING_Y = 39.25;
     double FIRST_STONE_X = 12.25;
 
-    double BRIDGE_SAFE_Y = 32;
+    double BRIDGE_SAFE_Y = 28;
     double BRIDGE_SAFE_X = 3 * 24;
 
-    double PLACING_Y = GRABBING_Y;
+    double PLACING_Y = GRABBING_Y + 1;
     double FIRST_PLACING_X = 5 * 24;
 
-    int MAX_TRIPS;
+    int MAX_TRIPS = 6;
 
 
     public boolean intakeGo = false;
@@ -87,7 +87,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
 
 
     public static int AP_COUNTS_TO_STABLE = 10;
-    public static double AP_NAV_UNITS_TO_STABLE = 1; // inch +/- //0.5
+    public static double AP_NAV_UNITS_TO_STABLE = 0.5; // inch +/- //0.5
     public static double AP_ORIENT_UNITS_TO_STABLE = 0.05; // rad +/-
 
 
@@ -147,7 +147,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
         seg.navigationTarget = pos;
         seg.orientationTarget = hdg;
         seg.navigationGain = navigationGain;
-        seg.orientationGain = 1.25;
+        seg.orientationGain = 1;
         seg.navigationMax = navigationMax;
         seg.navigationMin = navigationMin;
         seg.orientationMax = 0.9; //0.5
@@ -182,6 +182,16 @@ public class AutoCommonSideGrip extends LinearOpMode {
             telemetry.update();
 
             yxh = autopilot.navigationTick(tracker.getDeltaPos());
+
+            if (!fullStop) {
+                autopilot.setNavigationUnitsToStable(6);
+                autopilot.setOrientationUnitsToStable(Math.PI/4);
+            }
+
+            else {
+                autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
+                autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
+            }
         }
 
     }
@@ -286,6 +296,9 @@ public class AutoCommonSideGrip extends LinearOpMode {
         redGripSwing.setDirection(Servo.Direction.REVERSE);
         redGrip.setDirection(Servo.Direction.REVERSE);
 
+        setServoExtendedRange(redGrip, 500, 2500);
+        setServoExtendedRange(redGripSwing, 500, 2500);
+
         blueGrip = hardwareMap.get(Servo.class, "blueGrip");
         blueGripSwing = hardwareMap.get(Servo.class, "blueGripSwing");
 
@@ -301,7 +314,17 @@ public class AutoCommonSideGrip extends LinearOpMode {
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+
+
         myDrivetrain = new Drivetrain (tl, tr, bl, br);
+        movement_x = 0;
+        movement_y = 0;
+        movement_turn = 0;
+        tl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        tr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        myDrivetrain.updatePowers();
 
 
         //State Machines
@@ -321,8 +344,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
 
         ((AutopilotTrackerTripleOdo) tracker).setInverts(false, true, false);
         autopilot.setCountsToStable(AP_COUNTS_TO_STABLE);
-        autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
-        autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
+
 
         if (invert) {
             autopilot.setNavigationTargetInverts(new boolean[]{true, false, false});
@@ -363,14 +385,12 @@ public class AutoCommonSideGrip extends LinearOpMode {
             tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
         }
 
-        apGoTo(new double[]{36, 81.2, 0}, 0, true, true, true, 1.0, 0.15, 0.03);
 
 
 
-        /*
         int[] pickingOrder = new int[6];
-        pickingOrder[0] = popper.locations[0];
-        pickingOrder[1] = popper.locations[1];
+        pickingOrder[0] = 0; //popper.locations[0];
+        pickingOrder[1] = 3; //popper.locations[1];
 
         //Put the rest of the stones in the array, with the shortest trips first
         for (int i = 5, j = 2; i >= 0; i--) {
@@ -381,39 +401,65 @@ public class AutoCommonSideGrip extends LinearOpMode {
             }
         }
 
-        for (int trip = 0; trip < MAX_TRIPS; trip++)  {
+        for (int trip = 0; trip < MAX_TRIPS; trip++) {
 
             int location = pickingOrder[trip];
             //On the first trip, we need to do a special zoom-out
             if (trip == 0) {
-                apGoTo(new double[]{FIRST_STONE_X + (location * 8), GRABBING_Y, 0}, 3*Math.PI/2, true, true, true, 1.0, 0.15, 0.02);
+                apGoTo(new double[]{FIRST_STONE_X + (location * 8), GRABBING_Y, 0}, 3 * Math.PI / 2, true, true, true, 1.0, 0.20, 0.02);
                 side.safeToMove = false; //Not sure if this is necessary
                 triggerSideGrab = true;
-                while (!side.safeToMove) sleep(1);
+                while (!side.safeToMove) {
+                    idleStateMachines();
+                    sleep(1);
+                }
+                ;
+                tl.setPower(0);
+
+
             }
 
             //Otherwise, zoom regularly because we're coming from the foundation
             else {
-                apGoTo(new double[]{FIRST_STONE_X + (location * 8), GRABBING_Y, 0}, 3*Math.PI/2, true, true, true, 1.0, 0.15, 0.03);
+                apGoTo(new double[]{FIRST_STONE_X + (location * 8), GRABBING_Y, 0}, 3 * Math.PI / 2, true, true, true, 1.0, 0.15, 0.03);
                 side.safeToMove = false;
                 triggerSideGrab = true;
                 while (!side.safeToMove) sleep(1);
             }
             //Go to last stone location, unless we're already there
-            if (location != 5) {
-                location = 5;
-                apGoTo(new double[]{FIRST_STONE_X + (location * 8), GRABBING_Y, 0}, 3*Math.PI/2, true, true, false, 1.0, 0.15, 0.03);
+            if (location != 4) {
+                location = 4;
+                apGoTo(new double[]{FIRST_STONE_X + (location * 8), GRABBING_Y, 0}, 3 * Math.PI / 2, true, true, false, 1.0, 1.0, 0.03);
+
             }
 
             //Go to the bridge-avoidance position
-            apGoTo(new double[]{BRIDGE_SAFE_X, BRIDGE_SAFE_Y, 0}, 3*Math.PI/2, true, true, false, 1.0, 0.15, 0.03);
+            apGoTo(new double[]{BRIDGE_SAFE_X, BRIDGE_SAFE_Y, 0}, 3 * Math.PI / 2, false, true, false, 1.0, 1.0, 0.03);
+
 
             //Go to the first placing position
-            apGoTo(new double[]{FIRST_PLACING_X, PLACING_Y, 0}, 3*Math.PI/2, true, true, true, 1.0, 0.15, 0.03);
+            apGoTo(new double[]{FIRST_PLACING_X, PLACING_Y, 0}, 3*Math.PI/2, true, true, true, 1.0, 0.2, 0.03);
             triggerSideRelease = true;
             while (!side.safeToMove) sleep(1);
 
+            location  = 3;
+            apGoTo(new double[]{FIRST_STONE_X + (location * 8), GRABBING_Y, 0}, 3 * Math.PI / 2, true, true, true, 1.0, 0.2, 0.03);
+
+            tr.setPower(0);
+            tl.setPower(0);
+            br.setPower(0);
+            bl.setPower(0);
+
+            while (true) {
+                sleep(1);
+
+
+            }
+
+
+
         }
+        /*
 
         //Drive up against foundation and latch
         apGoTo(new double[]{5*24 , 40, 0}, Math.PI, true, true, true, 0.5, 0.15, 0.02); //38
@@ -441,6 +487,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
 
          */
 
+        /*
         while (opModeIsActive()) {
             autopilot.communicate(tracker);
             autopilot.telemetryUpdate();
@@ -448,6 +495,8 @@ public class AutoCommonSideGrip extends LinearOpMode {
             idleStateMachines();
             telemetry.addData("x odometer:", myDrivetrain.getXOdometer().getCurrentPosition());
         }
+        */
+
 
     }
 

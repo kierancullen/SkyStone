@@ -29,10 +29,10 @@ public class Drivetrain {
 
     public void updatePowers() {
 
-        double tl_power_raw = movement_y-movement_turn+movement_x*1.5;
-        double bl_power_raw = movement_y-movement_turn- movement_x*1.5;
-        double br_power_raw = -(movement_y+movement_turn+movement_x*1.5);
-        double tr_power_raw = -(movement_y+movement_turn-movement_x*1.5);
+        double tl_power_raw = movement_y-movement_turn+movement_x;
+        double bl_power_raw = movement_y-movement_turn- movement_x;
+        double br_power_raw = -(movement_y+movement_turn+movement_x);
+        double tr_power_raw = -(movement_y+movement_turn-movement_x);
 
 
         double maxRawPower = Math.abs(tl_power_raw);
