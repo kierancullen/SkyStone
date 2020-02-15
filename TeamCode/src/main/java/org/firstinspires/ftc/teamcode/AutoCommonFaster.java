@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_turn;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_x;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_y;
@@ -275,6 +276,8 @@ public class AutoCommonFaster extends LinearOpMode {
 
         myDrivetrain = new Drivetrain (tl, tr, bl, br);
 
+
+
         scotty = hardwareMap.get(AnalogInput.class, "scotty");
 
         out = new OuttakeController2 (winchRight, winchLeft, arm1, arm2, grip);
@@ -387,7 +390,7 @@ public class AutoCommonFaster extends LinearOpMode {
         sleep(1000);
         apGoToNoStrafe(new double[]{4*24 + 1 , 20, 0}, Math.PI, false, true, false, 0.7, 0.3, 0.02);
         apGoTo(new double[]{4*24 +1 , 20, 0}, Math.PI/2, true, false, false, 0.7, 0.3, 0.02);
-        apGoTo(new double[]{4*24 +1 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 2);
+        apGoTo(new double[]{4*24 +1 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 5);
         grab1.setPosition(0.25);
         grab2.setPosition(0.25);
         apGoTo(new double[]{5*24 - 4 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 2);
@@ -397,19 +400,19 @@ public class AutoCommonFaster extends LinearOpMode {
         autoPlace = false;
         location = 1; // popper.locations[1];
         if (location == 0) {
-            apGoTo(new double[]{20 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.15, 0.015);
+            apGoTo(new double[]{20 , 32, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015, 2);
             apGoTo(new double[]{20, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{16, 44, 0}, Math.PI/6, true, true, false);
+            apGoTo(new double[]{16, 48, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
             apGoTo(new double[]{20, 28, 0}, Math.PI/2, true, true, false);
             triggerGrab = true;
         }
         if (location == 1) {
             apGoTo(new double[]{20 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
-            apGoTo(new double[]{20, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{16, 44, 0}, Math.PI/6, true, true, false);
+            apGoTo(new double[]{20, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
+            apGoTo(new double[]{16, 44, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
             intakeGo = true;
-            apGoTo(new double[]{20, 28, 0}, Math.PI/2, true, true, false);
+            apGoTo(new double[]{20, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
             triggerGrab = true;
         }
         if (location == 2) {
@@ -440,12 +443,22 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{44, 32, 0}, 0, true, true, false);
         }
 
-        /*
-        apGoTo(new double[]{5*24 - 12 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.15, 0.03);
+
+        apGoTo(new double[]{5*24 - 9 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 5);
         autoPlace=true;
-        sleep(1000);
+        sleep(2000);
         triggerRelease=true;
-        apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.15, 0.03);
+        /*
+        apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 2);
+        tl.setZeroPowerBehavior(BRAKE);
+        tr.setZeroPowerBehavior(BRAKE);
+        br.setZeroPowerBehavior(BRAKE);
+        bl.setZeroPowerBehavior(BRAKE);
+
+        tr.setPower(0);
+        tl.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
 
 
 

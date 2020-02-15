@@ -18,9 +18,9 @@ public class AutoIntakeController {
     double IDLE_POWER = 0.35;//0.3/1.5
     double INTAKE_POWER = 0.35;
 
-    long INTAKING_MS = 1000;
-    long REVERSE_START_MS = 100; // after intaking starts
-    long REVERSE_END_MS = 500; // after intaking starts
+    long INTAKING_MS = 5000;
+    long REVERSE_START_MS = 2000; // after intaking starts
+    long REVERSE_END_MS = 2500; // after intaking starts
 
     DcMotor intakeLeft;
     DcMotor intakeRight;
