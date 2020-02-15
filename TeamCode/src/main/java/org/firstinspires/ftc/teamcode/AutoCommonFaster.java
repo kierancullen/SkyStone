@@ -351,21 +351,21 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{20, 36, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{16, 40, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
-            apGoTo(new double[]{20, 28, 0}, Math.PI/2, true, true, false);
+            apGoTo(new double[]{20, 36, 0}, Math.PI/2, true, true, false);
             triggerGrab = true;
         }
         if (location == 2) {
             apGoTo(new double[]{28, 36, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{26, 40, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
-            apGoTo(new double[]{28, 28, 0}, Math.PI/2, true, true, false);
+            apGoTo(new double[]{28, 36, 0}, Math.PI/2, true, true, false);
             triggerGrab = true;
         }
         if (location == 3) {
             apGoTo(new double[]{36, 36, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{34, 40, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
-            apGoTo(new double[]{36, 28, 0}, Math.PI/2, true, true, false);
+            apGoTo(new double[]{36, 36, 0}, Math.PI/2, true, true, false);
             triggerGrab = true;
 
         }
@@ -373,19 +373,19 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{44, 36, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{42, 40, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
-            apGoTo(new double[]{44, 28, 0}, Math.PI/2, true, true, false);
+            apGoTo(new double[]{44, 36, 0}, Math.PI/2, true, true, false);
             triggerGrab = true;
         }
         if (location == 5) {
             apGoTo(new double[]{52, 36, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{50, 40, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
-            apGoTo(new double[]{52, 28, 0}, Math.PI/2, true, true, false);
+            apGoTo(new double[]{52, 36, 0}, Math.PI/2, true, true, false);
             triggerGrab = true;
         }
 
         //apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.005);
-        apGoTo(new double[]{5*24 , 32, 0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 6); //28
+        apGoTo(new double[]{5*24 , 42, 0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 6); //28
         autoPlace=true;
         apGoTo(new double[]{5*24 , 44, 0}, Math.PI, true, true, true, 0.5, 0.3, 0.02, 1); //38
         grab1.setPosition(0.53);
@@ -398,17 +398,17 @@ public class AutoCommonFaster extends LinearOpMode {
         grab2.setPosition(0.25);
         apGoTo(new double[]{4*24 - 5 , 24, 0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.05, 3);
         apGoTo(new double[]{5*24 - 4 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 2);
-        apGoTo(new double[]{3*24 , 34, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 6);
+        apGoTo(new double[]{3*24 , 34, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 3);
 
 
         autoPlace = false;
         location =  popper.locations[0];
         if (location == 0) {
-            apGoTo(new double[]{20 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
-            apGoTo(new double[]{20, 32, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
-            apGoTo(new double[]{18, 37, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
+            apGoTo(new double[]{12 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
+            apGoTo(new double[]{12, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
+            apGoTo(new double[]{8, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
             intakeGo = true;
-            apGoTo(new double[]{15, 32, 0}, 0, true, true, false,1.0, 0.25, 0.015, 2);
+            apGoTo(new double[]{12, 36, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
             triggerGrab = true;
 
         }
@@ -418,7 +418,7 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{20, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
             apGoTo(new double[]{16, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
             intakeGo = true;
-            apGoTo(new double[]{20, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
+            apGoTo(new double[]{20, 36, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
             triggerGrab = true;
         }
         if (location == 2) {
@@ -426,7 +426,7 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{28, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
             apGoTo(new double[]{24, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
             intakeGo = true;
-            apGoTo(new double[]{28, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
+            apGoTo(new double[]{28, 36, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
             triggerGrab = true;
         }
         if (location == 3) {
@@ -434,7 +434,7 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{36, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
             apGoTo(new double[]{32, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
             intakeGo = true;
-            apGoTo(new double[]{36, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
+            apGoTo(new double[]{36, 36, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
             triggerGrab = true;
 
         }
@@ -443,7 +443,7 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{44, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
             apGoTo(new double[]{40, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
             intakeGo = true;
-            apGoTo(new double[]{44, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
+            apGoTo(new double[]{44, 36, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
             triggerGrab = true;
         }
         if (location == 5) {
@@ -451,18 +451,27 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{52, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
             apGoTo(new double[]{48, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
             intakeGo = true;
-            apGoTo(new double[]{52, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
+            apGoTo(new double[]{52, 36, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
             triggerGrab = true;
         }
 
-        apGoTo(new double[]{5*24 - 18 , 28, 0}, Math.PI/2, true, true, false, 0.7, 0.5, 0.03, 5);
+        apGoTo(new double[]{5*24 - 18 , 36, 0}, Math.PI/2, true, true, false, 0.7, 0.5, 0.03, 5);
         autoPlace=true;
-        apGoTo(new double[]{5*24 - 9 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 5);
+        apGoTo(new double[]{5*24 - 9 , 36, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 5);
         sleep(2000);
         triggerRelease=true;
         while(out.currentState != OuttakeController2.OuttakeState.RELEASING) idleStateMachines();
         sleep(1000);
-        apGoTo(new double[]{3*24 , 32, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 3); //28
+        apGoTo(new double[]{3*24 , 36, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 3); //28
+        tl.setZeroPowerBehavior(BRAKE);
+        tr.setZeroPowerBehavior(BRAKE);
+        br.setZeroPowerBehavior(BRAKE);
+        bl.setZeroPowerBehavior(BRAKE);
+
+        tr.setPower(0);
+        tl.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
 
         /*
         apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 2);
