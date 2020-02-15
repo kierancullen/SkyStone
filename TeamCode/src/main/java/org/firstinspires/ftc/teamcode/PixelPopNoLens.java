@@ -17,16 +17,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.Came
 public class PixelPopNoLens {
 
     public static int[][] STONE_LOCATIONS_BLUE = new int[][]{
-            {168, 381},
-            {245, 382},
-            {354, 381},
+            {608, 430},
+            {362, 431},
+            {87, 432},
     };
 
 
     public static int[][] STONE_LOCATIONS_RED = new int[][]{
-            {821, 378},
-            {728, 380},
-            {611, 381},
+            {80, 426},
+            {340, 426},
+            {586, 423},
     };
 
     private static final String VUFORIA_KEY =
@@ -90,18 +90,18 @@ public class PixelPopNoLens {
     public void storeLocations(int[] locations) {
 
         //Pattern A
-        if (locations[0] == 3) {
-            this.locations = new int[]{0, 3};
+        if (locations[0] == 2) {
+            this.locations = new int[]{2, 5};
         }
 
         //Pattern B
         else if (locations[0] == 0) {
-            this.locations = new int[]{1, 4};
+            this.locations = new int[]{0, 3};
         }
 
         //Pattern C
         else if (locations[0] == 1) {
-            this.locations = new int[]{2, 5};
+            this.locations = new int[]{1, 4};
         }
     }
 
