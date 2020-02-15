@@ -111,7 +111,8 @@ public class OuttakeController2 {
             boolean triggerRelease,
             boolean armUp,
             boolean armDown,
-            boolean autoPlace
+            boolean autoPlace,
+            boolean intakeBlock
     ) {
 
         if (currentState == OuttakeState.READY) {
@@ -119,8 +120,15 @@ public class OuttakeController2 {
             winchRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             grip.setPosition(GRAB_OPEN_POSITION);
             //slide.setPower(0);
-            arm1.setPosition(PRIME_POS);
-            arm2.setPosition(PRIME_POS);
+            if (intakeBlock) {
+                arm1.setPosition(PRIME_POS);
+                arm2.setPosition(PRIME_POS);
+            }
+            else {
+                arm1.setPosition(PRIME_POS);
+                arm2.setPosition(PRIME_POS);
+            }
+
             winchLeft.setPower(0);
             winchRight.setPower(0);
             if (triggerGrab) {
