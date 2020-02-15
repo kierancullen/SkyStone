@@ -21,7 +21,7 @@ import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_turn;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_x;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_y;
 
-public class AutoCommonFaster extends LinearOpMode {
+public class JustParkAuto extends LinearOpMode {
     public boolean intakeGo;
     public boolean triggerGrab;
     public boolean controlUp;
@@ -227,6 +227,11 @@ public class AutoCommonFaster extends LinearOpMode {
         runOpMode(false);
     }
 
+    int timeDelay;
+    boolean direction;
+    int distance;
+    boolean close;
+
     public void runOpMode(boolean invert) {
 
         winchLeft = hardwareMap.get(DcMotor.class, "winchLeft");
@@ -321,6 +326,25 @@ public class AutoCommonFaster extends LinearOpMode {
         popper = new PixelPopNoLens();
         popper.initVuforia();
         while (!opModeIsActive()) {
+
+            if (gamepad2.dpad_up) timeDelay++;
+            if (gamepad2.dpad_up) timeDelay--;
+            if (gamepad2.dpad_right) invert = false;
+            if (gamepad2.dpad_left) invert = true;
+            if (gamepad2.right_bumper) close = true;
+            if (gamepad2.left_bumper) close = false;
+
+
+            if (gamepad2.y) distance++;
+            if (gamepad2.a) distance--;
+
+            telemetry.addData("timeDelay:", timeDelay);
+            if (direction) telemetry.addData("Direction:", "right");
+            else telemetry.addData("Direction:", "left");
+            telemetry.addData("Distance:", distance);
+            telemetry.addData("Close:", close);
+
+
             if (!invert) {
                 popper.captureLocations(popper.STONE_LOCATIONS_RED);
             }
@@ -337,172 +361,14 @@ public class AutoCommonFaster extends LinearOpMode {
         in.start();
         out.start();
 
-
-
-
-        int location = popper.locations[1];
-        if (location == 0) {
-            apGoTo(new double[]{20, 32, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{18, 37, 0}, Math.PI/6, true, true, false);
-            intakeGo = true;
-            apGoTo(new double[]{15, 32, 0}, 0, true, true, false);
+        sleep(1000*timeDelay);
+        if (!direction) distance = -distance;
+        if (close) {
+            apGoTo(new double[]{36 + distance, 10.2, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.03, 1);
         }
-        if (location == 1) {
-            apGoTo(new double[]{20, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{16, 40, 0}, Math.PI/6, true, true, false);
-            intakeGo = true;
-            apGoTo(new double[]{20, 28, 0}, Math.PI/2, true, true, false);
-            triggerGrab = true;
+        else {
+            apGoTo(new double[]{36 + distance, 32, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.03, 1);
         }
-        if (location == 2) {
-            apGoTo(new double[]{28, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{26, 40, 0}, Math.PI/6, true, true, false);
-            intakeGo = true;
-            apGoTo(new double[]{28, 28, 0}, Math.PI/2, true, true, false);
-            triggerGrab = true;
-        }
-        if (location == 3) {
-            apGoTo(new double[]{36, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{34, 40, 0}, Math.PI/6, true, true, false);
-            intakeGo = true;
-            apGoTo(new double[]{36, 28, 0}, Math.PI/2, true, true, false);
-            triggerGrab = true;
-
-        }
-        if (location == 4) {
-            apGoTo(new double[]{44, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{42, 40, 0}, Math.PI/6, true, true, false);
-            intakeGo = true;
-            apGoTo(new double[]{44, 28, 0}, Math.PI/2, true, true, false);
-            triggerGrab = true;
-        }
-        if (location == 5) {
-            apGoTo(new double[]{52, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{50, 40, 0}, Math.PI/6, true, true, false);
-            intakeGo = true;
-            apGoTo(new double[]{52, 28, 0}, Math.PI/2, true, true, false);
-            triggerGrab = true;
-        }
-
-        //apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.005);
-        apGoTo(new double[]{5*24 , 28, 0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 6);
-        autoPlace=true;
-        apGoTo(new double[]{5*24 , 44, 0}, Math.PI, true, true, true, 0.5, 0.3, 0.02, 1); //38
-        grab1.setPosition(0.53);
-        grab2.setPosition(0.53);
-        triggerRelease=true;
-        sleep(1000);
-        apGoToNoStrafe(new double[]{4*24 + 1 , 20, 0}, Math.PI, false, true, false, 0.7, 0.3, 0.02);
-        apGoTo(new double[]{4*24 +1 , 20, 0}, Math.PI/2, true, false, false, 0.7, 0.3, 0.02);
-        grab1.setPosition(0.25);
-        grab2.setPosition(0.25);
-        apGoTo(new double[]{4*24 - 5 , 24, 0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.05, 3);
-        apGoTo(new double[]{5*24 - 4 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 2);
-        apGoTo(new double[]{3*24 , 34, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 6);
-
-
-        autoPlace = false;
-        location =  popper.locations[0];
-        if (location == 0) {
-            apGoTo(new double[]{20 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
-            apGoTo(new double[]{20, 32, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
-            apGoTo(new double[]{18, 37, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
-            intakeGo = true;
-            apGoTo(new double[]{15, 32, 0}, 0, true, true, false,1.0, 0.25, 0.015, 2);
-            triggerGrab = true;
-
-        }
-
-        if (location == 1) {
-            apGoTo(new double[]{20 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
-            apGoTo(new double[]{20, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
-            apGoTo(new double[]{16, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
-            intakeGo = true;
-            apGoTo(new double[]{20, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
-            triggerGrab = true;
-        }
-        if (location == 2) {
-            apGoTo(new double[]{28 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
-            apGoTo(new double[]{28, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
-            apGoTo(new double[]{24, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
-            intakeGo = true;
-            apGoTo(new double[]{28, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
-            triggerGrab = true;
-        }
-        if (location == 3) {
-            apGoTo(new double[]{36 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
-            apGoTo(new double[]{36, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
-            apGoTo(new double[]{32, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
-            intakeGo = true;
-            apGoTo(new double[]{36, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
-            triggerGrab = true;
-
-        }
-        if (location == 4) {
-            apGoTo(new double[]{44 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
-            apGoTo(new double[]{44, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
-            apGoTo(new double[]{40, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
-            intakeGo = true;
-            apGoTo(new double[]{44, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
-            triggerGrab = true;
-        }
-        if (location == 5) {
-            apGoTo(new double[]{52 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
-            apGoTo(new double[]{52, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
-            apGoTo(new double[]{48, 54, 0}, Math.PI/6, true, true, false,1.0, 0.25, 0.015, 2);
-            intakeGo = true;
-            apGoTo(new double[]{52, 28, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
-            triggerGrab = true;
-        }
-
-        apGoTo(new double[]{5*24 - 18 , 28, 0}, Math.PI/2, true, true, false, 0.7, 0.5, 0.03, 5);
-        autoPlace=true;
-        apGoTo(new double[]{5*24 - 9 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 5);
-        sleep(2000);
-        triggerRelease=true;
-        while(out.currentState != OuttakeController2.OuttakeState.RELEASING) idleStateMachines();
-        sleep(1000);
-        apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 3);
-
-        /*
-        apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 2);
-        tl.setZeroPowerBehavior(BRAKE);
-        tr.setZeroPowerBehavior(BRAKE);
-        br.setZeroPowerBehavior(BRAKE);
-        bl.setZeroPowerBehavior(BRAKE);
-
-        tr.setPower(0);
-        tl.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
-
-
-
-        /*
-        apGoTo(new double[]{5*24 - 6, 24, 0}, 3*Math.PI/4, true, true, false, 1.0, 0.5, 0.05);
-        apGoTo(new double[]{5*24 - 6 , 24, 0}, Math.PI/2, true, false, false, 1.0, 0.5, 0.05);
-        //apGoTo(new double[]{5*24 -3, 24, 0}, Math.PI/2, true, true, false, 1.0, 0.5, 0.05);
-
-        apGoTo(new double[]{2*24, 28, 0}, Math.PI/2, true, true, true, 0.7, 0.15, 0.03);
-
-         */
-
-
-
-
-
-
-        /*
-
-        while (out.currentState != OuttakeController2.OuttakeState.HUMAN) {
-            idleStateMachines();
-        }
-        triggerRelease = true;
-        apGoTo(new double[]{5*24, 32, 0}, Math.PI, true, true, true);
-        apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, true);
-        */
-
-
 
 
         while (opModeIsActive()) {

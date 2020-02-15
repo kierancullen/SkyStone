@@ -91,12 +91,12 @@ public class PixelPopNoLens {
 
         //Pattern A
         if (locations[0] == 2) {
-            this.locations = new int[]{2, 5};
+            this.locations = new int[]{0, 3};
         }
 
         //Pattern B
         else if (locations[0] == 0) {
-            this.locations = new int[]{0, 3};
+            this.locations = new int[]{2, 5};
         }
 
         //Pattern C
