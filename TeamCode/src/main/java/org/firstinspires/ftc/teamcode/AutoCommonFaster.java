@@ -408,7 +408,7 @@ public class AutoCommonFaster extends LinearOpMode {
             triggerGrab = true;
 
         }
-        
+
         if (location == 1) {
             apGoTo(new double[]{20 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
             apGoTo(new double[]{20, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
@@ -454,7 +454,7 @@ public class AutoCommonFaster extends LinearOpMode {
 
         apGoTo(new double[]{5*24 - 9 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 5);
         autoPlace=true;
-        sleep(2000);
+        while(out.currentState != OuttakeController2.OuttakeState.RELEASING) idleStateMachines();
         triggerRelease=true;
         /*
         apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 2);
