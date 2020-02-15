@@ -199,11 +199,11 @@ public class OuttakeController2 {
                     armTravel -= 0.01;
                 }
                 if (autoPlace) {
-                    armTravel = -0.95;
+                    armTravel = 0.7;
                 }
 
-                arm1.setPosition(0.68 + armTravel);
-                arm2.setPosition(0.68 + armTravel);
+                arm1.setPosition(PRIME_POS + armTravel);
+                arm2.setPosition(PRIME_POS + armTravel);
 
             }
         }

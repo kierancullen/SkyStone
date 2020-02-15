@@ -241,11 +241,16 @@ public class AutoCommonFaster extends LinearOpMode {
         swingLeft = hardwareMap.get(Servo.class, "swingLeft");
         swingRight = hardwareMap.get(Servo.class, "swingRight");
         swingRight.setDirection(Servo.Direction.REVERSE);
+
+        //Arm
         arm1 = hardwareMap.get(Servo.class, "arm1");
-        arm1.setDirection(Servo.Direction.REVERSE);
         arm2 = hardwareMap.get(Servo.class, "arm2");
+        arm2.setDirection(Servo.Direction.REVERSE);
+        setServoExtendedRange(arm1, 500, 2500);
+        setServoExtendedRange(arm2, 500, 2500);
 
 
+        //Grip
         grip = hardwareMap.get(Servo.class, "grip");
         grip.setDirection(Servo.Direction.REVERSE);
         setServoExtendedRange(grip, 500, 2500);
@@ -253,8 +258,6 @@ public class AutoCommonFaster extends LinearOpMode {
 
         setServoExtendedRange(swingLeft, 500, 2500);
         setServoExtendedRange(swingRight, 500, 2500);
-        setServoExtendedRange(arm1, 500, 2500);
-        setServoExtendedRange(arm2, 500, 2500);
 
         grab1 = hardwareMap.get(Servo.class, "hook1");
         grab1.setDirection(Servo.Direction.REVERSE);
@@ -297,6 +300,17 @@ public class AutoCommonFaster extends LinearOpMode {
             autopilot.setOrientationTargetInvert(true);
         }
 
+        // record any drift that happened while waiting, and zero it out
+        autopilot.communicate(tracker);
+        if (!invert) {
+            tracker.setRobotAttitude(ROBOT_INIT_ATTITUDE);
+            tracker.setRobotPosition(ROBOT_INIT_POSITION);
+        }
+        else {
+            tracker.setRobotAttitude(INVERT_ROBOT_INIT_ATTITUDE);
+            tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
+        }
+
         popper = new PixelPopTests();
         popper.initVuforia();
         while (!opModeIsActive()) {
@@ -316,19 +330,10 @@ public class AutoCommonFaster extends LinearOpMode {
         in.start();
         out.start();
 
-        // record any drift that happened while waiting, and zero it out
-        autopilot.communicate(tracker);
-        if (!invert) {
-            tracker.setRobotAttitude(ROBOT_INIT_ATTITUDE);
-            tracker.setRobotPosition(ROBOT_INIT_POSITION);
-        }
-        else {
-            tracker.setRobotAttitude(INVERT_ROBOT_INIT_ATTITUDE);
-            tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
-        }
 
 
-        int location = popper.locations[1];
+
+        int location = 3;// popper.locations[1];
         if (location == 0) {
             apGoTo(new double[]{20, 32, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{18, 37, 0}, Math.PI/6, true, true, false);
@@ -356,7 +361,6 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{36, 28, 0}, Math.PI/2, true, true, false);
             triggerGrab = true;
 
-
         }
         if (location == 4) {
             apGoTo(new double[]{44, 36, 0}, Math.PI/6, true, true, false);
@@ -374,22 +378,22 @@ public class AutoCommonFaster extends LinearOpMode {
         }
 
         //apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.005);
-        apGoTo(new double[]{5*24 , 28, 0}, Math.PI/2, true, true, false, 0.7, 0.15, 0.03);
+        apGoTo(new double[]{5*24 , 28, 0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 6);
         autoPlace=true;
-        apGoTo(new double[]{5*24 , 40, 0}, Math.PI, true, true, true, 0.5, 0.15, 0.02); //38
+        apGoTo(new double[]{5*24 , 44, 0}, Math.PI, true, true, true, 0.5, 0.3, 0.02, 1); //38
         grab1.setPosition(0.53);
         grab2.setPosition(0.53);
         triggerRelease=true;
         sleep(1000);
-        apGoToNoStrafe(new double[]{4*24 + 1 , 14, 0}, Math.PI, false, true, false, 0.7, 0.3, 0.02);
-        apGoTo(new double[]{4*24 +1 , 14, 0}, Math.PI/2, true, false, false, 0.7, 0.3, 0.02);
-        apGoTo(new double[]{5*24 - 4 , 14, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.015);
+        apGoToNoStrafe(new double[]{4*24 + 1 , 20, 0}, Math.PI, false, true, false, 0.7, 0.3, 0.02);
+        apGoTo(new double[]{4*24 +1 , 20, 0}, Math.PI/2, true, false, false, 0.7, 0.3, 0.02);
+        apGoTo(new double[]{4*24 +1 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 2);
         grab1.setPosition(0.25);
         grab2.setPosition(0.25);
-        sleep(1000);
-        apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true);
+        apGoTo(new double[]{5*24 - 4 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 2);
+        apGoTo(new double[]{3*24 , 34, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 6);
 
-        /*
+
         autoPlace = false;
         location = 1; // popper.locations[1];
         if (location == 0) {
@@ -401,7 +405,7 @@ public class AutoCommonFaster extends LinearOpMode {
             triggerGrab = true;
         }
         if (location == 1) {
-            apGoTo(new double[]{20 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.15, 0.015);
+            apGoTo(new double[]{20 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
             apGoTo(new double[]{20, 36, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{16, 44, 0}, Math.PI/6, true, true, false);
             intakeGo = true;
@@ -436,6 +440,7 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{44, 32, 0}, 0, true, true, false);
         }
 
+        /*
         apGoTo(new double[]{5*24 - 12 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.15, 0.03);
         autoPlace=true;
         sleep(1000);
