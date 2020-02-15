@@ -123,6 +123,10 @@ public class AutoCommonFaster extends LinearOpMode {
     }
 
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain) {
+        apGoTo(pos, hdg, useOrientation, useTranslation, fullStop, navigationMax, navigationMin, navigationGain, AP_NAV_UNITS_TO_STABLE);
+    }
+
+    public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain, double navigationUnitsToStable) {
         AutopilotSegment seg = new AutopilotSegment();
         seg.navigationTarget = pos;
         seg.orientationTarget = hdg;
@@ -134,6 +138,8 @@ public class AutoCommonFaster extends LinearOpMode {
         seg.useOrientation = useOrientation;
         seg.useTranslation = useTranslation;
         seg.fullStop = fullStop;
+
+        autopilot.setNavigationUnitsToStable(navigationUnitsToStable);
 
         autopilot.setNavigationTarget(seg);
         autopilot.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
