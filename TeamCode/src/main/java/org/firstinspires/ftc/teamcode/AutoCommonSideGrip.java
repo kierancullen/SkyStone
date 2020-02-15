@@ -24,7 +24,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
     double BRIDGE_SAFE_Y = 28;
     double BRIDGE_SAFE_X = 3 * 24;
 
-    double PLACING_Y = GRABBING_Y + 3;
+    double PLACING_Y = GRABBING_Y;
     double FIRST_PLACING_X = 5 * 24;
 
     int MAX_TRIPS = 6;
@@ -435,8 +435,8 @@ public class AutoCommonSideGrip extends LinearOpMode {
             triggerSideRelease = true;
             while (!side.safeToMove) sleep(1);
 
-            location  = 3;
-            apGoTo(new double[]{FIRST_STONE_X + (location * 8), GRABBING_Y, 0}, 3 * Math.PI / 2, true, true, true, 0.5, 0.2, 0.03);
+            //location  = 3;
+            //apGoTo(new double[]{FIRST_STONE_X + (location * 8), GRABBING_Y, 0}, 3 * Math.PI / 2, true, true, true, 0.3, 0.2, 0.03);
 
 
             }

@@ -34,10 +34,13 @@ public class RobotOpModeSwing extends OpMode  {
     Servo blueGrip;
     Servo blueGripSwing;
 
+    Servo capstone;
+
     IntakeController in;
     OuttakeController2 out;
     SideGripController side;
     AnalogInput scotty;
+
 
 
 
@@ -90,6 +93,9 @@ public class RobotOpModeSwing extends OpMode  {
 
         setServoExtendedRange(redGrip, 500, 2500);
         setServoExtendedRange(redGripSwing, 500, 2500);
+
+        capstone = hardwareMap.get(Servo.class, "capstone");
+        capstone.setPosition(0);
 
         blueGrip = hardwareMap.get(Servo.class, "blueGrip");
         blueGripSwing = hardwareMap.get(Servo.class, "blueGripSwing");
@@ -144,6 +150,15 @@ public class RobotOpModeSwing extends OpMode  {
             hook1.setPosition(0.25);
             hook2.setPosition(0.25);
         }
+
+        if (gamepad2.left_stick_button) {
+            capstone.setPosition(0);
+        }
+
+        if (gamepad2.right_stick_button) {
+            capstone.setPosition(0.25);
+        }
+
 
         side.tick(gamepad2.left_stick_button, gamepad2.right_stick_button);
 

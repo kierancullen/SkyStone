@@ -13,8 +13,8 @@ public class IntakeController {
     double SWINGLEFT_INTAKE_POSITION = 0.72;
     double SWINGRIGHT_INTAKE_POSITION = 0.72;
 
-    double IDLE_POWER = 0.3;//0.3/1.5
-    double INTAKE_POWER = 0.3;
+    double IDLE_POWER = 0.4;//0.3/1.5
+    double INTAKE_POWER = 0.4;
 
     long INTAKING_MS = 1000;
 

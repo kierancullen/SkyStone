@@ -15,10 +15,10 @@ public class OuttakeController2 {
     int LIFT_UPPER_BOUND = 1000;
     int RELEASE_LIFT = 200; // extra height on release
 
-    double PRIME_POS = 0.075;
+    double PRIME_POS = 0.1;
     double GRIP_POS = 0.01;
     double armTravel = 0.0;
-    double RELEASE_POS = 0.66;
+    double RELEASE_POS = 0.3;
     double HUMAN_UP_POWER = 0.7;
     double HUMAN_DOWN_POWER = 0;
     double FALLING_DOWN_POWER = -0.1;
@@ -202,8 +202,8 @@ public class OuttakeController2 {
                     armTravel = -0.95;
                 }
 
-                arm1.setPosition(PRIME_POS + armTravel);
-                arm2.setPosition(PRIME_POS + armTravel);
+                arm1.setPosition(0.68 + armTravel);
+                arm2.setPosition(0.68 + armTravel);
 
             }
         }
