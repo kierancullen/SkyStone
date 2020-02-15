@@ -503,5 +503,6 @@ public class AutoCommonFaster extends LinearOpMode {
         out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace);
         if (triggerGrab) { triggerGrab = false; }
         if (triggerRelease) {triggerRelease = false; }
+        if (autoPlace) {autoPlace = false;}
     }
 }
