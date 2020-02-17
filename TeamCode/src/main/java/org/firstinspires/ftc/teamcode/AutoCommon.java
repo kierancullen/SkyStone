@@ -282,7 +282,7 @@ public class AutoCommon extends LinearOpMode {
     public void idleStateMachines() {
         in.tick(intakeGo, false, false);
         if (intakeGo) { intakeGo = false; }
-        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, false);
+        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, false, false);
         if (triggerGrab) { triggerGrab = false; }
         if (triggerRelease) {triggerRelease = false; }
     }

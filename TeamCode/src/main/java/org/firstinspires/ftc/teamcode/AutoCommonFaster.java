@@ -398,7 +398,7 @@ public class AutoCommonFaster extends LinearOpMode {
         grab2.setPosition(0.25);
         apGoTo(new double[]{4*24 - 5 , 24, 0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.05, 3);
         apGoTo(new double[]{5*24 - 4 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 2);
-        apGoTo(new double[]{3*24 , 34, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 3);
+        apGoTo(new double[]{3*24 , 32, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 3);
 
 
         autoPlace = false;

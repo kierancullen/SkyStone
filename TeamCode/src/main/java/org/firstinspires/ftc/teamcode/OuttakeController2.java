@@ -121,8 +121,8 @@ public class OuttakeController2 {
             grip.setPosition(GRAB_OPEN_POSITION);
             //slide.setPower(0);
             if (intakeBlock) {
-                arm1.setPosition(PRIME_POS);
-                arm2.setPosition(PRIME_POS);
+                arm1.setPosition(0);
+                arm2.setPosition(0);
             }
             else {
                 arm1.setPosition(PRIME_POS);
