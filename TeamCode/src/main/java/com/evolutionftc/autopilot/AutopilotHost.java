@@ -272,7 +272,7 @@ public class AutopilotHost {
         if (useOrientation && !diffMode) {
             boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
         }
-        if (useTranslation) {
+        if (useTranslation && !diffMode) {
             boolReached = boolReached && hasReached(distance, 0, navigationUnitsToStable);
         }
 
