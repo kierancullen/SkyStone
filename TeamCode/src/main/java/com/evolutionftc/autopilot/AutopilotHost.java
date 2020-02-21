@@ -208,14 +208,16 @@ public class AutopilotHost {
         lastDistanceToTarget = distanceToTarget;
     }
 
-    private void applyDiff(double[] yxh) {
+    private double[] applyDiff(double[] yxh) {
+        double[] output = new double[3];
+        output[0] = yxh[0];
         if (yxh[0] > 0) {
-            yxh[2] = -yxh[1];
+            output[2] = -yxh[1];
         }
         else {
-            yxh[2] = yxh[1];
+            output[2] = yxh[1];
         }
-        yxh[1] = 0;
+        return output;
     }
 
     public double[] navigationTick() {
@@ -264,8 +266,7 @@ public class AutopilotHost {
             boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
         }
         if (useTranslation) {
-            boolReached = boolReached && hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
-                    && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable);
+            boolReached = boolReached && hasReached(distance, 0, navigationUnitsToStable);
         }
 
         if (boolReached) {
@@ -286,19 +287,18 @@ public class AutopilotHost {
 
         updateLasts(distance);
 
-        if (hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
-                && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable)) {
+        if (hasReached(distance, 0, navigationUnitsToStable)) {
             xCorr = 0;
             yCorr = 0;
         }
 
-        if (hasReached(robotAttitude[0], orientationTarget, orientationUnitsToStable)) {
+        if (hasReached(hErr, 0, orientationUnitsToStable)) {
             hCorr = 0;
         }
 
         double[] ret = new double[3];
 
-        if (useOrientation) {
+        if (useOrientation && !diffMode) {
             ret[2] = hCorr;
         }
         if (useTranslation) {
@@ -307,7 +307,7 @@ public class AutopilotHost {
         }
 
         if (diffMode) {
-            applyDiff(ret);
+            ret = applyDiff(ret);
         }
 
         return ret;
