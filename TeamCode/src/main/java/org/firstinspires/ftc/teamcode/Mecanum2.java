@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="Mecanum2", group="Mecanum")
 public class Mecanum2 extends RobotOpMode {
@@ -20,6 +24,16 @@ public class Mecanum2 extends RobotOpMode {
     Servo turn;
     Servo arm1, arm2, arm3, arm4;
     Servo grip;
+
+    AnalogInput sonarLeft;
+    DigitalChannel triggerLeft;
+    AnalogInput sonarBackLeft;
+    DigitalChannel triggerBackLeft;
+    AnalogInput sonarBackRight;
+    DigitalChannel triggerBackRight;
+
+    DistanceSensor ramp;
+    DistanceSensor floor;
 
 
     GrabLiftPlaceController g;
@@ -48,6 +62,24 @@ public class Mecanum2 extends RobotOpMode {
          arm1.setPosition(0.5);
          arm2.setPosition(0.5);
          grip.setPosition(0);
+         sonarLeft = hardwareMap.analogInput.get("sonarLeft");
+         triggerLeft = hardwareMap.digitalChannel.get("triggerLeft");
+         triggerLeft.setMode(DigitalChannel.Mode.OUTPUT);
+
+        sonarBackLeft = hardwareMap.analogInput.get("sonarBackLeft");
+        triggerBackLeft = hardwareMap.digitalChannel.get("triggerBackLeft");
+        triggerBackLeft.setMode(DigitalChannel.Mode.OUTPUT);
+
+        sonarBackRight = hardwareMap.analogInput.get("sonarBackRight");
+        triggerBackRight= hardwareMap.digitalChannel.get("triggerBackRight");
+        triggerBackRight.setMode(DigitalChannel.Mode.OUTPUT);
+
+        ramp = hardwareMap.get(DistanceSensor.class, "ramp");
+        floor = hardwareMap.get(DistanceSensor.class, "floor");
+
+        triggerLeft.setState(false);
+        triggerBackLeft.setState(false);
+        triggerBackRight.setState(false);
 
 
          //grab = hardwareMap.get(Servo.class, "grab");
@@ -80,6 +112,10 @@ public class Mecanum2 extends RobotOpMode {
     int targetPos = 0;
 
     double gripPos = 0;
+    boolean rampDetected;
+    boolean floorDetected;
+
+
     @Override
     public void loop() {
         /*GlobalMovement.updateFromGamepad(gamepad1);
@@ -99,8 +135,8 @@ public class Mecanum2 extends RobotOpMode {
 
         servos[servoIndex].setPosition(pwm); */
 
-        if (gamepad1.y) pwm +=0.02;
-        if (gamepad1.x) pwm -= 0.02;
+        if (gamepad1.y) pwm = 1.0;
+        if (gamepad1.x) pwm = 0.0;
         if (pwm>1) pwm=1;
         if (pwm<0) pwm =0;
 
@@ -118,7 +154,19 @@ public class Mecanum2 extends RobotOpMode {
 
         grip.setPosition(gripPos);
 
+        if (gamepad1.a) {
+            triggerLeft.setState(true);
+            //triggerBackLeft.setState(true);
+            triggerBackRight.setState(true);
 
+        }
+
+        triggerLeft.setState(false);
+        triggerBackLeft.setState(false);
+        triggerBackRight.setState(false);
+
+        rampDetected = ramp.getDistance(DistanceUnit.MM) < 100;
+        floorDetected = floor.getDistance(DistanceUnit.MM) < 100;
 
 
         telemetry.addData("Servo:", servoIndex);
@@ -126,6 +174,17 @@ public class Mecanum2 extends RobotOpMode {
         telemetry.addData("Grip Pos:", gripPos);
         telemetry.addData("wl:", winchLeft.getCurrentPosition());
         telemetry.addData("wr:", winchRight.getCurrentPosition());
+        telemetry.addData("sonarLeft (in):", 73.123*sonarLeft.getVoltage());
+        telemetry.addData("sonarBackLeft (in):", 73.123*sonarBackLeft.getVoltage());
+        telemetry.addData("sonarBackRight (in):", 73.123*sonarBackRight.getVoltage());
+        //telemetry.addData("floor (mm):", floor.getDistance(DistanceUnit.MM));
+        //telemetry.addData("ramp (mm):", ramp.getDistance(DistanceUnit.MM));
+
+        telemetry.addData("ramp:", rampDetected);
+        telemetry.addData("floor:", floorDetected);
+
+
+        //(5*(sonarLeft.getVoltage()/(3.3/1024)))/25.4
         telemetry.update();
 
         /*

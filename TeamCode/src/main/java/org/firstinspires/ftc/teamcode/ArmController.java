@@ -4,8 +4,9 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class OuttakeController2 {
+public class ArmController {
 
+    int placingLevel;
     boolean set;
 
     double GRAB_GRABBING_POSITION = 0.71;
@@ -19,8 +20,8 @@ public class OuttakeController2 {
     double GRIP_POS = 0.01;
     double armTravel = 0.0;
     double RELEASE_POS = 0.3;
-    double HUMAN_UP_POWER = 1.0;
-    double HUMAN_DOWN_POWER = -0.2;
+    double HUMAN_UP_POWER = 0.7;
+    double HUMAN_DOWN_POWER = 0;
     double FALLING_DOWN_POWER = -0.1;
 
     long GRABBING_MS = 500;
@@ -39,8 +40,6 @@ public class OuttakeController2 {
 
     Servo grip;
 
-    //CRServo slide;
-    //Servo grab;
 
     enum OuttakeState {
         READY,
@@ -57,7 +56,7 @@ public class OuttakeController2 {
     OuttakeState lastState;
     long timeAtStateStart;
 
-    public OuttakeController2 (DcMotor winchLeft, DcMotor winchRight, Servo arm1, Servo arm2, Servo grip) {
+    public ArmController (DcMotor winchLeft, DcMotor winchRight, Servo arm1, Servo arm2, Servo grip) {
 
         // Also ensure that winch directions get set correctly somewhere (here or in opmode class)
         // Positive direction is assumed to be up.
@@ -72,8 +71,7 @@ public class OuttakeController2 {
 
         this.winchLeft = winchLeft;
         this.winchRight = winchRight;
-        //this.slide = slide;
-        //this.grab = grab;
+        placingLevel = 0;
     }
 
     public int getLiftPosition() {
@@ -118,8 +116,9 @@ public class OuttakeController2 {
         if (currentState == OuttakeState.READY) {
             winchLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             winchRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            winchLeft.setPower(0);
+            winchRight.setPower(0);
             grip.setPosition(GRAB_OPEN_POSITION);
-            //slide.setPower(0);
             if (intakeBlock) {
                 arm1.setPosition(0);
                 arm2.setPosition(0);
@@ -129,8 +128,6 @@ public class OuttakeController2 {
                 arm2.setPosition(PRIME_POS);
             }
 
-            winchLeft.setPower(0);
-            winchRight.setPower(0);
             if (triggerGrab) {
                 currentState = OuttakeState.DOWN;
             }
@@ -200,7 +197,7 @@ public class OuttakeController2 {
                 }
 
                 if (armUp) {
-                   armTravel += 0.01;
+                    armTravel += 0.01;
 
                 }
                 if (armDown) {

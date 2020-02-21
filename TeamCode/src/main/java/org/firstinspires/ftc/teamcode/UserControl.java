@@ -11,7 +11,7 @@ public class UserControl extends RobotOpModeSwing {
     static double HP_HORIZ_M = 1.0; //0.75
     static double HP_DIFF_M = .75;
 
-    final boolean CONDENSED = false;
+    final boolean CONDENSED = true;
 
     @Override
     public void init() {
