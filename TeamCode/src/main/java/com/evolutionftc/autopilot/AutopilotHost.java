@@ -225,6 +225,10 @@ public class AutopilotHost {
     }
 
     public double[] navigationTick(double deltaPos) {
+        if (diffMode) {
+            fullStop = false;
+        }
+
 
         if (navigationStatus == NavigationStatus.STOPPED) {
             return new double[3];
@@ -253,7 +257,7 @@ public class AutopilotHost {
 
         if (chosenPowerAdjuster != null) {
             chosenPower = chosenPowerAdjuster.adjust(chosenPower, deltaPos);
-            Log.v("chosenPower", ""+ chosenPower);
+            //Log.v("chosenPower", ""+ chosenPower);
         }
 
         double xCorr = chosenPower * -Math.sin(finalAngle);
@@ -262,6 +266,9 @@ public class AutopilotHost {
 
         boolean boolReached = true;
 
+        if (diffMode && lastDistanceToTarget != -1) {
+            boolReached = boolReached && (distance > lastDistanceToTarget);
+        }
         if (useOrientation && !diffMode) {
             boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
         }
@@ -277,7 +284,7 @@ public class AutopilotHost {
         }
 
 
-        if (!fullStop && (nTimesStable > 0)) {
+        if (!fullStop && nTimesStable > 0) {
             navigationStatus = NavigationStatus.STOPPED;
         }
         if (nTimesStable > countsToStable) {
