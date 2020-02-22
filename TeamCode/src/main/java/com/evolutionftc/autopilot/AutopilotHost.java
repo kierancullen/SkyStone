@@ -268,6 +268,7 @@ public class AutopilotHost {
 
         if (diffMode && lastDistanceToTarget != -1) {
             boolReached = boolReached && (distance > lastDistanceToTarget);
+            Log.v("AP", "lastDistanceToTarget: " + lastDistanceToTarget);
         }
         if (useOrientation && !diffMode) {
             boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
