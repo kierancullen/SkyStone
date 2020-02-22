@@ -304,7 +304,7 @@ public class AutopilotHost {
         if (!fullStop && rapidStopSatisfied) {
             navigationStatus = NavigationStatus.STOPPED;
         }
-        if (nTimesStable > countsToStable) {
+        if (fullStop && nTimesStable > countsToStable) {
             navigationStatus = NavigationStatus.STOPPED;
         }
 
