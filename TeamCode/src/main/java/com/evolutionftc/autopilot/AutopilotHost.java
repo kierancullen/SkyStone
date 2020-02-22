@@ -273,14 +273,14 @@ public class AutopilotHost {
 
         boolean boolReached = true;
 
-        if (diffMode) {
+        /*if (diffMode) {
             if (lastDistanceToTarget != -1) {
                 boolReached = boolReached && (distanceDecreased && (distance > lastDistanceToTarget));
             }
             else {
                 boolReached = false;
             }
-        }
+        }*/
         if (useOrientation && !diffMode) {
             boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
         }
@@ -296,7 +296,12 @@ public class AutopilotHost {
         }
 
 
-        if (!fullStop && nTimesStable > 0) {
+        boolean rapidStopSatisfied = false;
+        if (lastDistanceToTarget != -1) {
+            rapidStopSatisfied = (distanceDecreased && (distance > lastDistanceToTarget));
+        }
+
+        if (!fullStop && rapidStopSatisfied) {
             navigationStatus = NavigationStatus.STOPPED;
         }
         if (nTimesStable > countsToStable) {
