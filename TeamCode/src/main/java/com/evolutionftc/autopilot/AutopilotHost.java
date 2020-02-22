@@ -108,6 +108,7 @@ public class AutopilotHost {
         this.navigationStatus = navigationStatus;
 
         lastDistanceToTarget = -1;
+        distanceDecreased = false;
         if (chosenPowerAdjuster != null) {
             chosenPowerAdjuster.reset();
         }
@@ -176,6 +177,7 @@ public class AutopilotHost {
         }
 
         lastDistanceToTarget = -1;
+        distanceDecreased = false;
         if (chosenPowerAdjuster != null) {
             chosenPowerAdjuster.reset();
         }
@@ -203,8 +205,12 @@ public class AutopilotHost {
     }
 
     double lastDistanceToTarget;
+    boolean distanceDecreased;
 
     private void updateLasts(double distanceToTarget) {
+        if (distanceToTarget < lastDistanceToTarget && lastDistanceToTarget != -1) {
+            distanceDecreased = true;
+        }
         lastDistanceToTarget = distanceToTarget;
     }
 
@@ -268,7 +274,7 @@ public class AutopilotHost {
 
         if (diffMode) {
             if (lastDistanceToTarget != -1) {
-                boolReached = boolReached && (distance > lastDistanceToTarget);
+                boolReached = boolReached && (distanceDecreased && (distance > lastDistanceToTarget));
             }
             else {
                 boolReached = false;
