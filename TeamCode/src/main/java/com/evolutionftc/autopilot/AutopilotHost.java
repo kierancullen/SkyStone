@@ -223,6 +223,7 @@ public class AutopilotHost {
         else {
             output[2] = yxh[1];
         }
+        output[2] *= orientationGain * (Math.PI / 2);
         return output;
     }
 
