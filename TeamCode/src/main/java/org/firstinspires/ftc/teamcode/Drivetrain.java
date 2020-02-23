@@ -21,10 +21,10 @@ public class Drivetrain {
         bottomLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bottomRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        topLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        topRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        bottomLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        bottomRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        topLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        topRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bottomLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bottomRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void updatePowers() {

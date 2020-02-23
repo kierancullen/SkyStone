@@ -125,10 +125,10 @@ public class AutoCommonZooming extends LinearOpMode {
     }
 
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain) {
-        apGoTo(pos, hdg, useOrientation, useTranslation, fullStop, navigationMax, navigationMin, navigationGain, AP_NAV_UNITS_TO_STABLE);
+        apGoTo(pos, hdg, useOrientation, useTranslation, fullStop, navigationMax, navigationMin, navigationGain, AP_NAV_UNITS_TO_STABLE, false);
     }
 
-    public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain, double navigationUnitsToStable) {
+    public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain, double navigationUnitsToStable, boolean diffMode) {
         AutopilotSegment seg = new AutopilotSegment();
         seg.navigationTarget = pos;
         seg.orientationTarget = hdg;
@@ -140,6 +140,7 @@ public class AutoCommonZooming extends LinearOpMode {
         seg.useOrientation = useOrientation;
         seg.useTranslation = useTranslation;
         seg.fullStop = fullStop;
+        seg.diffMode = diffMode;
 
         autopilot.setNavigationUnitsToStable(navigationUnitsToStable);
 
@@ -317,6 +318,7 @@ public class AutoCommonZooming extends LinearOpMode {
             tracker.setRobotAttitude(INVERT_ROBOT_INIT_ATTITUDE);
             tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
         }
+        autopilot.communicate(tracker);
 
         popper = new PixelPopNoLens();
         popper.initVuforia();
@@ -337,34 +339,38 @@ public class AutoCommonZooming extends LinearOpMode {
         in.start();
         out.start();
 
-        int location = popper.locations[1];
+        int location = popper.locations[0];
 
         //Only going for the first skystone on this run
         if (location == 0) {
-            apGoTo(new double[]{36, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{34, 40, 0}, Math.PI/6, true, true, false);
-            intakeGo = true;
-            apGoTo(new double[]{36, 36, 0}, Math.PI/2, true, true, false);
-            triggerGrab = true;
+
 
         }
         if (location == 1) {
-            apGoTo(new double[]{44, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{42, 40, 0}, Math.PI/6, true, true, false);
-            intakeGo = true;
-            apGoTo(new double[]{44, 36, 0}, Math.PI/2, true, true, false);
-            triggerGrab = true;
+
         }
         if (location == 2) {
-            apGoTo(new double[]{52, 36, 0}, Math.PI/6, true, true, false);
-            apGoTo(new double[]{50, 40, 0}, Math.PI/6, true, true, false);
-            intakeGo = true;
-            apGoTo(new double[]{52, 36, 0}, Math.PI/2, true, true, false);
-            triggerGrab = true;
+            apGoTo(new double[]{26,40,0}, Math.PI/6, true, true, false, 0.7, 0.2, 0.03, 1, true);
+            apGoTo(new double[]{3*24,36,0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 1, true);
+            apGoTo(new double[]{4*24 - 6,36,0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 1, true);
+            apGoTo(new double[]{5*24 , 44, 0}, Math.PI, true, true, false, 0.7, 0.5, 0.03, 1, false);
+            tl.setZeroPowerBehavior(BRAKE);
+            tr.setZeroPowerBehavior(BRAKE);
+            br.setZeroPowerBehavior(BRAKE);
+            bl.setZeroPowerBehavior(BRAKE);
+
+            tr.setPower(0);
+            tl.setPower(0);
+            bl.setPower(0);
+            br.setPower(0);
+
+
+
         }
 
+        /*
         //Drive to foundation
-        apGoTo(new double[]{5*24 , 42, 0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 6); //28
+
         autoPlace=true;
 
         //Bump against foundation and grab
@@ -461,15 +467,7 @@ public class AutoCommonZooming extends LinearOpMode {
 
         /*
         apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 2);
-        tl.setZeroPowerBehavior(BRAKE);
-        tr.setZeroPowerBehavior(BRAKE);
-        br.setZeroPowerBehavior(BRAKE);
-        bl.setZeroPowerBehavior(BRAKE);
 
-        tr.setPower(0);
-        tl.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
 
 
 
