@@ -65,6 +65,9 @@ public class AutoCommonZooming extends LinearOpMode {
 
     public static double DUALODO_X_RADIUS = 3.25614173 - 2.3134252;
     public static double DUALODO_Y_RADIUS = -0.25051181102 + 7.184370097;
+    public static double DUALODO_X_OFFSET = 7.687480315;
+    public static double DUALODO_Y_OFFSET = 2.21;
+
     public static double DUALODO_TICKS_PER_UNIT = 1440 /  (1.88976 * Math.PI);
 
 
@@ -125,15 +128,15 @@ public class AutoCommonZooming extends LinearOpMode {
     }
 
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain) {
-        apGoTo(pos, hdg, useOrientation, useTranslation, fullStop, navigationMax, navigationMin, navigationGain, AP_NAV_UNITS_TO_STABLE, false);
+        apGoTo(pos, hdg, useOrientation, useTranslation, fullStop, navigationMax, navigationMin, navigationGain, 1.25, AP_NAV_UNITS_TO_STABLE, false);
     }
 
-    public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain, double navigationUnitsToStable, boolean diffMode) {
+    public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain, double orientationGain, double navigationUnitsToStable, boolean diffMode) {
         AutopilotSegment seg = new AutopilotSegment();
         seg.navigationTarget = pos;
         seg.orientationTarget = hdg;
         seg.navigationGain = navigationGain;
-        seg.orientationGain = 1.25;
+        seg.orientationGain = orientationGain;
         seg.navigationMax = navigationMax;
         seg.navigationMin = navigationMin;
         seg.orientationMax = 0.9; //0.5
@@ -295,6 +298,7 @@ public class AutoCommonZooming extends LinearOpMode {
                 myDrivetrain.getYOdometerLeft(),
                 myDrivetrain.getYOdometerRight(),
                 DUALODO_X_RADIUS, DUALODO_Y_RADIUS,
+                DUALODO_X_OFFSET, DUALODO_Y_OFFSET,
                 DUALODO_TICKS_PER_UNIT
         );
 
@@ -350,10 +354,15 @@ public class AutoCommonZooming extends LinearOpMode {
 
         }
         if (location == 2) {
-            apGoTo(new double[]{26,40,0}, Math.PI/6, true, true, false, 0.7, 0.2, 0.03, 1, true);
-            apGoTo(new double[]{3*24,36,0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 1, true);
-            apGoTo(new double[]{4*24 - 6,36,0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 1, true);
-            apGoTo(new double[]{5*24 , 44, 0}, Math.PI, true, true, false, 0.7, 0.5, 0.03, 1, false);
+            apGoTo(new double[]{26,40,0}, Math.PI/6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, true);
+            apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, true, 1.0, 0.7, 0.03, 1.25, 1, true);
+            apGoTo(new double[]{4*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, false);
+            apGoTo(new double[]{5*24,40,0}, Math.PI, true, true, true, 1.0, 0.2, 0.03, 1.25, 1, false);
+            //apGoTo(new double[]{3*24,36,0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 1, true);
+
+            //apGoTo(new double[]{4*24 - 6,36,0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 1, true);
+
+
             tl.setZeroPowerBehavior(BRAKE);
             tr.setZeroPowerBehavior(BRAKE);
             br.setZeroPowerBehavior(BRAKE);
@@ -363,8 +372,6 @@ public class AutoCommonZooming extends LinearOpMode {
             tl.setPower(0);
             bl.setPower(0);
             br.setPower(0);
-
-
 
         }
 
