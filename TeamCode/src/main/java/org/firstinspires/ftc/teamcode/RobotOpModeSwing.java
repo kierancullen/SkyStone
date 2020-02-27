@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -36,9 +37,13 @@ public class RobotOpModeSwing extends OpMode  {
 
     Servo capstone;
 
+    Servo gate;
+    DistanceSensor ramp;
+    DistanceSensor floor;
+
+
     IntakeController in;
     OuttakeController2 out;
-    SideGripController side;
     AnalogInput scotty;
 
 
@@ -86,6 +91,10 @@ public class RobotOpModeSwing extends OpMode  {
         hook1.setPosition(0.0);
         hook2.setPosition(0.0);
 
+        gate = hardwareMap.get(Servo.class, "gate");
+        ramp = hardwareMap.get(DistanceSensor.class, "ramp");
+        floor = hardwareMap.get(DistanceSensor.class, "floor");
+
         redGrip = hardwareMap.get(Servo.class, "redGrip");
         redGripSwing = hardwareMap.get(Servo.class, "redGripSwing");
         redGripSwing.setDirection(Servo.Direction.REVERSE);
@@ -117,8 +126,7 @@ public class RobotOpModeSwing extends OpMode  {
         scotty = hardwareMap.get(AnalogInput.class, "scotty");
 
         out = new OuttakeController2(winchRight, winchLeft, arm1, arm2, grip);
-        in = new IntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
-        side = new SideGripController(redGrip, redGripSwing, blueGrip, blueGripSwing, false);
+        in = new IntakeController (intakeLeft, intakeRight, swingLeft, swingRight, gate, out, ramp, floor);
 
 
     }
@@ -133,7 +141,6 @@ public class RobotOpModeSwing extends OpMode  {
     public void start() {
         in.start();
         out.start();
-        side.start();
 
     }
 
@@ -142,6 +149,7 @@ public class RobotOpModeSwing extends OpMode  {
 
         myDrivetrain.updatePowers();
         telemetry.update();
+
         if (gamepad2.a) {
             hook1.setPosition(0.5);
             hook2.setPosition(0.5);
@@ -158,22 +166,6 @@ public class RobotOpModeSwing extends OpMode  {
         if (gamepad2.right_stick_button) {
             capstone.setPosition(0.25);
         }
-
-
-        side.tick(gamepad2.left_stick_button, gamepad2.right_stick_button);
-
-        /*if (gamepad2.dpad_left) redGripSwing.setPosition(0);
-        if (gamepad2.dpad_right) redGripSwing.setPosition(0.32);
-
-        if (gamepad2.right_stick_button) redGrip.setPosition(0);
-        if (gamepad2.left_stick_button) redGrip.setPosition(0.158);*/
-
-
-
-
-
-        telemetry.addData("Grab:", pwm);
-
 
 
 

@@ -2,33 +2,49 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class IntakeController {
 
     boolean readyForGrab = false;
 
-    double SWINGLEFT_IDLE_POSITION = 0.72;//0.25
-    double SWINGRIGHT_IDLE_POSITION = 0.72;//0.19
     double SWINGLEFT_INTAKE_POSITION = 0.72;
     double SWINGRIGHT_INTAKE_POSITION = 0.72;
 
-    double IDLE_POWER = 0.4;//0.3/1.5
+    double SWINGLEFT_STOW_POSITION = 0.06;
+    double SWINGRIGHT_STOW_POSITION = 0.06;
+
+    double GATE_OPEN_POSITION = 0.1;
+    double GATE_CLOSED_POSITION = 0.2;
+
     double INTAKE_POWER = 0.4;
 
     long INTAKING_MS = 1000;
+    long RAMP_MS = 1000;
+    long REVERSE_MS = 700;
 
     DcMotor intakeLeft;
     DcMotor intakeRight;
+
     Servo swingLeft;
     Servo swingRight;
+
+    Servo gate;
+
+    DistanceSensor ramp;
+    DistanceSensor floor;
 
     AnalogInput rangefinder;
 
     enum IntakeState {
         READY,
-        ALMOST,
-        INTAKING,
+        RAMP,
+        FLOOR,
+        REVERSING,
+        STOWED
     }
 
     IntakeState currentState;
@@ -41,8 +57,10 @@ public class IntakeController {
                             DcMotor intakeRight,
                             Servo swingLeft,
                             Servo swingRight,
-                            AnalogInput rangefinder,
-                            OuttakeController2 outtake) {
+                            Servo gate,
+                            OuttakeController2 outtake,
+                            DistanceSensor ramp,
+                            DistanceSensor floor) {
 
         this.intakeLeft = intakeLeft;
         this.intakeRight = intakeRight;
@@ -50,11 +68,13 @@ public class IntakeController {
         this.swingRight = swingRight;
         this.rangefinder = rangefinder;
         this.outtake = outtake;
+        this.gate = gate;
+        this.ramp = ramp;
+        this.floor = floor;
     }
 
-    public boolean rangefinderAlmost() {
-        return false;
-    }
+    public boolean onRamp() { return ramp.getDistance(DistanceUnit.MM) < 100;}
+    public boolean onFloor() { return floor.getDistance(DistanceUnit.MM) < 100;}
 
     public boolean rangefinderFull() {
         return false;
@@ -67,19 +87,24 @@ public class IntakeController {
         timeAtStateStart = System.currentTimeMillis();
     }
 
-    public void tick(boolean go, boolean reverse, float out) {
+    public void tick(boolean go, boolean reverse, boolean stow) {
 
         if (currentState == IntakeState.READY) {
-            swingLeft.setPosition(SWINGLEFT_IDLE_POSITION);
-            swingRight.setPosition(SWINGRIGHT_IDLE_POSITION);
+            readyForGrab = false;
+
+            swingLeft.setPosition(SWINGLEFT_INTAKE_POSITION);
+            swingRight.setPosition(SWINGLEFT_INTAKE_POSITION);
+
+            gate.setPosition(GATE_OPEN_POSITION);
+
             if (outtake.currentState == OuttakeController2.OuttakeState.READY) {
                 if (!reverse) {
-                    intakeLeft.setPower(IDLE_POWER);
-                    intakeRight.setPower(IDLE_POWER);
+                    intakeLeft.setPower(INTAKE_POWER);
+                    intakeRight.setPower(INTAKE_POWER);
                 }
                 else {
-                    intakeLeft.setPower(-IDLE_POWER);
-                    intakeRight.setPower(-IDLE_POWER);
+                    intakeLeft.setPower(-INTAKE_POWER);
+                    intakeRight.setPower(-INTAKE_POWER);
                 }
             }
             else {
@@ -87,22 +112,28 @@ public class IntakeController {
                 intakeRight.setPower(0);
             }
 
+            if (onRamp()) {
+                currentState = IntakeState.RAMP;
+            }
 
+            //In case we miss the ramp state somehow
+            if (onFloor()) {
+                currentState = IntakeState.FLOOR;
+            }
 
-            if (rangefinderAlmost() || go) {
-                currentState = IntakeState.INTAKING;
+            //If we manually trigger that the stone is in, just go right to the gate routine
+            if (go) {
+                currentState = IntakeState.FLOOR;
+            }
+
+            if (stow) {
+                currentState = IntakeState.STOWED;
             }
         }
 
-        else if (currentState == IntakeState.ALMOST) {
-            if (rangefinderFull()) {
-                currentState = IntakeState.INTAKING;
-            }
-        }
-
-        else if (currentState == IntakeState.INTAKING) {
+        else if (currentState == IntakeState.RAMP) {
             swingLeft.setPosition(SWINGLEFT_INTAKE_POSITION);
-            swingRight.setPosition(SWINGRIGHT_INTAKE_POSITION);
+            swingRight.setPosition(SWINGLEFT_INTAKE_POSITION);
             if (!reverse) {
                 intakeLeft.setPower(INTAKE_POWER);
                 intakeRight.setPower(INTAKE_POWER);
@@ -112,10 +143,66 @@ public class IntakeController {
                 intakeRight.setPower(-INTAKE_POWER);
             }
 
-            if (System.currentTimeMillis() - timeAtStateStart > INTAKING_MS) {
-                currentState = IntakeState.READY;
-                readyForGrab = true;
+            if (onFloor()) {
+                currentState = IntakeState.FLOOR;
             }
+            //If we manually trigger that the stone is in, just go right to the gate routine
+            if (go) {
+                currentState = IntakeState.FLOOR;
+            }
+
+            //If we've been in this state for too long, the stone must be stuck
+            if (System.currentTimeMillis() - timeAtStateStart > RAMP_MS) {
+                currentState = IntakeState.REVERSING;
+            }
+
+        }
+
+        else if (currentState == IntakeState.REVERSING) {
+            intakeLeft.setPower(-INTAKE_POWER);
+            intakeRight.setPower(-INTAKE_POWER);
+
+            if (onFloor()) {
+                currentState = IntakeState.FLOOR;
+            }
+            else if (!onRamp()) {
+                currentState = IntakeState.READY;
+            }
+
+            if (go) {
+                currentState = IntakeState.FLOOR;
+            }
+
+            if (System.currentTimeMillis() - timeAtStateStart > REVERSE_MS) {
+                currentState = IntakeState.READY;
+            }
+
+
+        }
+
+        else if (currentState == IntakeState.FLOOR) {
+            gate.setPosition(GATE_CLOSED_POSITION);
+            intakeLeft.setPower(-INTAKE_POWER);
+            intakeRight.setPower(-INTAKE_POWER);
+            readyForGrab = true;
+
+            if (outtake.currentState == OuttakeController2.OuttakeState.GRABBING) {
+                currentState = IntakeState.READY;
+            }
+        }
+
+        else if (currentState == IntakeState.STOWED) {
+            gate.setPosition(GATE_CLOSED_POSITION);
+            intakeLeft.setPower(0);
+            intakeRight.setPower(0);
+            swingLeft.setPosition(SWINGLEFT_STOW_POSITION);
+            swingRight.setPosition(SWINGRIGHT_STOW_POSITION);
+
+            if (!stow) {
+                currentState = IntakeState.READY;
+            }
+
+
         }
 
 
