@@ -344,6 +344,14 @@ public class AutoCommonZooming extends LinearOpMode {
         out.start();
 
         int location = popper.locations[0];
+        while (opModeIsActive()) {
+            autopilot.communicate(tracker);
+            GlobalMovement.updateFromGamepad(gamepad1);
+            myDrivetrain.updatePowers();
+            //AutopilotSystem.visualizerBroadcastRoutine(autopilot);
+            autopilot.telemetryUpdate();
+            telemetry.update();
+        }
 
         //Only going for the first skystone on this run
         if (location == 0) {
