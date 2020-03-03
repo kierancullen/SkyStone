@@ -24,7 +24,6 @@ public class Mecanum2 extends RobotOpMode {
     Servo turn;
     Servo arm1, arm2, arm3, arm4;
     Servo grip;
-    Servo gate;
 
     AnalogInput sonarLeft;
     DigitalChannel triggerLeft;
@@ -49,8 +48,6 @@ public class Mecanum2 extends RobotOpMode {
 
          winchLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
          winchRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-         winchLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winchRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
          swing = hardwareMap.get(Servo.class, "swingLeft");
          swing.setDirection(Servo.Direction.REVERSE);
@@ -68,8 +65,6 @@ public class Mecanum2 extends RobotOpMode {
          sonarLeft = hardwareMap.analogInput.get("sonarLeft");
          triggerLeft = hardwareMap.digitalChannel.get("triggerLeft");
          triggerLeft.setMode(DigitalChannel.Mode.OUTPUT);
-
-         gate = hardwareMap.get(Servo.class, "gate");
 
         sonarBackLeft = hardwareMap.analogInput.get("sonarBackLeft");
         triggerBackLeft = hardwareMap.digitalChannel.get("triggerBackLeft");
@@ -140,8 +135,8 @@ public class Mecanum2 extends RobotOpMode {
 
         servos[servoIndex].setPosition(pwm); */
 
-        if (gamepad1.y) pwm+= 0.02;
-        if (gamepad1.x) pwm-= 0.02;
+        if (gamepad1.y) pwm = 1.0;
+        if (gamepad1.x) pwm = 0.0;
         if (pwm>1) pwm=1;
         if (pwm<0) pwm =0;
 
@@ -150,13 +145,11 @@ public class Mecanum2 extends RobotOpMode {
 
 
 
-
-
         if (gamepad1.right_bumper) {
-            gripPos += 0.06;
+            gripPos += 0.02;
         }
         if (gamepad1.left_bumper) {
-            gripPos -= 0.06;
+            gripPos -= 0.02;
         }
 
         grip.setPosition(gripPos);
@@ -168,33 +161,6 @@ public class Mecanum2 extends RobotOpMode {
 
         }
 
-
-            if (gamepad1.dpad_up) {
-                if (winchLeft.getCurrentPosition() > 1150) {
-                    winchRight.setPower(0);
-                    winchLeft.setPower(0);
-                }
-                winchRight.setPower(1.0);
-                winchLeft.setPower(1.0);
-            }
-            else if (gamepad1.dpad_down) {
-                if (winchLeft.getCurrentPosition() < 10) {
-                    winchRight.setPower(0);
-                    winchLeft.setPower(0);
-                }
-                else {
-                    winchRight.setPower(-0.5);
-                    winchLeft.setPower(-0.5);
-                }
-
-            }
-            else {
-                winchRight.setPower(0);
-                winchLeft.setPower(0);
-            }
-
-
-
         triggerLeft.setState(false);
         triggerBackLeft.setState(false);
         triggerBackRight.setState(false);
@@ -202,7 +168,7 @@ public class Mecanum2 extends RobotOpMode {
         rampDetected = ramp.getDistance(DistanceUnit.MM) < 100;
         floorDetected = floor.getDistance(DistanceUnit.MM) < 100;
 
-        telemetry.addData("Lift: ", (winchLeft.getCurrentPosition() + winchRight.getCurrentPosition()) / 2);
+
         telemetry.addData("Servo:", servoIndex);
         telemetry.addData("Servo Pos:", pwm);
         telemetry.addData("Grip Pos:", gripPos);

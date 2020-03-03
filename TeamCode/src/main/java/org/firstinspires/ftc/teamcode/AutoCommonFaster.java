@@ -525,7 +525,7 @@ public class AutoCommonFaster extends LinearOpMode {
     public void idleStateMachines() {
         in.tick(intakeGo, false, false);
         if (intakeGo) { intakeGo = false; }
-        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace, false, false, false);
+        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace, false);
         if (triggerGrab) { triggerGrab = false; }
         if (triggerRelease) {triggerRelease = false; }
         if (autoPlace) {autoPlace = false;}

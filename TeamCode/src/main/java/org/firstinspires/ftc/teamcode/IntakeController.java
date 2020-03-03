@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class IntakeController {
 
+    boolean readyForGrab = false;
 
     double SWINGLEFT_INTAKE_POSITION = 0.72;
     double SWINGRIGHT_INTAKE_POSITION = 0.72;
@@ -16,16 +17,14 @@ public class IntakeController {
     double SWINGLEFT_STOW_POSITION = 0.06;
     double SWINGRIGHT_STOW_POSITION = 0.06;
 
-    double GATE_OPEN_POSITION = 0;
-    double GATE_CLOSED_POSITION = 0.219;
+    double GATE_OPEN_POSITION = 0.1;
+    double GATE_CLOSED_POSITION = 0.2;
 
-    double INTAKE_POWER = 0.3;
+    double INTAKE_POWER = 0.4;
 
     long INTAKING_MS = 1000;
     long RAMP_MS = 1000;
     long REVERSE_MS = 700;
-    long FLOOR_MS = 700;
-    long TRAP_MS = 500;
 
     DcMotor intakeLeft;
     DcMotor intakeRight;
@@ -44,7 +43,6 @@ public class IntakeController {
         READY,
         RAMP,
         FLOOR,
-        TRAPPED,
         REVERSING,
         STOWED
     }
@@ -92,7 +90,8 @@ public class IntakeController {
     public void tick(boolean go, boolean reverse, boolean stow) {
 
         if (currentState == IntakeState.READY) {
-            outtake.readyForGrab = false;
+            readyForGrab = false;
+
             swingLeft.setPosition(SWINGLEFT_INTAKE_POSITION);
             swingRight.setPosition(SWINGLEFT_INTAKE_POSITION);
 
@@ -113,12 +112,12 @@ public class IntakeController {
                 intakeRight.setPower(0);
             }
 
-            if (onRamp() && outtake.currentState == OuttakeController2.OuttakeState.READY) {
+            if (onRamp()) {
                 currentState = IntakeState.RAMP;
             }
 
             //In case we miss the ramp state somehow
-            if (onFloor() && outtake.currentState == OuttakeController2.OuttakeState.READY) {
+            if (onFloor()) {
                 currentState = IntakeState.FLOOR;
             }
 
@@ -182,27 +181,13 @@ public class IntakeController {
         }
 
         else if (currentState == IntakeState.FLOOR) {
-
-            if (System.currentTimeMillis() - timeAtStateStart > FLOOR_MS) {
-                currentState = IntakeState.TRAPPED;
-            }
-        }
-
-        else if (currentState == IntakeState.TRAPPED) {
             gate.setPosition(GATE_CLOSED_POSITION);
             intakeLeft.setPower(-INTAKE_POWER);
             intakeRight.setPower(-INTAKE_POWER);
-            if (reverse) {
-                gate.setPosition(GATE_OPEN_POSITION);
-            }
-            if (System.currentTimeMillis() - timeAtStateStart > TRAP_MS) {
-                outtake.readyForGrab = true;
-
-            }
+            readyForGrab = true;
 
             if (outtake.currentState == OuttakeController2.OuttakeState.GRABBING) {
                 currentState = IntakeState.READY;
-                outtake.readyForGrab = false;
             }
         }
 

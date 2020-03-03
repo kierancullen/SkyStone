@@ -9,11 +9,11 @@ public class UserControl extends RobotOpModeSwing {
     static double LP_HORIZ_M = .25;
     static double LP_DIFF_M = .35;
     static double HP_HORIZ_M = 1.0; //0.75
-    static double HP_DIFF_M = 1.0;
+    static double HP_DIFF_M = .75;
 
-    final boolean CONDENSED = false;
+    final boolean CONDENSED = true;
     boolean triggerGrab = false;
-    boolean stowed = false;
+    boolean stowed = true;
 
     @Override
     public void init() {
@@ -61,11 +61,12 @@ public class UserControl extends RobotOpModeSwing {
         GlobalMovement.movement_x = horiz;
         GlobalMovement.movement_y = (l + r) / 2.0;
         GlobalMovement.movement_turn = (r - l) / 2;
-        triggerGrab=false;
-        if (gamepad2.right_bumper) triggerGrab = true;
-        in.tick(false, gamepad2.back, stowed);
-        out.tick(triggerGrab, gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.left_bumper, gamepad2.x, gamepad2.b, false, gamepad2.dpad_left, gamepad2.left_trigger > 0.1, gamepad2.right_trigger > 0.1);
-        if (triggerGrab) triggerGrab = false;
+
+        if (in.readyForGrab || gamepad2.right_bumper) triggerGrab = true;
+        if (gamepad2.y) stowed = false;
+        if (gamepad2.a) stowed = true;
+        in.tick(gamepad2. right_bumper, gamepad2.back, stowed);
+        out.tick(triggerGrab, gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.left_bumper, gamepad2.x, gamepad2.b, false, gamepad2.dpad_left);
 
     }
 }
