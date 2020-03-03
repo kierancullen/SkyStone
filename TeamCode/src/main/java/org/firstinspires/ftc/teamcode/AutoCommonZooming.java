@@ -4,8 +4,10 @@ import com.evolutionftc.autopilot.AutopilotHost;
 import com.evolutionftc.autopilot.AutopilotSegment;
 import com.evolutionftc.autopilot.AutopilotSystem;
 import com.evolutionftc.autopilot.AutopilotTracker;
+import com.evolutionftc.autopilot.AutopilotTrackerDualOdo;
 import com.evolutionftc.autopilot.AutopilotTrackerTripleOdo;
 import com.evolutionftc.autopilot.DiscreteIntegralAdjuster;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -56,6 +58,8 @@ public class AutoCommonZooming extends LinearOpMode {
     OuttakeController2 out;
     AnalogInput scotty;
 
+    BNO055IMU imu;
+
     AutopilotHost autopilot;
     AutopilotTracker tracker;
 
@@ -69,7 +73,7 @@ public class AutoCommonZooming extends LinearOpMode {
     public static double DUALODO_X_OFFSET = 7.687480315;
     public static double DUALODO_Y_OFFSET = 2.21;
 
-    public static double DUALODO_TICKS_PER_UNIT = 1440 /  (2.5 * Math.PI); //1440 /  (1.88976 * Math.PI);
+    public static double DUALODO_TICKS_PER_UNIT = 1440 /  (1.88976 * Math.PI);
 
 
     public static int AP_COUNTS_TO_STABLE = 10;
@@ -292,18 +296,23 @@ public class AutoCommonZooming extends LinearOpMode {
         capstone = hardwareMap.get(Servo.class, "capstone");
         capstone.setPosition(0);
 
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        imu.initialize(parameters);
+
 
         autopilot = new AutopilotHost(telemetry);
-        tracker = new AutopilotTrackerTripleOdo(
+        tracker = new AutopilotTrackerDualOdo(
                 myDrivetrain.getXOdometer(),
-                myDrivetrain.getYOdometerLeft(),
                 myDrivetrain.getYOdometerRight(),
                 DUALODO_X_RADIUS, DUALODO_Y_RADIUS,
-                DUALODO_X_OFFSET, DUALODO_Y_OFFSET,
-                DUALODO_TICKS_PER_UNIT
+                DUALODO_TICKS_PER_UNIT,
+                imu
         );
 
-        ((AutopilotTrackerTripleOdo) tracker).setInverts(false, true, false);
+        ((AutopilotTrackerDualOdo) tracker).setInverts(false, false);
         autopilot.setCountsToStable(AP_COUNTS_TO_STABLE);
         autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
         autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
