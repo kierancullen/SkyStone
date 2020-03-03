@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_turn;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_x;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_y;
@@ -64,11 +65,11 @@ public class AutoCommonZooming extends LinearOpMode {
     public static double[] INVERT_ROBOT_INIT_ATTITUDE = new double[]{0, 0, 0};
 
     public static double DUALODO_X_RADIUS = 3.25614173 - 2.3134252;
-    public static double DUALODO_Y_RADIUS = -0.25051181102 + 7.184370097;
+    public static double DUALODO_Y_RADIUS = 7.3204370097; //7.304370097; //-0.25051181102 + 7.184370097; //7.28370097;//
     public static double DUALODO_X_OFFSET = 7.687480315;
     public static double DUALODO_Y_OFFSET = 2.21;
 
-    public static double DUALODO_TICKS_PER_UNIT = 1440 /  (1.88976 * Math.PI);
+    public static double DUALODO_TICKS_PER_UNIT = 1440 /  (2.5 * Math.PI); //1440 /  (1.88976 * Math.PI);
 
 
     public static int AP_COUNTS_TO_STABLE = 10;
@@ -313,7 +314,7 @@ public class AutoCommonZooming extends LinearOpMode {
         }
 
         // record any drift that happened while waiting, and zero it out
-        autopilot.communicate(tracker);
+        //autopilot.communicate(tracker);
         if (!invert) {
             tracker.setRobotAttitude(ROBOT_INIT_ATTITUDE);
             tracker.setRobotPosition(ROBOT_INIT_POSITION);
@@ -322,7 +323,7 @@ public class AutoCommonZooming extends LinearOpMode {
             tracker.setRobotAttitude(INVERT_ROBOT_INIT_ATTITUDE);
             tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
         }
-        autopilot.communicate(tracker);
+        //0autopilot.communicate(tracker);
 
         popper = new PixelPopNoLens();
         popper.initVuforia();
@@ -344,6 +345,13 @@ public class AutoCommonZooming extends LinearOpMode {
         out.start();
 
         int location = popper.locations[0];
+        tl.setZeroPowerBehavior(FLOAT);
+        tr.setZeroPowerBehavior(FLOAT);
+        br.setZeroPowerBehavior(FLOAT);
+        bl.setZeroPowerBehavior(FLOAT);
+
+        tracker.setRobotAttitude(new double[]{0,0,0});
+
         while (opModeIsActive()) {
             autopilot.communicate(tracker);
             GlobalMovement.updateFromGamepad(gamepad1);
@@ -524,7 +532,7 @@ public class AutoCommonZooming extends LinearOpMode {
     public void idleStateMachines() {
         in.tick(intakeGo, false, false);
         if (intakeGo) { intakeGo = false; }
-        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace, false);
+        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace, false, false, false);
         if (triggerGrab) { triggerGrab = false; }
         if (triggerRelease) {triggerRelease = false; }
         if (autoPlace) {autoPlace = false;}
