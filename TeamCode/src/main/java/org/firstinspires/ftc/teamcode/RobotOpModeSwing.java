@@ -30,10 +30,6 @@ public class RobotOpModeSwing extends OpMode  {
     Servo hook1;
     Servo hook2;
 
-    Servo redGripSwing;
-    Servo redGrip;
-    Servo blueGrip;
-    Servo blueGripSwing;
 
     Servo capstone;
 
@@ -95,21 +91,8 @@ public class RobotOpModeSwing extends OpMode  {
         ramp = hardwareMap.get(DistanceSensor.class, "ramp");
         floor = hardwareMap.get(DistanceSensor.class, "floor");
 
-        redGrip = hardwareMap.get(Servo.class, "redGrip");
-        redGripSwing = hardwareMap.get(Servo.class, "redGripSwing");
-        redGripSwing.setDirection(Servo.Direction.REVERSE);
-        redGrip.setDirection(Servo.Direction.REVERSE);
-
-        setServoExtendedRange(redGrip, 500, 2500);
-        setServoExtendedRange(redGripSwing, 500, 2500);
-
         capstone = hardwareMap.get(Servo.class, "capstone");
         capstone.setPosition(0);
-
-        blueGrip = hardwareMap.get(Servo.class, "blueGrip");
-        blueGripSwing = hardwareMap.get(Servo.class, "blueGripSwing");
-
-
 
         DcMotor tl = hardwareMap.get(DcMotor.class, "tl");
         DcMotor tr = hardwareMap.get(DcMotor.class, "tr");
@@ -147,6 +130,11 @@ public class RobotOpModeSwing extends OpMode  {
     double pwm = 0.0;
     public void loop() {
 
+        telemetry.addData("Intake state:", in.currentState.toString());
+        telemetry.addData("Level:", out.placingLevel);
+        telemetry.addData("LevelLift:", out.levelLiftPosition());
+        telemetry.addData("Lift encoder:", out.getLiftPosition());
+        telemetry.addData("Outtake state:", out.currentState.toString());
         myDrivetrain.updatePowers();
         telemetry.update();
 

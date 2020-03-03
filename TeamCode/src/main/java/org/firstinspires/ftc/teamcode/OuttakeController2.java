@@ -6,27 +6,29 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class OuttakeController2 {
 
-    boolean set;
+    boolean readyForGrab;
 
     double GRAB_GRABBING_POSITION = 0.71;
-    double GRAB_OPEN_POSITION = 0.46;
+    double GRAB_OPEN_POSITION = 0.06;
 
     int LIFT_LOWER_BOUND = 15;
-    int LIFT_UPPER_BOUND = 1000;
-    int RELEASE_LIFT = 200; // extra height on release
+    int LIFT_UPPER_BOUND = 1150;
+    int RELEASE_LIFT = 100; // extra height on release
 
-    double PRIME_POS = 0.1;
-    double GRIP_POS = 0.01;
+    double PRIME_POS = 0.8;
+    double GRIP_POS = 0.96;
     double armTravel = 0.0;
     double RELEASE_POS = 0.3;
     double HUMAN_UP_POWER = 1.0;
-    double HUMAN_DOWN_POWER = -0.2;
+    double HUMAN_DOWN_POWER = -0.1;
     double FALLING_DOWN_POWER = -0.1;
 
     long GRABBING_MS = 500;
     long EXTENDING_MS = 400;
-    long RELEASING_MS = 1000;
+    long RELEASING_MS = 700;
     long RETRACTING_MS = 400;
+
+    int placingLevel;
 
 
 
@@ -46,7 +48,7 @@ public class OuttakeController2 {
         READY,
         DOWN,
         GRABBING,
-        EXTENDING,
+        LIFTING,
         HUMAN,
         RELEASING,
         RETRACTING,
@@ -72,8 +74,7 @@ public class OuttakeController2 {
 
         this.winchLeft = winchLeft;
         this.winchRight = winchRight;
-        //this.slide = slide;
-        //this.grab = grab;
+
     }
 
     public int getLiftPosition() {
@@ -96,12 +97,30 @@ public class OuttakeController2 {
         return liftPosition < 20;
     }
 
+    public int levelLiftPosition() {
+        if (placingLevel <= 3) {
+            return ((placingLevel - 1) * 120);
+        }
+        else {
+            return ((placingLevel - 3) * 120);
+        }
+    }
+
+    public double levelArmPosition() {
+        if (placingLevel == 1) return 0;
+        else if (placingLevel == 2) return 0;
+        else if (placingLevel == 3) return 0;
+        else return 0.3;
+    }
+
 
     public void start() {
         // Call once before calling calling tick. (In start() is the best place to do this)
         currentState = OuttakeState.READY;
         lastState = OuttakeState.READY;
         timeAtStateStart = System.currentTimeMillis();
+
+        placingLevel = 1;
     }
 
     public void tick(
@@ -112,8 +131,12 @@ public class OuttakeController2 {
             boolean armUp,
             boolean armDown,
             boolean autoPlace,
-            boolean intakeBlock
+            boolean intakeBlock,
+            boolean levelUp,
+            boolean levelDown
     ) {
+        if (levelUp) placingLevel++;
+        if (levelDown) placingLevel--;
 
         if (currentState == OuttakeState.READY) {
             winchLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -131,7 +154,7 @@ public class OuttakeController2 {
 
             winchLeft.setPower(0);
             winchRight.setPower(0);
-            if (triggerGrab) {
+            if (triggerGrab || readyForGrab) {
                 currentState = OuttakeState.DOWN;
             }
         }
@@ -139,7 +162,7 @@ public class OuttakeController2 {
         else if (currentState == OuttakeState.DOWN) {
             arm1.setPosition(GRIP_POS);
             arm2.setPosition(GRIP_POS);
-            if (System.currentTimeMillis() - timeAtStateStart > GRABBING_MS) {
+            if (triggerGrab) {
                 currentState = OuttakeState.GRABBING;
             }
         }
@@ -147,24 +170,43 @@ public class OuttakeController2 {
         else if (currentState == OuttakeState.GRABBING) {
 
             grip.setPosition(GRAB_GRABBING_POSITION);
-            if (System.currentTimeMillis() - timeAtStateStart > GRABBING_MS) {
-                currentState = OuttakeState.HUMAN;
+            if (triggerGrab && System.currentTimeMillis() - timeAtStateStart > GRABBING_MS) {
+                currentState = OuttakeState.LIFTING;
                 arm1.setPosition(PRIME_POS);
                 arm2.setPosition(PRIME_POS);
             }
         }
 
-
-
-        /*else if (currentState == OuttakeState.EXTENDING) {
-            //slide.setPower(SLIDE_EXTENDING_POWER);
-            if (System.currentTimeMillis() - timeAtStateStart > EXTENDING_MS) {
+        else if (currentState == OuttakeState.LIFTING) {
+            winchLeft.setTargetPosition(levelLiftPosition());
+            winchRight.setTargetPosition(levelLiftPosition());
+            winchLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            winchRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            winchLeft.setPower(1);
+            winchRight.setPower(1);
+            grip.setPosition(GRAB_GRABBING_POSITION);
+            if (Math.abs(getLiftPosition() - levelLiftPosition()) < 10) {
                 currentState = OuttakeState.HUMAN;
             }
-        } */
+        }
+
 
         else if (currentState == OuttakeState.HUMAN) {
-            //slide.setPower(0);
+            winchLeft.setTargetPosition(getLiftPosition());
+            winchRight.setTargetPosition(getLiftPosition());
+            if (armUp) {
+                armTravel += 0.1;
+
+            }
+            if (armDown) {
+                armTravel -= 0.1;
+            }
+            if (autoPlace) {
+                armTravel = 0.7;
+            }
+            arm1.setPosition(levelArmPosition() + armTravel);
+            arm2.setPosition(levelArmPosition() + armTravel);
+
             if (controlUp && liftCanGoUp()) {
                 winchLeft.setPower(HUMAN_UP_POWER);
                 winchRight.setPower(HUMAN_UP_POWER);
@@ -185,59 +227,43 @@ public class OuttakeController2 {
                 winchLeft.setPower(HUMAN_DOWN_POWER);
                 winchRight.setPower(HUMAN_DOWN_POWER);
             }
-            else if (triggerRelease && System.currentTimeMillis() - timeAtStateStart > 1000) { //Ensure that auto doesn't go through this state too fast
+            else if (triggerGrab && System.currentTimeMillis() - timeAtStateStart > 1000) {
                 currentState = OuttakeState.RELEASING;
-                set = false;
+                placingLevel++;
             }
             else { // stay put
                 if (winchLeft.getMode() == DcMotor.RunMode.RUN_USING_ENCODER || winchLeft.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
-                    winchLeft.setTargetPosition(winchLeft.getCurrentPosition() + 10);
-                    winchRight.setTargetPosition(winchRight.getCurrentPosition() + 10);
+                    winchLeft.setTargetPosition(winchLeft.getCurrentPosition());
+                    winchRight.setTargetPosition(winchRight.getCurrentPosition());
                     winchLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     winchRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     winchLeft.setPower(1);
                     winchRight.setPower(1);
                 }
 
-                if (armUp) {
-                   armTravel += 0.01;
-
-                }
-                if (armDown) {
-                    armTravel -= 0.01;
-                }
-                if (autoPlace) {
-                    armTravel = 0.7;
-                }
-
-                arm1.setPosition(PRIME_POS + armTravel);
-                arm2.setPosition(PRIME_POS + armTravel);
 
             }
         }
 
         else if (currentState == OuttakeState.RELEASING) {
+
             armTravel = 0.0;
             grip.setPosition(GRAB_OPEN_POSITION);
-            if (!set) {
-                winchLeft.setTargetPosition(winchLeft.getCurrentPosition() + RELEASE_LIFT);
-                winchRight.setTargetPosition(winchRight.getCurrentPosition() + RELEASE_LIFT);
-                winchLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                winchRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                winchLeft.setPower(1);
-                winchRight.setPower(1);
-                set = true;
-            }
+            winchLeft.setTargetPosition(winchLeft.getCurrentPosition() + RELEASE_LIFT);
+            winchRight.setTargetPosition(winchRight.getCurrentPosition() + RELEASE_LIFT);
+            winchLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            winchRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            winchLeft.setPower(1);
+            winchRight.setPower(1);
+
             if (System.currentTimeMillis() - timeAtStateStart > RELEASING_MS) {
                 currentState = OuttakeState.RETRACTING;
             }
         }
 
         else if (currentState == OuttakeState.RETRACTING) {
-            //grab.setPosition(GRAB_GRABBING_POSITION);
-            //slide.setPower(SLIDE_RETRACTING_POWER);
-            arm1.setPosition(RELEASE_POS);
-            arm2.setPosition(RELEASE_POS);
+            arm1.setPosition(PRIME_POS);
+            arm2.setPosition(PRIME_POS);
             if (System.currentTimeMillis() - timeAtStateStart > RETRACTING_MS) {
                 currentState = OuttakeState.FALLING;
             }
@@ -246,18 +272,12 @@ public class OuttakeController2 {
         else if (currentState == OuttakeState.FALLING) {
             winchLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             winchRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            //grab.setPosition(GRAB_OPEN_POSITION);
             winchLeft.setPower(FALLING_DOWN_POWER);
             winchRight.setPower(FALLING_DOWN_POWER);
             winchLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             winchRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             winchLeft.setPower(FALLING_DOWN_POWER);
             winchRight.setPower(FALLING_DOWN_POWER);
-            //slide.setPower(0);
-            /*if (liftIsNearBottom()) {
-                winchLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                winchRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            }*/
             if (!liftCanGoDown()) {
                 currentState = OuttakeState.READY;
             }

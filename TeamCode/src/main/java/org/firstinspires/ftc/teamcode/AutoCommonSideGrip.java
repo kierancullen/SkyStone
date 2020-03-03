@@ -490,7 +490,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
         in.tick(intakeGo, false, intakeRetract);
         if (intakeGo) { intakeGo = false; }
 
-        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace, false);
+        out.tick(triggerGrab, controlUp, controlDown, triggerRelease, armUp, armDown, autoPlace, false, false, false);
         if (triggerGrab) { triggerGrab = false; }
         if (triggerRelease) {triggerRelease = false; }
 
