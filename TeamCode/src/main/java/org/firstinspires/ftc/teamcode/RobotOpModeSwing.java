@@ -95,19 +95,10 @@ public class RobotOpModeSwing extends OpMode  {
         ramp = hardwareMap.get(DistanceSensor.class, "ramp");
         floor = hardwareMap.get(DistanceSensor.class, "floor");
 
-        redGrip = hardwareMap.get(Servo.class, "redGrip");
-        redGripSwing = hardwareMap.get(Servo.class, "redGripSwing");
-        redGripSwing.setDirection(Servo.Direction.REVERSE);
-        redGrip.setDirection(Servo.Direction.REVERSE);
-
-        setServoExtendedRange(redGrip, 500, 2500);
-        setServoExtendedRange(redGripSwing, 500, 2500);
 
         capstone = hardwareMap.get(Servo.class, "capstone");
         capstone.setPosition(0);
 
-        blueGrip = hardwareMap.get(Servo.class, "blueGrip");
-        blueGripSwing = hardwareMap.get(Servo.class, "blueGripSwing");
 
 
 
