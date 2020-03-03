@@ -6,10 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name="UserControl")
 public class UserControl extends RobotOpModeSwing {
 
-    static double LP_HORIZ_M = 0.5;
+    static double LP_HORIZ_M = .25;
     static double LP_DIFF_M = .35;
     static double HP_HORIZ_M = 1.0; //0.75
-    static double HP_DIFF_M = 1.0;
+    static double HP_DIFF_M = .75;
 
     final boolean CONDENSED = true;
     boolean triggerGrab = false;
@@ -60,7 +60,7 @@ public class UserControl extends RobotOpModeSwing {
 
         GlobalMovement.movement_x = horiz;
         GlobalMovement.movement_y = (l + r) / 2.0;
-        GlobalMovement.movement_turn = (r - l) / 3;
+        GlobalMovement.movement_turn = (r - l) / 2;
 
         if (in.readyForGrab || gamepad2.right_bumper) triggerGrab = true;
         if (gamepad2.y) stowed = false;
