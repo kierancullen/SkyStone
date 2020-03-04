@@ -2,26 +2,26 @@ package com.evolutionftc.autopilot;
 
 
 // Quad-odometer tracker, not using IMU at all
-// Only y for rotation; extra X for translation only
+// Full turn-corroboration version ("x" encoder mounting pattern)
 
-// Copyright (c) 2016-2019 Aedan Cullen and/or Evolution Robotics.
+// Copyright (c) 2016-2020 Aedan Cullen and/or Evolution Robotics.
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-public class AutopilotTrackerQuadOdo extends AutopilotTracker {
+public class AutopilotTrackerQuadFullOdo extends AutopilotTracker {
 
-    private DcMotor x;
-    private DcMotor x2;
+    private DcMotor xF;
+    private DcMotor xB;
     private DcMotor yL;
     private DcMotor yR;
 
-    public boolean invertX;
-    public boolean invertX2;
+    public boolean invertXF;
+    public boolean invertXB;
     public boolean invertYL;
     public boolean invertYR;
 
-    long xenc;
-    long xenc2;
+    long xencF;
+    long xencB;
     long yencL;
     long yencR;
     double ticksPerUnit;
@@ -122,9 +122,9 @@ public class AutopilotTrackerQuadOdo extends AutopilotTracker {
     // Set xOffset to the position in the x-direction of the x-encoder relative to the robot center
     // Set yOffset to the position in the y-direction of the y-encoders relative to the robot center (symmetric)
     //
-    public AutopilotTrackerQuadOdo(DcMotor x, DcMotor x2, DcMotor yL, DcMotor yR, double xRadius, double yRadius, double xOffset, double yOffset, double ticksPerUnit) {
-        this.x = x;
-        this.x2 = x2;
+    public AutopilotTrackerQuadFullOdo(DcMotor xF, DcMotor xB, DcMotor yL, DcMotor yR, double xRadius, double yRadius, double xOffset, double yOffset, double ticksPerUnit) {
+        this.xF = xF;
+        this.xB = xB;
         this.yL = yL;
         this.yR = yR;
         this.ticksPerUnit = ticksPerUnit;
@@ -134,9 +134,9 @@ public class AutopilotTrackerQuadOdo extends AutopilotTracker {
         this.yTheta = Math.atan(yOffset / yRadius);
     }
 
-    public AutopilotTrackerQuadOdo(DcMotor x, DcMotor x2, DcMotor yL, DcMotor yR, double xRadius, double yRadius, double ticksPerUnit) {
-        this.x = x;
-        this.x2 = x2;
+    public AutopilotTrackerQuadFullOdo(DcMotor xF, DcMotor xB, DcMotor yL, DcMotor yR, double xRadius, double yRadius, double ticksPerUnit) {
+        this.xF = xF;
+        this.xB = xB;
         this.yL = yL;
         this.yR = yR;
         this.ticksPerUnit = ticksPerUnit;
@@ -144,9 +144,9 @@ public class AutopilotTrackerQuadOdo extends AutopilotTracker {
         this.yRadius = yRadius;
     }
 
-    public void setInverts(boolean invertX, boolean invertX2, boolean invertYL, boolean invertYR) {
-        this.invertX = invertX;
-        this.invertX2 = invertX2;
+    public void setInverts(boolean invertXF, boolean invertXB, boolean invertYL, boolean invertYR) {
+        this.invertXF = invertXF;
+        this.invertXB = invertXB;
         this.invertYL = invertYL;
         this.invertYR = invertYR;
     }
@@ -154,35 +154,36 @@ public class AutopilotTrackerQuadOdo extends AutopilotTracker {
 
     public void update() {
 
-        long ticksX = x.getCurrentPosition();
-        long ticksX2 = x2.getCurrentPosition();
+        long ticksXF = xF.getCurrentPosition();
+        long ticksXB = xB.getCurrentPosition();
         long ticksYL = yL.getCurrentPosition();
         long ticksYR = yR.getCurrentPosition();
 
-        double xval = ((double)(ticksX - xenc) / ticksPerUnit);
-        double x2val = ((double)(ticksX2 - xenc2) / ticksPerUnit);
+        double xFval = ((double)(ticksXF - xencF) / ticksPerUnit);
+        double xBval = ((double)(ticksXB - xencB) / ticksPerUnit);
         double yLval = ((double)(ticksYL - yencL) / ticksPerUnit);
         double yRval = ((double)(ticksYR - yencR) / ticksPerUnit);
 
-        xenc = ticksX;
-        xenc2 = ticksX2;
+        xencF = ticksXF;
+        xencB = ticksXB;
         yencL = ticksYL;
         yencR = ticksYR;
 
-        if (invertX) {xval = -xval;}
-        if (invertX2) {x2val = -x2val;}
+        if (invertXF) {xFval = -xFval;}
+        if (invertXB) {xBval = -xBval;}
         if (invertYL) {yLval = -yLval;}
         if (invertYR) {yRval = -yRval;}
 
-        double unitsTurn = (yRval - yLval) / 2.0; // CCW rotation is positive
-        double dA = (unitsTurn / Math.cos(yTheta)) / yRadius;
+        double unitsTurnY = (yRval - yLval) / 2.0; // CCW rotation is positive
+        double dAY = (unitsTurnY / Math.cos(yTheta)) / yRadius;
 
-        double error_xval = -(dA * xRadius * Math.cos(xTheta)); // X-odometer at a positive radius wil track negative (left)
-        xval -= error_xval;
-        x2val -= error_xval;
+        double unitsTurnX = (xBval - xFval) / 2.0; // CCW rotation is positive
+        double dAX = (unitsTurnX / Math.cos(xTheta)) / xRadius;
+
+        double dA = (dAX + dAY) / 2.0;
 
         double unitsTranslateY = (yLval + yRval) / 2.0;
-        double unitsTranslateX = (xval + x2val) / 2.0;
+        double unitsTranslateX = (xFval + xBval) / 2.0;
 
         deltaX = unitsTranslateX; deltaY = unitsTranslateY; deltaH = dA;
 
