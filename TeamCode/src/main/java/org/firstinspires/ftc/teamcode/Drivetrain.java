@@ -76,4 +76,6 @@ public class Drivetrain {
         return bottomLeft;
     }
 
+    public DcMotor getXOdometerLeft() {return topRight;}
+
 }

@@ -5,6 +5,7 @@ import com.evolutionftc.autopilot.AutopilotSegment;
 import com.evolutionftc.autopilot.AutopilotSystem;
 import com.evolutionftc.autopilot.AutopilotTracker;
 import com.evolutionftc.autopilot.AutopilotTrackerDualOdo;
+import com.evolutionftc.autopilot.AutopilotTrackerQuadOdo;
 import com.evolutionftc.autopilot.AutopilotTrackerTripleOdo;
 import com.evolutionftc.autopilot.DiscreteIntegralAdjuster;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -304,15 +305,16 @@ public class AutoCommonZooming extends LinearOpMode {
 
 
         autopilot = new AutopilotHost(telemetry);
-        tracker = new AutopilotTrackerDualOdo(
+        tracker = new AutopilotTrackerQuadOdo(
                 myDrivetrain.getXOdometer(),
+                myDrivetrain.getXOdometerLeft(),
                 myDrivetrain.getYOdometerRight(),
+                myDrivetrain.getYOdometerLeft(),
                 DUALODO_X_RADIUS, DUALODO_Y_RADIUS,
-                DUALODO_TICKS_PER_UNIT,
-                imu
+                DUALODO_TICKS_PER_UNIT
         );
 
-        ((AutopilotTrackerDualOdo) tracker).setInverts(false, false);
+        ((AutopilotTrackerQuadOdo) tracker).setInverts(false, false, true, false);
         autopilot.setCountsToStable(AP_COUNTS_TO_STABLE);
         autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
         autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
@@ -367,6 +369,11 @@ public class AutoCommonZooming extends LinearOpMode {
             myDrivetrain.updatePowers();
             //AutopilotSystem.visualizerBroadcastRoutine(autopilot);
             autopilot.telemetryUpdate();
+            telemetry.addData("xRight:", myDrivetrain.getXOdometer().getCurrentPosition());
+            telemetry.addData("xLeft:", myDrivetrain.getXOdometerLeft().getCurrentPosition());
+            telemetry.addData("yRight:", myDrivetrain.getYOdometerRight().getCurrentPosition());
+            telemetry.addData("yLeft:", myDrivetrain.getYOdometerLeft().getCurrentPosition());
+
             telemetry.update();
         }
 
