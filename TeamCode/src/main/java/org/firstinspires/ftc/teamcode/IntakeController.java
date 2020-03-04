@@ -19,7 +19,7 @@ public class IntakeController {
     double GATE_OPEN_POSITION = 0;
     double GATE_CLOSED_POSITION = 0.219;
 
-    double INTAKE_POWER = 0.3;
+    double INTAKE_POWER = 0.5;
 
     long INTAKING_MS = 1000;
     long RAMP_MS = 1000;
