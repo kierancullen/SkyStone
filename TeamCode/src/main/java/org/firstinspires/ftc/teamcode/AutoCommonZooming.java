@@ -70,7 +70,7 @@ public class AutoCommonZooming extends LinearOpMode {
     public static double[] INVERT_ROBOT_INIT_ATTITUDE = new double[]{0, 0, 0};
 
     public static double DUALODO_X_RADIUS = (3.25614173 - 2.3134252);
-    public static double DUALODO_Y_RADIUS = 7.184370097; //-0.25051181102 + 7.184370097; //7.28370097;//
+    public static double DUALODO_Y_RADIUS = 7.284370097; //-0.25051181102 + 7.184370097; //7.28370097;//
     public static double DUALODO_X_OFFSET = 7.687480315;
     public static double DUALODO_Y_OFFSET = 2.21;
 
@@ -176,8 +176,8 @@ public class AutoCommonZooming extends LinearOpMode {
             lastTime = timeNow;
 
             //AutopilotSystem.visualizerBroadcastRoutine(autopilot);
-            //autopilot.telemetryUpdate();
-            //telemetry.update();
+            autopilot.telemetryUpdate();
+            telemetry.update();
 
             yxh = autopilot.navigationTick();
         }
@@ -305,15 +305,17 @@ public class AutoCommonZooming extends LinearOpMode {
 
 
         autopilot = new AutopilotHost(telemetry);
-        tracker = new AutopilotTrackerTripleOdo(
+        tracker = new AutopilotTrackerQuadOdo(
                 myDrivetrain.getXOdometer(),
-                myDrivetrain.getYOdometerRight(),
+                myDrivetrain.getXOdometerLeft(),
                 myDrivetrain.getYOdometerLeft(),
+                myDrivetrain.getYOdometerRight(),
                 DUALODO_X_RADIUS, DUALODO_Y_RADIUS,
+                DUALODO_X_OFFSET, DUALODO_Y_OFFSET,
                 DUALODO_TICKS_PER_UNIT
         );
 
-        ((AutopilotTrackerTripleOdo) tracker).setInverts(false, true, false);
+        ((AutopilotTrackerQuadOdo) tracker).setInverts(false, true, true, false);
         autopilot.setCountsToStable(AP_COUNTS_TO_STABLE);
         autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
         autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
@@ -324,7 +326,7 @@ public class AutoCommonZooming extends LinearOpMode {
         }
 
         // record any drift that happened while waiting, and zero it out
-        //autopilot.communicate(tracker);
+        autopilot.communicate(tracker);
         if (!invert) {
             tracker.setRobotAttitude(ROBOT_INIT_ATTITUDE);
             tracker.setRobotPosition(ROBOT_INIT_POSITION);
@@ -333,11 +335,13 @@ public class AutoCommonZooming extends LinearOpMode {
             tracker.setRobotAttitude(INVERT_ROBOT_INIT_ATTITUDE);
             tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
         }
-        //0autopilot.communicate(tracker);
+        autopilot.communicate(tracker);
 
         popper = new PixelPopNoLens();
         popper.initVuforia();
         while (!opModeIsActive()) {
+            autopilot.communicate(tracker);
+            autopilot.telemetryUpdate();
             if (!invert) {
                 popper.captureLocations(popper.STONE_LOCATIONS_RED);
             }
@@ -355,14 +359,13 @@ public class AutoCommonZooming extends LinearOpMode {
         out.start();
 
         int location = popper.locations[0];
-        tl.setZeroPowerBehavior(FLOAT);
-        tr.setZeroPowerBehavior(FLOAT);
-        br.setZeroPowerBehavior(FLOAT);
-        bl.setZeroPowerBehavior(FLOAT);
+        tl.setZeroPowerBehavior(BRAKE);
+        tr.setZeroPowerBehavior(BRAKE);
+        br.setZeroPowerBehavior(BRAKE);
+        bl.setZeroPowerBehavior(BRAKE);
 
-        tracker.setRobotAttitude(new double[]{0,0,0});
 
-        while (opModeIsActive()) {
+        /*while (opModeIsActive()) {
             autopilot.communicate(tracker);
             GlobalMovement.updateFromGamepad(gamepad1);
             myDrivetrain.updatePowers();
@@ -374,7 +377,7 @@ public class AutoCommonZooming extends LinearOpMode {
             telemetry.addData("yLeft:", myDrivetrain.getYOdometerLeft().getCurrentPosition());
 
             telemetry.update();
-        }
+        }*/
 
         //Only going for the first skystone on this run
         if (location == 0) {
@@ -386,13 +389,8 @@ public class AutoCommonZooming extends LinearOpMode {
         }
         if (location == 2) {
             apGoTo(new double[]{26,40,0}, Math.PI/6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, true);
-            apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, true, 1.0, 0.7, 0.03, 1.25, 1, true);
-            apGoTo(new double[]{4*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, false);
-            apGoTo(new double[]{5*24,40,0}, Math.PI, true, true, true, 1.0, 0.2, 0.03, 1.25, 1, false);
-            //apGoTo(new double[]{3*24,36,0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 1, true);
-
-            //apGoTo(new double[]{4*24 - 6,36,0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 1, true);
-
+            apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 0.8, 1, true);
+            apGoTo(new double[]{3*24 - 12,36,0}, Math.PI/2, true, true, true, 1.0, 1.0, 0.03, 1.25, 1, false);
 
             tl.setZeroPowerBehavior(BRAKE);
             tr.setZeroPowerBehavior(BRAKE);
@@ -403,34 +401,51 @@ public class AutoCommonZooming extends LinearOpMode {
             tl.setPower(0);
             bl.setPower(0);
             br.setPower(0);
+            while (opModeIsActive()) {
+                sleep(1);
+            }
+            apGoTo(new double[]{4*24,36,0}, Math.PI/2, false, true, false, 1.0, 1.0, 0.03, 1.25, 1, false);
+            apGoTo(new double[]{4*24 + 12,30,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, false);
+            apGoTo(new double[]{5*24,40,0}, Math.PI, true, true, true, 1.0, 0.4, 0.03, 1.25, 3, false);
 
         }
 
-        /*
+
         //Drive to foundation
 
         autoPlace=true;
 
         //Bump against foundation and grab
-        apGoTo(new double[]{5*24 , 44, 0}, Math.PI, true, true, true, 0.5, 0.3, 0.02, 1); //38
         grab1.setPosition(0.53);
         grab2.setPosition(0.53);
-        triggerRelease=true;
+        //triggerRelease=true;
         sleep(1000);
 
         //Pull foundation out
-        apGoToNoStrafe(new double[]{4*24 + 1 , 20, 0}, Math.PI, false, true, false, 0.7, 0.3, 0.02);
+        //apGoTo(new double[]{4*24 + 1 , 20, 0}, Math.PI, false, true, true, 0.7, 0.5, 0.02, 1.25, 5, true);
+
+        tl.setZeroPowerBehavior(BRAKE);
+        tr.setZeroPowerBehavior(BRAKE);
+        br.setZeroPowerBehavior(BRAKE);
+        bl.setZeroPowerBehavior(BRAKE);
+
+        tr.setPower(0);
+        tl.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+
+        /*
         //Correct rotation and raise hooks
         apGoTo(new double[]{4*24 +1 , 20, 0}, Math.PI/2, true, false, false, 0.7, 0.3, 0.02);
         grab1.setPosition(0.25);
         grab2.setPosition(0.25);
 
         //Strafe to center the robot on the foundation
-        apGoTo(new double[]{4*24 - 5 , 24, 0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.05, 3);
-        apGoTo(new double[]{5*24 - 4 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 2);
-        apGoTo(new double[]{3*24 , 32, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 3);
+        apGoTo(new double[]{4*24 - 5 , 24, 0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.05, 1.25, 3, false);
+        apGoTo(new double[]{5*24 - 4 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 1.25, 2, false);
+        apGoTo(new double[]{3*24 , 32, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 1.25, 3, false);
 
-
+/*
         autoPlace = false;
         location =  popper.locations[0];
         if (location == 0) {
