@@ -69,8 +69,8 @@ public class AutoCommonZooming extends LinearOpMode {
     public static double[] INVERT_ROBOT_INIT_POSITION = new double[]{-36, 9.2, 0};
     public static double[] INVERT_ROBOT_INIT_ATTITUDE = new double[]{0, 0, 0};
 
-    public static double DUALODO_X_RADIUS = 3.25614173 - 2.3134252;
-    public static double DUALODO_Y_RADIUS = 7.3204370097; //7.304370097; //-0.25051181102 + 7.184370097; //7.28370097;//
+    public static double DUALODO_X_RADIUS = (3.25614173 - 2.3134252);
+    public static double DUALODO_Y_RADIUS = 7.184370097; //-0.25051181102 + 7.184370097; //7.28370097;//
     public static double DUALODO_X_OFFSET = 7.687480315;
     public static double DUALODO_Y_OFFSET = 2.21;
 
@@ -305,16 +305,15 @@ public class AutoCommonZooming extends LinearOpMode {
 
 
         autopilot = new AutopilotHost(telemetry);
-        tracker = new AutopilotTrackerQuadOdo(
+        tracker = new AutopilotTrackerTripleOdo(
                 myDrivetrain.getXOdometer(),
-                myDrivetrain.getXOdometerLeft(),
                 myDrivetrain.getYOdometerRight(),
                 myDrivetrain.getYOdometerLeft(),
                 DUALODO_X_RADIUS, DUALODO_Y_RADIUS,
                 DUALODO_TICKS_PER_UNIT
         );
 
-        ((AutopilotTrackerQuadOdo) tracker).setInverts(false, false, true, false);
+        ((AutopilotTrackerTripleOdo) tracker).setInverts(false, true, false);
         autopilot.setCountsToStable(AP_COUNTS_TO_STABLE);
         autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
         autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
