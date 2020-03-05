@@ -180,7 +180,7 @@ public class AutopilotTrackerQuadFullOdo extends AutopilotTracker {
         double unitsTurnX = (xBval - xFval) / 2.0; // CCW rotation is positive
         double dAX = (unitsTurnX / Math.cos(xTheta)) / xRadius;
 
-        double dA = (dAX + dAY) / 2.0;
+        double dA = dAX;//(dAX + dAY) / 2.0;
 
         double unitsTranslateY = (yLval + yRval) / 2.0;
         double unitsTranslateX = (xFval + xBval) / 2.0;
