@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
@@ -61,6 +62,13 @@ public class AutoCommonZooming extends LinearOpMode {
 
     BNO055IMU imu;
 
+    AnalogInput sonarLeft;
+    DigitalChannel triggerLeft;
+    AnalogInput sonarBackLeft;
+    DigitalChannel triggerBackLeft;
+    AnalogInput sonarBackRight;
+    DigitalChannel triggerBackRight;
+
     AutopilotHost autopilot;
     AutopilotTracker tracker;
 
@@ -87,6 +95,23 @@ public class AutoCommonZooming extends LinearOpMode {
         int servoPort = servo.getPortNumber();
         PwmControl.PwmRange range = new PwmControl.PwmRange(min, max);
         controller.setServoPwmRange(servoPort, range);
+    }
+
+    void updateXFromSonar(AnalogInput sonar, DigitalChannel trigger) {
+        trigger.setState(true);
+        trigger.setState(false);
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < 100 && opModeIsActive()){
+            idleStateMachines();
+            autopilot.communicate(tracker);
+        }
+        double reading = (6 * 24) - (73.123*sonar.getVoltage() + 5);
+        telemetry.addData("reading:", reading);
+        autopilot.communicate(tracker);
+        double[] robotPos = tracker.getRobotPosition();
+        robotPos[0] = reading;
+        tracker.setRobotPosition(robotPos);
+        autopilot.communicate(tracker);
     }
 
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop) {
@@ -303,6 +328,17 @@ public class AutoCommonZooming extends LinearOpMode {
         parameters.calibrationDataFile = "BNO055IMUCalibration.json";
         imu.initialize(parameters);
 
+        sonarLeft = hardwareMap.analogInput.get("sonarLeft");
+        triggerLeft = hardwareMap.digitalChannel.get("triggerLeft");
+        triggerLeft.setMode(DigitalChannel.Mode.OUTPUT);
+
+        sonarBackLeft = hardwareMap.analogInput.get("sonarBackLeft");
+        triggerBackLeft = hardwareMap.digitalChannel.get("triggerBackLeft");
+        triggerBackLeft.setMode(DigitalChannel.Mode.OUTPUT);
+
+        sonarBackRight = hardwareMap.analogInput.get("sonarBackRight");
+        triggerBackRight= hardwareMap.digitalChannel.get("triggerBackRight");
+        triggerBackRight.setMode(DigitalChannel.Mode.OUTPUT);
 
         autopilot = new AutopilotHost(telemetry);
         tracker = new AutopilotTrackerQuadOdo(
@@ -389,8 +425,17 @@ public class AutoCommonZooming extends LinearOpMode {
         }
         if (location == 2) {
             apGoTo(new double[]{26,40,0}, Math.PI/6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, true);
-            apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 0.8, 1, true);
-            apGoTo(new double[]{3*24 - 12,36,0}, Math.PI/2, true, true, true, 1.0, 1.0, 0.03, 1.25, 1, false);
+            apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, true);
+            //apGoTo(new double[]{3*24 - 12,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, true);
+
+            apGoTo(new double[]{4*24 - 12,36,0}, Math.PI/2, true, true, true, 1.0, 0.2, 0.03, 1.25, 1, true);
+            while (opModeIsActive()) {
+                sleep(1);
+                telemetry.update();
+            }
+            //apGoTo(new double[]{4*24+4,24,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 0.5, 3, true);
+            apGoTo(new double[]{5*24 - 12,40,0}, Math.PI, true, true, true, 1.0, 0.4, 0.03, 1.25, 5, false);
+
 
             tl.setZeroPowerBehavior(BRAKE);
             tr.setZeroPowerBehavior(BRAKE);
@@ -401,12 +446,14 @@ public class AutoCommonZooming extends LinearOpMode {
             tl.setPower(0);
             bl.setPower(0);
             br.setPower(0);
+
+            updateXFromSonar(sonarLeft, triggerLeft);
+            telemetry.update();
+            apGoTo(new double[]{5*24,44,0}, Math.PI, true, true, true, 1.0, 0.7, 0.03, 1.25, 3, false);
             while (opModeIsActive()) {
                 sleep(1);
+                telemetry.update();
             }
-            apGoTo(new double[]{4*24,36,0}, Math.PI/2, false, true, false, 1.0, 1.0, 0.03, 1.25, 1, false);
-            apGoTo(new double[]{4*24 + 12,30,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, false);
-            apGoTo(new double[]{5*24,40,0}, Math.PI, true, true, true, 1.0, 0.4, 0.03, 1.25, 3, false);
 
         }
 
