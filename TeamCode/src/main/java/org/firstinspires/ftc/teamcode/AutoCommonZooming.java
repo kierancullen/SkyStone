@@ -97,7 +97,7 @@ public class AutoCommonZooming extends LinearOpMode {
         controller.setServoPwmRange(servoPort, range);
     }
 
-    void updateXFromSonar(AnalogInput sonar, DigitalChannel trigger) {
+    double updateXFromSonar(AnalogInput sonar, DigitalChannel trigger) {
         trigger.setState(true);
         trigger.setState(false);
         long start = System.currentTimeMillis();
@@ -112,6 +112,7 @@ public class AutoCommonZooming extends LinearOpMode {
         robotPos[0] = reading;
         tracker.setRobotPosition(robotPos);
         autopilot.communicate(tracker);
+        return reading;
     }
 
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop) {
@@ -159,10 +160,10 @@ public class AutoCommonZooming extends LinearOpMode {
     }
 
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain) {
-        apGoTo(pos, hdg, useOrientation, useTranslation, fullStop, navigationMax, navigationMin, navigationGain, 1.25, AP_NAV_UNITS_TO_STABLE, false);
+        apGoTo(pos, hdg, useOrientation, useTranslation, fullStop, navigationMax, navigationMin, navigationGain, 1.25, AP_NAV_UNITS_TO_STABLE, AP_ORIENT_UNITS_TO_STABLE, false);
     }
 
-    public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain, double orientationGain, double navigationUnitsToStable, boolean diffMode) {
+    public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain, double orientationGain, double navigationUnitsToStable, double orientationUnitsToStable, boolean diffMode) {
         AutopilotSegment seg = new AutopilotSegment();
         seg.navigationTarget = pos;
         seg.orientationTarget = hdg;
@@ -177,6 +178,7 @@ public class AutoCommonZooming extends LinearOpMode {
         seg.diffMode = diffMode;
 
         autopilot.setNavigationUnitsToStable(navigationUnitsToStable);
+        autopilot.setOrientationUnitsToStable(orientationUnitsToStable);
 
         autopilot.setNavigationTarget(seg);
         autopilot.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
@@ -424,17 +426,14 @@ public class AutoCommonZooming extends LinearOpMode {
 
         }
         if (location == 2) {
-            apGoTo(new double[]{26,40,0}, Math.PI/6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, true);
-            apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, true);
+            apGoTo(new double[]{26,40,0}, Math.PI/6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, 0.05, true);
+            apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05, true);
             //apGoTo(new double[]{3*24 - 12,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, true);
 
-            apGoTo(new double[]{4*24 - 12,36,0}, Math.PI/2, true, true, true, 1.0, 0.2, 0.03, 1.25, 1, true);
-            while (opModeIsActive()) {
-                sleep(1);
-                telemetry.update();
-            }
+            apGoTo(new double[]{4*24,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 0.75, 1, 0.05, true);
+            apGoTo(new double[]{5*24,36,0}, Math.PI, true, false, true, 1.0, 0.3, 0.03, 1.25, 3, 0.1, false);
             //apGoTo(new double[]{4*24+4,24,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 0.5, 3, true);
-            apGoTo(new double[]{5*24 - 12,40,0}, Math.PI, true, true, true, 1.0, 0.4, 0.03, 1.25, 5, false);
+            //apGoTo(new double[]{5*24 - 12,40,0}, Math.PI, true, true, true, 1.0, 0.4, 0.03, 1.25, 5, false);
 
 
             tl.setZeroPowerBehavior(BRAKE);
@@ -447,11 +446,28 @@ public class AutoCommonZooming extends LinearOpMode {
             bl.setPower(0);
             br.setPower(0);
 
-            updateXFromSonar(sonarLeft, triggerLeft);
+            double reading = updateXFromSonar(sonarLeft, triggerLeft);
             telemetry.update();
-            apGoTo(new double[]{5*24,44,0}, Math.PI, true, true, true, 1.0, 0.7, 0.03, 1.25, 3, false);
+
+
+            apGoTo(new double[]{5*24,44,0}, Math.PI, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05,  false);
+            tl.setZeroPowerBehavior(BRAKE);
+            tr.setZeroPowerBehavior(BRAKE);
+            br.setZeroPowerBehavior(BRAKE);
+            bl.setZeroPowerBehavior(BRAKE);
+
+            tr.setPower(0);
+            tl.setPower(0);
+            bl.setPower(0);
+            br.setPower(0);
+            grab1.setPosition(0.53);
+            grab2.setPosition(0.53);
+            sleep(500);
+            apGoTo(new double[]{4*24 , 36, 0}, Math.PI, false, true, true, 1.0, 0.3, 0.02, 1.25, 5, 0.05, true);
+
             while (opModeIsActive()) {
                 sleep(1);
+                telemetry.addData("Reading:", reading);
                 telemetry.update();
             }
 
