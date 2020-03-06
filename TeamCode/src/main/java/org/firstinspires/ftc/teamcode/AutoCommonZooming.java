@@ -427,11 +427,12 @@ public class AutoCommonZooming extends LinearOpMode {
 
         }
         if (location == 2) {
+
             apGoTo(new double[]{26,40,0}, Math.PI/6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, 0.05, true);
             apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05, true);
             //apGoTo(new double[]{3*24 - 12,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, true);
 
-            apGoTo(new double[]{4*24,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 0.75, 1, 0.05, true);
+            apGoTo(new double[]{4*24 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 0.75, 1, 0.05, true);
 
             autopilot.communicate(tracker);
 
@@ -440,11 +441,34 @@ public class AutoCommonZooming extends LinearOpMode {
                 telemetry.addData("heading: ", autopilot.getRobotAttitude()[0]);
                 telemetry.update();
                 double error = Math.PI - autopilot.getRobotAttitude()[0];
-                movement_turn = 0.25; //-error * 1.25;
-                movement_x = -0.25; //* 1.25;
+                movement_turn = error * 0.32;
+                movement_x = 0 ; //* 1.25;
+                movement_y = -error * 0.32;
                 myDrivetrain.updatePowers();
             }
+            autopilot.communicate(tracker);
+            apGoTo(new double[]{autopilot.getRobotPosition()[0],autopilot.getRobotPosition()[1]+3,0}, Math.PI, true, true, true, 1.0, 0.25, 0.03, 1.25, 1, 0.05,  false);
 
+            tr.setPower(0);
+            tl.setPower(0);
+            bl.setPower(0);
+            br.setPower(0);
+
+            autopilot.communicate(tracker);
+            grab1.setPosition(0.53);
+            grab2.setPosition(0.53);
+            sleep(500);
+
+
+
+            tl.setZeroPowerBehavior(BRAKE);
+            tr.setZeroPowerBehavior(BRAKE);
+            br.setZeroPowerBehavior(BRAKE);
+            bl.setZeroPowerBehavior(BRAKE);
+
+
+
+            apGoTo(new double[]{autopilot.getRobotPosition()[0],44,0}, Math.PI, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05,  false);
             tl.setZeroPowerBehavior(BRAKE);
             tr.setZeroPowerBehavior(BRAKE);
             br.setZeroPowerBehavior(BRAKE);
@@ -455,10 +479,8 @@ public class AutoCommonZooming extends LinearOpMode {
             bl.setPower(0);
             br.setPower(0);
 
-            while (opModeIsActive()) {
-                sleep(1);
-                telemetry.update();
-            }
+
+
 
 
 
