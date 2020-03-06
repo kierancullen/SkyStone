@@ -447,7 +447,19 @@ public class AutoCommonZooming extends LinearOpMode {
                 myDrivetrain.updatePowers();
             }
             autopilot.communicate(tracker);
-            apGoTo(new double[]{autopilot.getRobotPosition()[0],autopilot.getRobotPosition()[1]+3,0}, Math.PI, true, true, true, 1.0, 0.25, 0.03, 1.25, 1, 0.05,  false);
+            double reading = updateXFromSonar(sonarLeft, triggerLeft);
+
+            tr.setPower(0);
+            tl.setPower(0);
+            bl.setPower(0);
+            br.setPower(0);
+
+            while (opModeIsActive()) {
+                telemetry.addData("reading:", reading);
+                telemetry.update();
+                sleep(1);
+            }
+            apGoTo(new double[]{5*24,autopilot.getRobotPosition()[1]+3,0}, Math.PI, true, true, false, 1.0, 0.7, 0.03, 1.25, 1, 0.05,  false);
 
             tr.setPower(0);
             tl.setPower(0);
@@ -458,7 +470,13 @@ public class AutoCommonZooming extends LinearOpMode {
             grab1.setPosition(0.53);
             grab2.setPosition(0.53);
             sleep(500);
+            apGoTo(new double[]{4*24 , 36, 0}, Math.PI, false, true, true, 1.0, 0.3, 0.02, 1.25, 5, 0.05, true);
 
+            while (opModeIsActive()) {
+                telemetry.addData("reading:", reading);
+                telemetry.update();
+                sleep(1);
+            }
 
 
             tl.setZeroPowerBehavior(BRAKE);
@@ -499,7 +517,6 @@ public class AutoCommonZooming extends LinearOpMode {
             bl.setPower(0);
             br.setPower(0);
 
-            double reading = updateXFromSonar(sonarLeft, triggerLeft);
             telemetry.update();
 
 
