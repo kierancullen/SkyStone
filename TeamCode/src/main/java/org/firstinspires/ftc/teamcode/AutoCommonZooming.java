@@ -130,9 +130,9 @@ public class AutoCommonZooming extends LinearOpMode {
             idleStateMachines();
             autopilot.communicate(tracker);
         }
-        double readingBackLeft = (73.123*sonarBackLeft.getVoltage() + 1);
-        double readingBackRight = (73.123*sonarLeft.getVoltage() + 1);
-        double readingLeft = (73.123*sonarLeft.getVoltage() + 5);
+        double readingBackLeft = (73.123*sonarBackLeft.getVoltage() + 7.5);
+        double readingBackRight = (73.123*sonarLeft.getVoltage() + 7.5);
+        double readingLeft = (73.123*sonarLeft.getVoltage() + 6);
         double readingRight = 0;
 
         double backWallDist = (readingBackLeft + readingBackRight) / 2;
@@ -144,6 +144,10 @@ public class AutoCommonZooming extends LinearOpMode {
         double[] robotPos = tracker.getRobotPosition();
         robotPos[0] = (6*24 - backWallDist);
         robotPos[1] = (sideWallDist);
+
+        double[] robotAttitude = tracker.getRobotAttitude();
+        //Resent rotation here since we're squared against the wall
+        robotAttitude[0] = Math.PI/2;
 
         tracker.setRobotPosition(robotPos);
         autopilot.communicate(tracker);
@@ -511,16 +515,18 @@ public class AutoCommonZooming extends LinearOpMode {
             grab1.setPosition(0.25);
             grab2.setPosition(0.25);
             updateAllFromSonar(invert);
+            while (opModeIsActive()) {
+                autopilot.communicate(tracker);
+                autopilot.telemetryUpdate();
+                telemetry.update();
+                sleep(1);
+            }
             apGoTo(new double[]{3*24 ,36,0}, Math.PI/2, true, true, true, 1.0, 0.2, 0.03, 1.25, 1, 0.05, false);
             tr.setPower(0);
             tl.setPower(0);
             bl.setPower(0);
             br.setPower(0);
-            while (opModeIsActive()) {
-                autopilot.telemetryUpdate();
-                telemetry.update();
-                sleep(1);
-            }
+
 
 
             tl.setZeroPowerBehavior(BRAKE);

@@ -199,6 +199,15 @@ public class Mecanum2 extends RobotOpMode {
         triggerBackLeft.setState(false);
         triggerBackRight.setState(false);
 
+        if (gamepad2.back) {
+            triggerLeft.setState(true);
+            triggerBackLeft.setState(true);
+            triggerBackRight.setState(true);
+            triggerLeft.setState(false);
+            triggerBackLeft.setState(false);
+            triggerBackRight.setState(false);
+        }
+
         rampDetected = ramp.getDistance(DistanceUnit.MM) < 100;
         floorDetected = floor.getDistance(DistanceUnit.MM) < 100;
 
