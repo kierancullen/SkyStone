@@ -466,7 +466,7 @@ public class AutoCommonZooming extends LinearOpMode {
             apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05, true);
             //apGoTo(new double[]{3*24 - 12,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, true);
 
-            apGoTo(new double[]{4*24 - 4 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 0.4, 1, 0.05, true);
+            apGoTo(new double[]{4*24 - 4 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 1.25, 1, 0.05, false);
 
             autopilot.communicate(tracker);
 
