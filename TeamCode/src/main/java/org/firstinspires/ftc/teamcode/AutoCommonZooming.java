@@ -432,7 +432,7 @@ public class AutoCommonZooming extends LinearOpMode {
             apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05, true);
             //apGoTo(new double[]{3*24 - 12,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, true);
 
-            apGoTo(new double[]{4*24 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 0.75, 1, 0.05, true);
+            apGoTo(new double[]{4*24 - 4 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 0.75, 1, 0.05, true);
 
             autopilot.communicate(tracker);
 
@@ -447,19 +447,10 @@ public class AutoCommonZooming extends LinearOpMode {
                 myDrivetrain.updatePowers();
             }
             autopilot.communicate(tracker);
-            double reading = updateXFromSonar(sonarLeft, triggerLeft);
+            //double reading = updateXFromSonar(sonarLeft, triggerLeft);
 
-            tr.setPower(0);
-            tl.setPower(0);
-            bl.setPower(0);
-            br.setPower(0);
 
-            while (opModeIsActive()) {
-                telemetry.addData("reading:", reading);
-                telemetry.update();
-                sleep(1);
-            }
-            apGoTo(new double[]{5*24,autopilot.getRobotPosition()[1]+3,0}, Math.PI, true, true, false, 1.0, 0.7, 0.03, 1.25, 1, 0.05,  false);
+            apGoTo(new double[]{autopilot.getRobotPosition()[0],autopilot.getRobotPosition()[1]+3,0}, Math.PI, true, true, false, 1.0, 0.7, 0.03, 1.25, 1, 0.05,  false);
 
             tr.setPower(0);
             tl.setPower(0);
@@ -470,10 +461,10 @@ public class AutoCommonZooming extends LinearOpMode {
             grab1.setPosition(0.53);
             grab2.setPosition(0.53);
             sleep(500);
-            apGoTo(new double[]{4*24 , 36, 0}, Math.PI, false, true, true, 1.0, 0.3, 0.02, 1.25, 5, 0.05, true);
-
+            apGoTo(new double[]{4*24 , 36, 0}, Math.PI, false, true, true, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
+            apGoTo(new double[]{4*24 , 36, 0}, Math.PI/2, true, false, true, 1.0, 0.2, 0.02, 1.25, 5, 0.05, false);
             while (opModeIsActive()) {
-                telemetry.addData("reading:", reading);
+                //telemetry.addData("reading:", reading);
                 telemetry.update();
                 sleep(1);
             }
@@ -533,11 +524,12 @@ public class AutoCommonZooming extends LinearOpMode {
             grab1.setPosition(0.53);
             grab2.setPosition(0.53);
             sleep(500);
-            apGoTo(new double[]{4*24 , 36, 0}, Math.PI, false, true, true, 1.0, 0.3, 0.02, 1.25, 5, 0.05, true);
-
+            apGoTo(new double[]{4*24 , 36, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
+            apGoTo(new double[]{5*24 , 36, 0}, Math.PI/2, true, true, true, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
             while (opModeIsActive()) {
                 sleep(1);
-                telemetry.addData("Reading:", reading);
+                //
+                // telemetry.addData("Reading:", reading);
                 telemetry.update();
             }
 
