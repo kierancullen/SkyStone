@@ -129,7 +129,6 @@ public class AutoCommonZooming extends LinearOpMode {
         while (System.currentTimeMillis() - start < 100 && opModeIsActive()){
             idleStateMachines();
             autopilot.communicate(tracker);
-            myDrivetrain.updatePowers();
         }
         double readingBackLeft = (73.123*sonarBackLeft.getVoltage() + 1);
         double readingBackRight = (73.123*sonarLeft.getVoltage() + 1);
@@ -485,21 +484,40 @@ public class AutoCommonZooming extends LinearOpMode {
             //double reading = updateXFromSonar(sonarLeft, triggerLeft);
 
 
-            apGoTo(new double[]{autopilot.getRobotPosition()[0],autopilot.getRobotPosition()[1]+3,0}, Math.PI, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05,  false);
+            apGoTo(new double[]{autopilot.getRobotPosition()[0],autopilot.getRobotPosition()[1]+4,0}, Math.PI, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05,  false);
 
             tr.setPower(0);
             tl.setPower(0);
             bl.setPower(0);
             br.setPower(0);
 
-            autopilot.communicate(tracker);
+
             grab1.setPosition(0.53);
             grab2.setPosition(0.53);
             sleep(500);
-            apGoTo(new double[]{4*24 , 36, 0}, Math.PI, false, true, false, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
-            apGoTo(new double[]{5*24 , 36, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
+            autopilot.communicate(tracker);
+            apGoTo(new double[]{4*24 , 36, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 2, 0.05, true);
+
+            long start = System.currentTimeMillis();
+            while (System.currentTimeMillis() - start < 2000 && opModeIsActive()){
+                apGoTo(new double[]{5*24 , 30, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
+                idleStateMachines();
+                autopilot.communicate(tracker);
+            }
+            tr.setPower(0);
+            tl.setPower(0);
+            bl.setPower(0);
+            br.setPower(0);
+            grab1.setPosition(0.25);
+            grab2.setPosition(0.25);
+            updateAllFromSonar(invert);
+            apGoTo(new double[]{3*24 ,36,0}, Math.PI/2, true, true, true, 1.0, 0.2, 0.03, 1.25, 1, 0.05, false);
+            tr.setPower(0);
+            tl.setPower(0);
+            bl.setPower(0);
+            br.setPower(0);
             while (opModeIsActive()) {
-                //telemetry.addData("reading:", reading);
+                autopilot.telemetryUpdate();
                 telemetry.update();
                 sleep(1);
             }
