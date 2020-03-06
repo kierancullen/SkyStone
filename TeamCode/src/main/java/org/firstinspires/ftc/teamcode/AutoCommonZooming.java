@@ -19,6 +19,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
+import com.qualcomm.robotcore.util.Range;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
@@ -431,6 +432,36 @@ public class AutoCommonZooming extends LinearOpMode {
             //apGoTo(new double[]{3*24 - 12,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, true);
 
             apGoTo(new double[]{4*24,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 0.75, 1, 0.05, true);
+
+            autopilot.communicate(tracker);
+
+            while (Math.abs(Math.PI - autopilot.getRobotAttitude()[0]) > 0.1) {
+                autopilot.communicate(tracker);
+                telemetry.addData("heading: ", autopilot.getRobotAttitude()[0]);
+                telemetry.update();
+                double error = Math.PI - autopilot.getRobotAttitude()[0];
+                movement_turn = 0.25; //-error * 1.25;
+                movement_x = -0.25; //* 1.25;
+                myDrivetrain.updatePowers();
+            }
+
+            tl.setZeroPowerBehavior(BRAKE);
+            tr.setZeroPowerBehavior(BRAKE);
+            br.setZeroPowerBehavior(BRAKE);
+            bl.setZeroPowerBehavior(BRAKE);
+
+            tr.setPower(0);
+            tl.setPower(0);
+            bl.setPower(0);
+            br.setPower(0);
+
+            while (opModeIsActive()) {
+                sleep(1);
+                telemetry.update();
+            }
+
+
+
             apGoTo(new double[]{5*24,36,0}, Math.PI, true, false, true, 1.0, 0.3, 0.03, 1.25, 3, 0.1, false);
             //apGoTo(new double[]{4*24+4,24,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 0.5, 3, true);
             //apGoTo(new double[]{5*24 - 12,40,0}, Math.PI, true, true, true, 1.0, 0.4, 0.03, 1.25, 5, false);
