@@ -98,6 +98,7 @@ public class AutoCommonZooming extends LinearOpMode {
         controller.setServoPwmRange(servoPort, range);
     }
 
+    //Not currently using this
     double updateXFromSonar(AnalogInput sonar, DigitalChannel trigger) {
         trigger.setState(true);
         trigger.setState(false);
@@ -114,6 +115,40 @@ public class AutoCommonZooming extends LinearOpMode {
         tracker.setRobotPosition(robotPos);
         autopilot.communicate(tracker);
         return reading;
+    }
+
+    //Used at the foundation only
+    void updateAllFromSonar(boolean invert) {
+        triggerLeft.setState(true);
+        triggerBackLeft.setState(true);
+        triggerBackRight.setState(true);
+        triggerLeft.setState(false);
+        triggerBackLeft.setState(false);
+        triggerBackRight.setState(false);
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < 100 && opModeIsActive()){
+            idleStateMachines();
+            autopilot.communicate(tracker);
+            myDrivetrain.updatePowers();
+        }
+        double readingBackLeft = (73.123*sonarBackLeft.getVoltage() + 1);
+        double readingBackRight = (73.123*sonarLeft.getVoltage() + 1);
+        double readingLeft = (73.123*sonarLeft.getVoltage() + 5);
+        double readingRight = 0;
+
+        double backWallDist = (readingBackLeft + readingBackRight) / 2;
+        double sideWallDist;
+        if (invert) sideWallDist = readingRight;
+        else sideWallDist = readingLeft;
+
+        autopilot.communicate(tracker);
+        double[] robotPos = tracker.getRobotPosition();
+        robotPos[0] = (6*24 - backWallDist);
+        robotPos[1] = (sideWallDist);
+
+        tracker.setRobotPosition(robotPos);
+        autopilot.communicate(tracker);
+
     }
 
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop) {
@@ -441,16 +476,16 @@ public class AutoCommonZooming extends LinearOpMode {
                 telemetry.addData("heading: ", autopilot.getRobotAttitude()[0]);
                 telemetry.update();
                 double error = Math.PI - autopilot.getRobotAttitude()[0];
-                movement_turn = error * 0.32;
+                movement_turn = error * 0.45;
                 movement_x = 0 ; //* 1.25;
-                movement_y = -error * 0.32;
+                movement_y = -error * 0.45;
                 myDrivetrain.updatePowers();
             }
             autopilot.communicate(tracker);
             //double reading = updateXFromSonar(sonarLeft, triggerLeft);
 
 
-            apGoTo(new double[]{autopilot.getRobotPosition()[0],autopilot.getRobotPosition()[1]+3,0}, Math.PI, true, true, false, 1.0, 0.7, 0.03, 1.25, 1, 0.05,  false);
+            apGoTo(new double[]{autopilot.getRobotPosition()[0],autopilot.getRobotPosition()[1]+3,0}, Math.PI, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05,  false);
 
             tr.setPower(0);
             tl.setPower(0);
@@ -462,7 +497,6 @@ public class AutoCommonZooming extends LinearOpMode {
             grab2.setPosition(0.53);
             sleep(500);
             apGoTo(new double[]{4*24 , 36, 0}, Math.PI, false, true, false, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
-            //apGoTo(new double[]{4*24 , 36, 0}, Math.PI/2, true, false, false, 1.0, 1.0, 0.02, 1.25, 5, 0.1, false);
             apGoTo(new double[]{5*24 , 36, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
             while (opModeIsActive()) {
                 //telemetry.addData("reading:", reading);
