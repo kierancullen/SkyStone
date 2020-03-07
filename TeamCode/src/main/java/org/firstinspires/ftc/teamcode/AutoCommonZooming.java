@@ -446,7 +446,7 @@ public class AutoCommonZooming extends LinearOpMode {
         }
 
 
-            apGoTo(new double[]{4*24 + 1 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 1.0, 3, 0.05, false);
+            apGoTo(new double[]{4*24 -6 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 1.0, 3, 0.05, false);
             autopilot.communicate(tracker);
 
 
@@ -464,7 +464,7 @@ public class AutoCommonZooming extends LinearOpMode {
                     }
                     movement_turn = error * 0.45;
                     movement_x = 0; //* 1.25;
-                    movement_y = -error * 0.45;
+                    movement_y = -error * 0.75;
                     myDrivetrain.updatePowers();
                 }
             }
@@ -510,19 +510,11 @@ public class AutoCommonZooming extends LinearOpMode {
                 autopilot.communicate(tracker);
                 idleStateMachines();
             }
+
             //out.currentState = OuttakeController2.OuttakeState.RELEASING;
             autopilot.communicate(tracker);
-            apGoTo(new double[]{autopilot.getRobotPosition()[0] - 24 , 36, 0}, Math.PI, true, true, true, 1.0, 1.0, 0.02, 1.25, 2, 0.05, true);
-        tr.setPower(0);
-        tl.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
-            while (opModeIsActive()) {
-            autopilot.communicate(tracker);
-            autopilot.telemetryUpdate();
-            telemetry.update();
-            sleep(1);
-          }
+            apGoTo(new double[]{autopilot.getRobotPosition()[0] - 24 , 36, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 2, 0.05, true);
+            out.currentState = OuttakeController2.OuttakeState.RELEASING;
             long start = System.currentTimeMillis();
             while (System.currentTimeMillis() - start < 2000 && opModeIsActive()){
                 apGoTo(new double[]{5*24 , 30, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
