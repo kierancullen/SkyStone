@@ -356,12 +356,6 @@ public class AutoCommonZooming extends LinearOpMode {
         capstone = hardwareMap.get(Servo.class, "capstone");
         capstone.setPosition(0);
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
-        imu.initialize(parameters);
-
         sonarLeft = hardwareMap.analogInput.get("sonarLeft");
         triggerLeft = hardwareMap.digitalChannel.get("triggerLeft");
         triggerLeft.setMode(DigitalChannel.Mode.OUTPUT);
@@ -395,7 +389,7 @@ public class AutoCommonZooming extends LinearOpMode {
         }
 
         // record any drift that happened while waiting, and zero it out
-        autopilot.communicate(tracker);
+        //autopilot.communicate(tracker);
         if (!invert) {
             tracker.setRobotAttitude(ROBOT_INIT_ATTITUDE);
             tracker.setRobotPosition(ROBOT_INIT_POSITION);
@@ -431,7 +425,7 @@ public class AutoCommonZooming extends LinearOpMode {
         in.start();
         out.start();
 
-        int location = popper.locations[0];
+        int location = 2;
         tl.setZeroPowerBehavior(BRAKE);
         tr.setZeroPowerBehavior(BRAKE);
         br.setZeroPowerBehavior(BRAKE);
@@ -442,17 +436,17 @@ public class AutoCommonZooming extends LinearOpMode {
 
 
         }
-        if (location == 1) {
+        else if (location == 1) {
 
         }
-        if (location == 2) {
+        else if (location == 2) {
 
             apGoTo(new double[]{26, 40, 0}, Math.PI / 6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, 0.05, true);
             apGoTo(new double[]{2 * 24, 36, 0}, Math.PI / 2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05, true);
         }
 
 
-            apGoTo(new double[]{4*24 - 4 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 1.25, 1, 0.05, false);
+            apGoTo(new double[]{4*24 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 1.25, 1, 0.05, false);
             autopilot.communicate(tracker);
 
             while (Math.abs(Math.PI - autopilot.getRobotAttitude()[0]) > 0.1) {
@@ -460,14 +454,14 @@ public class AutoCommonZooming extends LinearOpMode {
                 telemetry.addData("heading: ", autopilot.getRobotAttitude()[0]);
                 telemetry.update();
                 double error = Math.PI - autopilot.getRobotAttitude()[0];
-                movement_turn = error * 0.45;
+                movement_turn = error * 0.7;
                 movement_x = 0 ; //* 1.25;
                 movement_y = -error * 0.45;
                 myDrivetrain.updatePowers();
             }
             autopilot.communicate(tracker);
             //double reading = updateXFromSonar(sonarLeft, triggerLeft);
-
+            triggerGrab = true;
 
             apGoTo(new double[]{autopilot.getRobotPosition()[0],autopilot.getRobotPosition()[1]+4,0}, Math.PI, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05,  false);
 
@@ -476,7 +470,7 @@ public class AutoCommonZooming extends LinearOpMode {
             bl.setPower(0);
             br.setPower(0);
 
-
+            triggerGrab = true;
             grab1.setPosition(0.53);
             grab2.setPosition(0.53);
             long grabStart = System.currentTimeMillis();
@@ -484,9 +478,9 @@ public class AutoCommonZooming extends LinearOpMode {
                 autopilot.communicate(tracker);
                 idleStateMachines();
             }
-
+            triggerGrab = true;
             autopilot.communicate(tracker);
-            apGoTo(new double[]{4*24 , 36, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 2, 0.05, true);
+            apGoTo(new double[]{4*24 - 10 , 36, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 2, 0.05, true);
 
             long start = System.currentTimeMillis();
             while (System.currentTimeMillis() - start < 2000 && opModeIsActive()){
