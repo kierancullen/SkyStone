@@ -158,6 +158,7 @@ public class RobotOpModeSwing extends OpMode  {
         }
 
         if (gamepad2.right_stick_button) {
+            telemetry.addData("Capstone Deployed: ", true);
             capstone.setPosition(0.25);
         }
 

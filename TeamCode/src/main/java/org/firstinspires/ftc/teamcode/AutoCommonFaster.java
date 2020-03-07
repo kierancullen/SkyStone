@@ -282,7 +282,7 @@ public class AutoCommonFaster extends LinearOpMode {
         scotty = hardwareMap.get(AnalogInput.class, "scotty");
 
         out = new OuttakeController2 (winchRight, winchLeft, arm1, arm2, grip);
-        in = new AutoIntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
+        in = new AutoIntakeController (intakeLeft, intakeRight, swingLeft, swingRight, null, out, null, null);
 
         capstone = hardwareMap.get(Servo.class, "capstone");
         capstone.setPosition(0);

@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
@@ -62,6 +63,11 @@ public class AutoCommonZooming extends LinearOpMode {
     AutoIntakeController in;
     OuttakeController2 out;
     AnalogInput scotty;
+
+    Servo gate;
+    DistanceSensor ramp;
+    DistanceSensor floor;
+
 
     BNO055IMU imu;
 
@@ -278,54 +284,6 @@ public class AutoCommonZooming extends LinearOpMode {
 
     }
 
-    public void apGoToNoStrafe(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain) {
-        AutopilotSegment seg = new AutopilotSegment();
-        seg.navigationTarget = pos;
-        seg.orientationTarget = hdg;
-        seg.navigationGain = navigationGain;
-        seg.orientationGain = 1.25;
-        seg.navigationMax = navigationMax;
-        seg.navigationMin = navigationMin;
-        seg.orientationMax = 0.9; //0.5
-        seg.useOrientation = useOrientation;
-        seg.useTranslation = useTranslation;
-        seg.fullStop = fullStop;
-
-        autopilot.setNavigationTarget(seg);
-        autopilot.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
-
-        double [] yxh = null;
-        long lastTime = System.currentTimeMillis();
-
-        while (autopilot.getNavigationStatus() == AutopilotHost.NavigationStatus.RUNNING && opModeIsActive()) {
-
-            idleStateMachines();
-
-            if (yxh != null) {
-                /*GlobalMovement.*/movement_y = yxh[0];
-                /*GlobalMovement.*/movement_x = yxh[1];
-                if (yxh[0] < 0) {
-                    /*GlobalMovement.*/movement_turn = -yxh[1];
-                }
-                else {
-                    /*GlobalMovement.*/movement_turn = -yxh[1];
-                }
-                myDrivetrain.updatePowers();
-            }
-            autopilot.communicate(tracker);
-
-            long timeNow = System.currentTimeMillis();
-            //telemetry.addData("FPS", 1000.0 / (timeNow - lastTime));
-            lastTime = timeNow;
-
-            //AutopilotSystem.visualizerBroadcastRoutine(autopilot);
-            //autopilot.telemetryUpdate();
-            //telemetry.update();
-
-            yxh = autopilot.navigationTick();
-        }
-
-    }
 
     public void runOpMode() {
         runOpMode(false);
@@ -369,6 +327,13 @@ public class AutoCommonZooming extends LinearOpMode {
         grab1.setDirection(Servo.Direction.REVERSE);
         grab2 = hardwareMap.get(Servo.class, "hook2");
 
+        gate = hardwareMap.get(Servo.class, "gate");
+        ramp = hardwareMap.get(DistanceSensor.class, "ramp");
+        floor = hardwareMap.get(DistanceSensor.class, "floor");
+
+
+
+
         DcMotor tl = hardwareMap.get(DcMotor.class, "tl");
         DcMotor tr = hardwareMap.get(DcMotor.class, "tr");
         DcMotor bl = hardwareMap.get(DcMotor.class, "bl");
@@ -386,7 +351,7 @@ public class AutoCommonZooming extends LinearOpMode {
         scotty = hardwareMap.get(AnalogInput.class, "scotty");
 
         out = new OuttakeController2 (winchRight, winchLeft, arm1, arm2, grip);
-        in = new AutoIntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
+        in = new AutoIntakeController (intakeLeft, intakeRight, swingLeft, swingRight, gate, out, ramp, floor);
 
         capstone = hardwareMap.get(Servo.class, "capstone");
         capstone.setPosition(0);
@@ -410,8 +375,7 @@ public class AutoCommonZooming extends LinearOpMode {
         triggerBackRight.setMode(DigitalChannel.Mode.OUTPUT);
 
         autopilot = new AutopilotHost(telemetry);
-        tracker = new AutopilotTrackerQuadOdo(
-                myDrivetrain.getXOdometer(),
+        tracker = new AutopilotTrackerTripleOdo(
                 myDrivetrain.getXOdometerLeft(),
                 myDrivetrain.getYOdometerLeft(),
                 myDrivetrain.getYOdometerRight(),
@@ -420,7 +384,7 @@ public class AutoCommonZooming extends LinearOpMode {
                 DUALODO_TICKS_PER_UNIT
         );
 
-        ((AutopilotTrackerQuadOdo) tracker).setInverts(false, true, true, false);
+        ((AutopilotTrackerTripleOdo) tracker).setInverts(true, true, false);
         autopilot.setCountsToStable(AP_COUNTS_TO_STABLE);
         autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
         autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
@@ -458,6 +422,10 @@ public class AutoCommonZooming extends LinearOpMode {
                 telemetry.addData("second", popper.locations[0]);
                 telemetry.update();
             }
+            telemetry.addData("xLeft:", myDrivetrain.getXOdometerLeft().getCurrentPosition());
+            telemetry.addData("xRight:", myDrivetrain.getXOdometer().getCurrentPosition());
+            telemetry.addData("yLeft:", myDrivetrain.getYOdometerLeft().getCurrentPosition());
+            telemetry.addData("yRight:", myDrivetrain.getYOdometerRight().getCurrentPosition());
         }
 
         in.start();
@@ -469,21 +437,6 @@ public class AutoCommonZooming extends LinearOpMode {
         br.setZeroPowerBehavior(BRAKE);
         bl.setZeroPowerBehavior(BRAKE);
 
-
-        /*while (opModeIsActive()) {
-            autopilot.communicate(tracker);
-            GlobalMovement.updateFromGamepad(gamepad1);
-            myDrivetrain.updatePowers();
-            //AutopilotSystem.visualizerBroadcastRoutine(autopilot);
-            autopilot.telemetryUpdate();
-            telemetry.addData("xRight:", myDrivetrain.getXOdometer().getCurrentPosition());
-            telemetry.addData("xLeft:", myDrivetrain.getXOdometerLeft().getCurrentPosition());
-            telemetry.addData("yRight:", myDrivetrain.getYOdometerRight().getCurrentPosition());
-            telemetry.addData("yLeft:", myDrivetrain.getYOdometerLeft().getCurrentPosition());
-
-            telemetry.update();
-        }*/
-
         //Only going for the first skystone on this run
         if (location == 0) {
 
@@ -494,12 +447,12 @@ public class AutoCommonZooming extends LinearOpMode {
         }
         if (location == 2) {
 
-            apGoTo(new double[]{26,40,0}, Math.PI/6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, 0.05, true);
-            apGoTo(new double[]{2*24,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05, true);
-            //apGoTo(new double[]{3*24 - 12,36,0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, true);
+            apGoTo(new double[]{26, 40, 0}, Math.PI / 6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, 0.05, true);
+            apGoTo(new double[]{2 * 24, 36, 0}, Math.PI / 2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05, true);
+        }
+
 
             apGoTo(new double[]{4*24 - 4 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 1.25, 1, 0.05, false);
-
             autopilot.communicate(tracker);
 
             while (Math.abs(Math.PI - autopilot.getRobotAttitude()[0]) > 0.1) {
@@ -526,7 +479,12 @@ public class AutoCommonZooming extends LinearOpMode {
 
             grab1.setPosition(0.53);
             grab2.setPosition(0.53);
-            sleep(500);
+            long grabStart = System.currentTimeMillis();
+            while (System.currentTimeMillis() - grabStart < 500 && opModeIsActive()){
+                autopilot.communicate(tracker);
+                idleStateMachines();
+            }
+
             autopilot.communicate(tracker);
             apGoTo(new double[]{4*24 , 36, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 2, 0.05, true);
 
@@ -623,7 +581,7 @@ public class AutoCommonZooming extends LinearOpMode {
 
         }
 
-
+        /*
         //Drive to foundation
 
         autoPlace=true;
@@ -764,13 +722,15 @@ public class AutoCommonZooming extends LinearOpMode {
 
 
 
-        while (opModeIsActive()) {
+        /*while (opModeIsActive()) {
             autopilot.communicate(tracker);
             autopilot.telemetryUpdate();
             telemetry.update();
             idleStateMachines();
         }
     }
+    */
+
 
     public void idleStateMachines() {
         in.tick(intakeGo, false, false);

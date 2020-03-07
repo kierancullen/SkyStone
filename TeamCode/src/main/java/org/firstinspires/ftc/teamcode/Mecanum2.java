@@ -89,6 +89,7 @@ public class Mecanum2 extends RobotOpMode {
         triggerBackRight.setState(false);
 
         capstone = hardwareMap.get(Servo.class, "capstone");
+        setServoExtendedRange(capstone, 500, 2500);
         capstone.setPosition(0);
 
 
@@ -215,10 +216,12 @@ public class Mecanum2 extends RobotOpMode {
 
         if (gamepad2.left_stick_button) {
             capstone.setPosition(0);
+            telemetry.addData("capstone:", 0);
         }
 
         if (gamepad2.right_stick_button) {
             capstone.setPosition(0.25);
+            telemetry.addData("capstone:", 0.25);
         }
 
 

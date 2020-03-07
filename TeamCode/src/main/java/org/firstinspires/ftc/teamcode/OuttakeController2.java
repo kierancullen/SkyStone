@@ -9,7 +9,7 @@ public class OuttakeController2 {
     boolean readyForGrab;
 
     double GRAB_GRABBING_POSITION = 0.71;
-    double GRAB_OPEN_POSITION = 0.06;
+    double GRAB_OPEN_POSITION = 0.15; //0.06
 
     int LIFT_LOWER_BOUND = 25;
     int LIFT_UPPER_BOUND = 1150;

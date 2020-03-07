@@ -328,7 +328,7 @@ public class AutoCommonSideGrip extends LinearOpMode {
 
         //State Machines
         out = new OuttakeController2(winchRight, winchLeft, arm1, arm2, grip);
-        in = new AutoIntakeController(intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
+        in = new AutoIntakeController(intakeLeft, intakeRight, swingLeft, swingRight, null, out, null, null);
         side = new SideGripController(redGrip, redGripSwing, blueGrip, blueGripSwing, invert);
 
 

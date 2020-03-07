@@ -165,7 +165,7 @@ public class AutoCommon extends LinearOpMode {
         scotty = hardwareMap.get(AnalogInput.class, "scotty");
 
         out = new OuttakeController2 (winchRight, winchLeft, arm1, arm2, grip);
-        in = new AutoIntakeController (intakeLeft, intakeRight, swingLeft, swingRight, scotty, out);
+        in = new AutoIntakeController (intakeLeft, intakeRight, swingLeft, swingRight, null, out, null, null);
         swingLeft.setPosition(0.72);
         swingRight.setPosition(0.72);
 
