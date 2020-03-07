@@ -230,7 +230,7 @@ public class OuttakeController2 {
                 winchLeft.setPower(HUMAN_DOWN_POWER);
                 winchRight.setPower(HUMAN_DOWN_POWER);
             }
-            else if (triggerGrab && System.currentTimeMillis() - timeAtStateStart > 1000) {
+            else if (triggerGrab && System.currentTimeMillis() - timeAtStateStart > 200) {
                 currentState = OuttakeState.RELEASING;
                 placingLevel++;
             }

@@ -442,19 +442,26 @@ public class AutoCommonZooming extends LinearOpMode {
         else if (location == 2) {
 
             apGoTo(new double[]{26, 40, 0}, Math.PI / 6, true, true, false, 0.7, 0.2, 0.03, 1.25, 1, 0.05, true);
-            apGoTo(new double[]{2 * 24, 36, 0}, Math.PI / 2, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05, true);
+            apGoTo(new double[]{2 * 24, 36, 0}, Math.PI / 2, true, true, false, 1.0, 1.0, 0.03, 1.7, 1, 0.05, false);
         }
 
 
-            apGoTo(new double[]{5*24 - 12 ,36,0}, Math.PI/2, true, true, true, 1.0, 0.2, 0.03, 1.25, 1, 0.05, false);
+            apGoTo(new double[]{4*24 + 1 ,36,0}, Math.PI/2, true, true, false, 1.0, 0.2, 0.03, 1.0, 3, 0.05, false);
             autopilot.communicate(tracker);
+
 
             if (!invert) {
                 while (Math.abs(Math.PI - autopilot.getRobotAttitude()[0]) > 0.1) {
                     autopilot.communicate(tracker);
                     telemetry.addData("heading: ", autopilot.getRobotAttitude()[0]);
                     telemetry.update();
-                    double error = Math.PI - autopilot.getRobotAttitude()[0];
+                    double error;
+                    if (autopilot.getRobotAttitude()[0] >= 0) {
+                        error = Math.PI - autopilot.getRobotAttitude()[0];
+                    }
+                    else {
+                        error = -Math.PI - autopilot.getRobotAttitude()[0];
+                    }
                     movement_turn = error * 0.45;
                     movement_x = 0; //* 1.25;
                     movement_y = -error * 0.45;
@@ -466,16 +473,27 @@ public class AutoCommonZooming extends LinearOpMode {
                     autopilot.communicate(tracker);
                     telemetry.addData("heading: ", autopilot.getRobotAttitude()[0]);
                     telemetry.update();
-                    double error = Math.PI + autopilot.getRobotAttitude()[0];
-                    movement_turn = -error * 0.7;
+                    double error;
+                    if (autopilot.getRobotAttitude()[0] >= 0) {
+                        error = Math.PI + autopilot.getRobotAttitude()[0];
+                    }
+                    else {
+                        error = -Math.PI + autopilot.getRobotAttitude()[0];
+                    }
+                    movement_turn = -error * 0.45;
                     movement_x = 0; //* 1.25;
                     movement_y = -error * 0.45;
                     myDrivetrain.updatePowers();
                 }
             }
+        tr.setPower(0);
+        tl.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
             autopilot.communicate(tracker);
+
             //double reading = updateXFromSonar(sonarLeft, triggerLeft);
-            triggerGrab = true;
+            out.currentState = OuttakeController2.OuttakeState.GRABBING;
 
             apGoTo(new double[]{autopilot.getRobotPosition()[0],autopilot.getRobotPosition()[1]+4,0}, Math.PI, true, true, false, 1.0, 1.0, 0.03, 1.25, 1, 0.05,  false);
 
@@ -484,7 +502,7 @@ public class AutoCommonZooming extends LinearOpMode {
             bl.setPower(0);
             br.setPower(0);
 
-            triggerGrab = true;
+            out.currentState = OuttakeController2.OuttakeState.HUMAN;
             grab1.setPosition(0.53);
             grab2.setPosition(0.53);
             long grabStart = System.currentTimeMillis();
@@ -492,10 +510,19 @@ public class AutoCommonZooming extends LinearOpMode {
                 autopilot.communicate(tracker);
                 idleStateMachines();
             }
-            triggerGrab = true;
+            //out.currentState = OuttakeController2.OuttakeState.RELEASING;
             autopilot.communicate(tracker);
-            apGoTo(new double[]{autopilot.getRobotPosition()[0] - 24 , 36, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 2, 0.05, true);
-
+            apGoTo(new double[]{autopilot.getRobotPosition()[0] - 24 , 36, 0}, Math.PI, true, true, true, 1.0, 1.0, 0.02, 1.25, 2, 0.05, true);
+        tr.setPower(0);
+        tl.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+            while (opModeIsActive()) {
+            autopilot.communicate(tracker);
+            autopilot.telemetryUpdate();
+            telemetry.update();
+            sleep(1);
+          }
             long start = System.currentTimeMillis();
             while (System.currentTimeMillis() - start < 2000 && opModeIsActive()){
                 apGoTo(new double[]{5*24 , 30, 0}, Math.PI, true, true, false, 1.0, 1.0, 0.02, 1.25, 5, 0.05, true);
