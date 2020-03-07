@@ -576,7 +576,11 @@ public class AutoCommon2Stone extends LinearOpMode {
         grab1.setPosition(0.53);
         grab2.setPosition(0.53);
         //triggerRelease=true;
-        sleep(1000);
+        startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < 1000 && opModeIsActive()){
+            autopilot.communicate(tracker);
+            idleStateMachines();
+        }
         apGoToNoStrafe(new double[]{4*24 + 1 , 20, 0}, Math.PI, false, true, false, 0.7, 0.3, 0.02);
         apGoTo(new double[]{4*24 +1 , 20, 0}, Math.PI/2, true, false, false, 0.7, 0.3, 0.02);
         grab1.setPosition(0.25);
@@ -643,10 +647,18 @@ public class AutoCommon2Stone extends LinearOpMode {
         apGoTo(new double[]{5*24 - 18 , 36, 0}, Math.PI/2, true, true, false, 0.7, 0.5, 0.03, 5);
         //autoPlace=true;
         apGoTo(new double[]{5*24 - 9 , 36, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 5);
-        sleep(2000);
+        startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < 2000 && opModeIsActive()){
+            autopilot.communicate(tracker);
+            idleStateMachines();
+        }
         //triggerRelease=true;
         while(out.currentState != OuttakeController2.OuttakeState.RELEASING) idleStateMachines();
-        sleep(1000);
+        startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < 1000 && opModeIsActive()){
+            autopilot.communicate(tracker);
+            idleStateMachines();
+        }
         apGoTo(new double[]{3*24 , 36, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 3); //28
         tl.setZeroPowerBehavior(BRAKE);
         tr.setZeroPowerBehavior(BRAKE);
@@ -709,6 +721,7 @@ public class AutoCommon2Stone extends LinearOpMode {
 
     }
 
+    long startTime;
 
 
     public void idleStateMachines() {
