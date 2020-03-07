@@ -449,15 +449,29 @@ public class AutoCommonZooming extends LinearOpMode {
             apGoTo(new double[]{5*24 - 12 ,36,0}, Math.PI/2, true, true, true, 1.0, 0.2, 0.03, 1.25, 1, 0.05, false);
             autopilot.communicate(tracker);
 
-            while (Math.abs(Math.PI - autopilot.getRobotAttitude()[0]) > 0.1) {
-                autopilot.communicate(tracker);
-                telemetry.addData("heading: ", autopilot.getRobotAttitude()[0]);
-                telemetry.update();
-                double error = Math.PI - autopilot.getRobotAttitude()[0];
-                movement_turn = error * 0.45;
-                movement_x = 0 ; //* 1.25;
-                movement_y = -error * 0.45;
-                myDrivetrain.updatePowers();
+            if (!invert) {
+                while (Math.abs(Math.PI - autopilot.getRobotAttitude()[0]) > 0.1) {
+                    autopilot.communicate(tracker);
+                    telemetry.addData("heading: ", autopilot.getRobotAttitude()[0]);
+                    telemetry.update();
+                    double error = Math.PI - autopilot.getRobotAttitude()[0];
+                    movement_turn = error * 0.45;
+                    movement_x = 0; //* 1.25;
+                    movement_y = -error * 0.45;
+                    myDrivetrain.updatePowers();
+                }
+            }
+            else {
+                while (Math.abs(Math.PI + autopilot.getRobotAttitude()[0]) > 0.1) {
+                    autopilot.communicate(tracker);
+                    telemetry.addData("heading: ", autopilot.getRobotAttitude()[0]);
+                    telemetry.update();
+                    double error = Math.PI + autopilot.getRobotAttitude()[0];
+                    movement_turn = -error * 0.7;
+                    movement_x = 0; //* 1.25;
+                    movement_y = -error * 0.45;
+                    myDrivetrain.updatePowers();
+                }
             }
             autopilot.communicate(tracker);
             //double reading = updateXFromSonar(sonarLeft, triggerLeft);
