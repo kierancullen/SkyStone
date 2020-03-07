@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name="UserControl")
 public class UserControl extends RobotOpModeSwing {
 
-    static double LP_HORIZ_M = .5;
+    static double LP_HORIZ_M = .35;
     static double LP_DIFF_M = .35;
     static double HP_HORIZ_M = 1.0; //0.75
     static double HP_DIFF_M = 1.0;

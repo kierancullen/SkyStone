@@ -17,14 +17,14 @@ public class IntakeController {
     double SWINGRIGHT_STOW_POSITION = 0.06;
 
     double GATE_OPEN_POSITION = 0;
-    double GATE_CLOSED_POSITION = 0.219;
+    double GATE_CLOSED_POSITION = 0.25;
 
     double INTAKE_POWER = 0.5;
 
     long INTAKING_MS = 1000;
     long RAMP_MS = 1000;
     long REVERSE_MS = 700;
-    long FLOOR_MS = 700;
+    long FLOOR_MS = 1;
     long TRAP_MS = 500;
 
     DcMotor intakeLeft;
@@ -160,8 +160,8 @@ public class IntakeController {
         }
 
         else if (currentState == IntakeState.REVERSING) {
-            intakeLeft.setPower(-INTAKE_POWER);
-            intakeRight.setPower(-INTAKE_POWER);
+            intakeLeft.setPower(-INTAKE_POWER / 2);
+            intakeRight.setPower(-INTAKE_POWER / 2);
 
             if (onFloor()) {
                 currentState = IntakeState.FLOOR;
@@ -184,19 +184,20 @@ public class IntakeController {
         else if (currentState == IntakeState.FLOOR) {
 
             if (System.currentTimeMillis() - timeAtStateStart > FLOOR_MS) {
+                gate.setPosition(GATE_CLOSED_POSITION);
                 currentState = IntakeState.TRAPPED;
             }
         }
 
         else if (currentState == IntakeState.TRAPPED) {
-            gate.setPosition(GATE_CLOSED_POSITION);
             intakeLeft.setPower(-INTAKE_POWER);
             intakeRight.setPower(-INTAKE_POWER);
             if (reverse) {
-                gate.setPosition(GATE_OPEN_POSITION);
+                gate.setPosition(GATE_CLOSED_POSITION);
             }
             if (System.currentTimeMillis() - timeAtStateStart > TRAP_MS) {
                 outtake.readyForGrab = true;
+                gate.setPosition(0.17);
 
             }
 

@@ -11,7 +11,7 @@ public class OuttakeController2 {
     double GRAB_GRABBING_POSITION = 0.71;
     double GRAB_OPEN_POSITION = 0.06;
 
-    int LIFT_LOWER_BOUND = 15;
+    int LIFT_LOWER_BOUND = 25;
     int LIFT_UPPER_BOUND = 1150;
     int RELEASE_LIFT = 100; // extra height on release
 
@@ -21,7 +21,7 @@ public class OuttakeController2 {
     double RELEASE_POS = 0.3;
     double HUMAN_UP_POWER = 1.0;
     double HUMAN_DOWN_POWER = -0.1;
-    double FALLING_DOWN_POWER = -0.1;
+    double FALLING_DOWN_POWER = -0.2;
 
     long GRABBING_MS = 500;
     long EXTENDING_MS = 400;
@@ -175,6 +175,9 @@ public class OuttakeController2 {
                 arm1.setPosition(PRIME_POS);
                 arm2.setPosition(PRIME_POS);
             }
+            if (triggerRelease) {
+                currentState = OuttakeState.READY;
+            }
         }
 
         else if (currentState == OuttakeState.LIFTING) {
@@ -185,7 +188,7 @@ public class OuttakeController2 {
             winchLeft.setPower(1);
             winchRight.setPower(1);
             grip.setPosition(GRAB_GRABBING_POSITION);
-            if (Math.abs(getLiftPosition() - levelLiftPosition()) < 10) {
+            if (Math.abs(getLiftPosition() - levelLiftPosition()) < 10 || triggerRelease) {
                 currentState = OuttakeState.HUMAN;
             }
         }
@@ -278,7 +281,7 @@ public class OuttakeController2 {
             winchRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             winchLeft.setPower(FALLING_DOWN_POWER);
             winchRight.setPower(FALLING_DOWN_POWER);
-            if (!liftCanGoDown()) {
+            if (!liftCanGoDown() || triggerRelease) {
                 currentState = OuttakeState.READY;
             }
         }

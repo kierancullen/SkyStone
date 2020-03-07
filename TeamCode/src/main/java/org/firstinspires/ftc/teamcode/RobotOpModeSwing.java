@@ -138,11 +138,17 @@ public class RobotOpModeSwing extends OpMode  {
         myDrivetrain.updatePowers();
         telemetry.update();
 
-        if (gamepad2.a) {
+
+        if (gamepad2.right_trigger > 0.7) {
             hook1.setPosition(0.5);
             hook2.setPosition(0.5);
+
         }
-        if (gamepad2.y) {
+        else if (out.placingLevel <= 3) {
+            hook1.setPosition(0.45);
+            hook2.setPosition(0.45);
+        }
+        else {
             hook1.setPosition(0.25);
             hook2.setPosition(0.25);
         }

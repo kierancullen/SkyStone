@@ -36,6 +36,8 @@ public class Mecanum2 extends RobotOpMode {
     DistanceSensor ramp;
     DistanceSensor floor;
 
+    Servo capstone;
+
 
     GrabLiftPlaceController g;
 
@@ -85,6 +87,9 @@ public class Mecanum2 extends RobotOpMode {
         triggerLeft.setState(false);
         triggerBackLeft.setState(false);
         triggerBackRight.setState(false);
+
+        capstone = hardwareMap.get(Servo.class, "capstone");
+        capstone.setPosition(0);
 
 
          //grab = hardwareMap.get(Servo.class, "grab");
@@ -207,6 +212,15 @@ public class Mecanum2 extends RobotOpMode {
             triggerBackLeft.setState(false);
             triggerBackRight.setState(false);
         }
+
+        if (gamepad2.left_stick_button) {
+            capstone.setPosition(0);
+        }
+
+        if (gamepad2.right_stick_button) {
+            capstone.setPosition(0.25);
+        }
+
 
         rampDetected = ramp.getDistance(DistanceUnit.MM) < 100;
         floorDetected = floor.getDistance(DistanceUnit.MM) < 100;
