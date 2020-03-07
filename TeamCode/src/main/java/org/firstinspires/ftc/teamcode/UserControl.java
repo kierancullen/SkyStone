@@ -15,6 +15,9 @@ public class UserControl extends RobotOpModeSwing {
     boolean triggerGrab = false;
     boolean stowed = false;
 
+    boolean upPressedLast = false;
+    boolean downPressedLast = false;
+
     @Override
     public void init() {
         super.init();
@@ -64,7 +67,9 @@ public class UserControl extends RobotOpModeSwing {
         triggerGrab=false;
         if (gamepad2.right_bumper) triggerGrab = true;
         in.tick(false, gamepad2.back, stowed);
-        out.tick(triggerGrab, gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.left_bumper, gamepad2.x, gamepad2.b, false, gamepad2.dpad_left, gamepad2.left_trigger > 0.1, gamepad2.right_trigger > 0.1);
+        out.tick(triggerGrab, gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.left_bumper, gamepad2.x, gamepad2.b, false, gamepad2.dpad_left, gamepad2.y && !upPressedLast, gamepad2.a && !downPressedLast);
+        upPressedLast = gamepad2.y;
+        downPressedLast = gamepad2.a;
         if (triggerGrab) triggerGrab = false;
 
     }

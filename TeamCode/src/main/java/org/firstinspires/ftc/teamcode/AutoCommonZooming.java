@@ -21,6 +21,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.qualcomm.robotcore.util.Range;
 
+import java.util.Arrays;
+
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.GlobalMovement.movement_turn;
@@ -117,8 +119,8 @@ public class AutoCommonZooming extends LinearOpMode {
         return reading;
     }
 
-    //Used at the foundation only
-    void updateAllFromSonar(boolean invert) {
+    // Does sensing once and returns suggested new position; used by updateAllFromSonar
+    double[] suggestAllFromSonar(boolean invert) {
         triggerLeft.setState(true);
         triggerBackLeft.setState(true);
         triggerBackRight.setState(true);
@@ -140,14 +142,40 @@ public class AutoCommonZooming extends LinearOpMode {
         if (invert) sideWallDist = readingRight;
         else sideWallDist = readingLeft;
 
+        double[] suggestedPos = new double[3];
+        suggestedPos[0] = (6*24 - backWallDist);
+        suggestedPos[1] = (sideWallDist);
+        if (invert) {
+            suggestedPos[0] = -suggestedPos[0]; // axis is mirrored
+        }
+
+        return suggestedPos;
+    }
+
+    //Used at the foundation only
+    void updateAllFromSonar(boolean invert) {
+        int nSamples = 5;
+        double[] xSuggestions = new double[nSamples];
+        double[] ySuggestions = new double[nSamples];
+        for (int i = 0; i < nSamples; i++) {
+            double[] suggestedPos = suggestAllFromSonar(invert);
+            xSuggestions[i] = suggestedPos[0];
+            ySuggestions[i] = suggestedPos[1];
+        }
+        Arrays.sort(xSuggestions);
+        Arrays.sort(ySuggestions);
+
         autopilot.communicate(tracker);
         double[] robotPos = tracker.getRobotPosition();
-        robotPos[0] = (6*24 - backWallDist);
-        robotPos[1] = (sideWallDist);
-
         double[] robotAttitude = tracker.getRobotAttitude();
         //Resent rotation here since we're squared against the wall
         robotAttitude[0] = Math.PI/2;
+        if (invert) {
+            robotAttitude[0] = -robotAttitude[0]; // rotation is mirrored
+        }
+        //Update position according to median
+        robotPos[0] = xSuggestions[nSamples / 2];
+        robotPos[1] = ySuggestions[nSamples / 2];
 
         tracker.setRobotPosition(robotPos);
         autopilot.communicate(tracker);
