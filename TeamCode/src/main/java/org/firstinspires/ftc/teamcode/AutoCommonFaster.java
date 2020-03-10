@@ -58,21 +58,25 @@ public class AutoCommonFaster extends LinearOpMode {
     AutopilotHost autopilot;
     AutopilotTracker tracker;
 
+    //Robot start positions
     public static double[] ROBOT_INIT_POSITION = new double[]{36, 9.2, 0};
     public static double[] ROBOT_INIT_ATTITUDE = new double[]{0, 0, 0};
     public static double[] INVERT_ROBOT_INIT_POSITION = new double[]{-36, 9.2, 0};
     public static double[] INVERT_ROBOT_INIT_ATTITUDE = new double[]{0, 0, 0};
-
+    
+    //Odometry constants, based on the physical locations of our wheels
     public static double DUALODO_X_RADIUS = 3.25614173 - 2.3134252;
     public static double DUALODO_Y_RADIUS = -0.25051181102 + 7.184370097;
     public static double DUALODO_TICKS_PER_UNIT = 1440 /  (1.88976 * Math.PI);
 
-
+    
+    
     public static int AP_COUNTS_TO_STABLE = 10;
-    public static double AP_NAV_UNITS_TO_STABLE = 1; // inch +/- //0.5
-    public static double AP_ORIENT_UNITS_TO_STABLE = 0.05; // rad +/-
+    public static double AP_NAV_UNITS_TO_STABLE = 1; // inch, Distance to the target position before we go to the next move
+    public static double AP_ORIENT_UNITS_TO_STABLE = 0.05; // rad, Difference between current angle and desired angle before we go to the next move
 
 
+    //Used for 270deg servos 
     public void setServoExtendedRange(Servo servo, int min, int max) {
         ServoControllerEx controller = (ServoControllerEx) servo.getController();
         int servoPort = servo.getPortNumber();
@@ -80,17 +84,18 @@ public class AutoCommonFaster extends LinearOpMode {
         controller.setServoPwmRange(servoPort, range);
     }
 
+    //Method called to navigate to a point
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop) {
         AutopilotSegment seg = new AutopilotSegment();
         seg.navigationTarget = pos;
         seg.orientationTarget = hdg;
-        seg.navigationGain = 0.015;
-        seg.orientationGain = 1.25;
-        seg.navigationMax = 1.0;
+        seg.navigationGain = 0.015; //Gain for translation, lower gain
+        seg.orientationGain = 1.25; //Gain for rotation
+        seg.navigationMax = 1.0; 
         seg.navigationMin = 0.25;
         seg.orientationMax = 0.5;
-        seg.useOrientation = useOrientation;
-        seg.useTranslation = useTranslation;
+        seg.useOrientation = useOrientation; //Set this to false to do a move that only cares about robot position and not angle
+        seg.useTranslation = useTranslation; //Set this to false to do a turn
         seg.fullStop = fullStop;
 
         autopilot.setNavigationTarget(seg);
@@ -101,7 +106,7 @@ public class AutoCommonFaster extends LinearOpMode {
 
         while (autopilot.getNavigationStatus() == AutopilotHost.NavigationStatus.RUNNING && opModeIsActive()) {
 
-            idleStateMachines();
+            idleStateMachines(); 
 
             if (yxh != null) {
                 /*GlobalMovement.*/movement_y = yxh[0];
@@ -109,7 +114,7 @@ public class AutoCommonFaster extends LinearOpMode {
                 /*GlobalMovement.*/movement_turn = yxh[2];
                 myDrivetrain.updatePowers();
             }
-            autopilot.communicate(tracker);
+            autopilot.communicate(tracker); 
 
             long timeNow = System.currentTimeMillis();
             telemetry.addData("FPS", 1000.0 / (timeNow - lastTime));
@@ -123,7 +128,9 @@ public class AutoCommonFaster extends LinearOpMode {
         }
 
     }
-
+    
+    //Some more apGoTo methods that allow more parameters to be set 
+    
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain) {
         apGoTo(pos, hdg, useOrientation, useTranslation, fullStop, navigationMax, navigationMin, navigationGain, AP_NAV_UNITS_TO_STABLE);
     }
@@ -174,6 +181,7 @@ public class AutoCommonFaster extends LinearOpMode {
 
     }
 
+    //Legacy method for driving differential with no strafing, can also set seg.diffmode = true instead 
     public void apGoToNoStrafe(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain) {
         AutopilotSegment seg = new AutopilotSegment();
         seg.navigationTarget = pos;
@@ -287,7 +295,8 @@ public class AutoCommonFaster extends LinearOpMode {
         capstone = hardwareMap.get(Servo.class, "capstone");
         capstone.setPosition(0);
 
-
+        
+        //Instantiate autopilot
         autopilot = new AutopilotHost(telemetry);
         tracker = new AutopilotTrackerTripleOdo(
                 myDrivetrain.getXOdometer(),
@@ -297,11 +306,13 @@ public class AutoCommonFaster extends LinearOpMode {
                 DUALODO_TICKS_PER_UNIT
         );
 
+        
         ((AutopilotTrackerTripleOdo) tracker).setInverts(false, true, false);
         autopilot.setCountsToStable(AP_COUNTS_TO_STABLE);
         autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
         autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
 
+        //The invert boolean allows all cooredinates to be reversed for the opposite side of the field
         if (invert) {
             autopilot.setNavigationTargetInverts(new boolean[]{true, false, false});
             autopilot.setOrientationTargetInvert(true);
@@ -318,6 +329,7 @@ public class AutoCommonFaster extends LinearOpMode {
             tracker.setRobotPosition(INVERT_ROBOT_INIT_POSITION);
         }
 
+        //Scan the quarry to find the skystone locations
         popper = new PixelPopNoLens();
         popper.initVuforia();
         while (!opModeIsActive()) {
@@ -334,13 +346,16 @@ public class AutoCommonFaster extends LinearOpMode {
             }
         }
 
+        //Start intake and outtake state machines
         in.start();
         out.start();
 
 
 
-
+        //Beginning of actual auto
         int location = popper.locations[1];
+        
+        //Collect the first stone
         if (location == 0) {
             apGoTo(new double[]{20, 32, 0}, Math.PI/6, true, true, false);
             apGoTo(new double[]{18, 37, 0}, Math.PI/6, true, true, false);
@@ -384,25 +399,32 @@ public class AutoCommonFaster extends LinearOpMode {
             triggerGrab = true;
         }
 
-        //apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, false, 1.0, 0.7, 0.005);
+        //Drive under the skybridge 
         apGoTo(new double[]{5*24 , 42, 0}, Math.PI/2, true, true, false, 0.7, 0.2, 0.03, 6); //28
         autoPlace=true;
+        //Drive against the foundation, grab it, and release the stone
         apGoTo(new double[]{5*24 , 44, 0}, Math.PI, true, true, true, 0.5, 0.3, 0.02, 1); //38
         grab1.setPosition(0.53);
         grab2.setPosition(0.53);
         triggerRelease=true;
         sleep(1000);
+        //Pull the foundation out
         apGoToNoStrafe(new double[]{4*24 + 1 , 20, 0}, Math.PI, false, true, false, 0.7, 0.3, 0.02);
         apGoTo(new double[]{4*24 +1 , 20, 0}, Math.PI/2, true, false, false, 0.7, 0.3, 0.02);
         grab1.setPosition(0.25);
         grab2.setPosition(0.25);
+        //Push the foundation into the wall
         apGoTo(new double[]{4*24 - 5 , 24, 0}, Math.PI/2, true, true, false, 1.0, 1.0, 0.05, 3);
         apGoTo(new double[]{5*24 - 4 , 24, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 2);
+        
+        //Drive back under the skybirdge 
         apGoTo(new double[]{3*24 , 32, 0}, Math.PI/2, true, true, false, 0.7, 0.7, 0.03, 3);
 
 
         autoPlace = false;
         location =  popper.locations[0];
+        
+        //Get the second stone 
         if (location == 0) {
             apGoTo(new double[]{12 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.2, 0.015);
             apGoTo(new double[]{12, 36, 0}, Math.PI/6, true, true, false, 1.0, 0.25, 0.015, 2);
@@ -454,14 +476,18 @@ public class AutoCommonFaster extends LinearOpMode {
             apGoTo(new double[]{52, 36, 0}, Math.PI/2, true, true, false,1.0, 0.25, 0.015, 2);
             triggerGrab = true;
         }
-
+        
+        //Go back under the bridge 
         apGoTo(new double[]{5*24 - 18 , 36, 0}, Math.PI/2, true, true, false, 0.7, 0.5, 0.03, 5);
         autoPlace=true;
+        //Bump up against the foundation and place 
         apGoTo(new double[]{5*24 - 9 , 36, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 5);
         sleep(2000);
         triggerRelease=true;
         while(out.currentState != OuttakeController2.OuttakeState.RELEASING) idleStateMachines();
         sleep(1000);
+        
+        //Park, set motor powers to zero 
         apGoTo(new double[]{3*24 , 36, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 3); //28
         tl.setZeroPowerBehavior(BRAKE);
         tr.setZeroPowerBehavior(BRAKE);
@@ -473,47 +499,10 @@ public class AutoCommonFaster extends LinearOpMode {
         bl.setPower(0);
         br.setPower(0);
 
-        /*
-        apGoTo(new double[]{3*24 , 28, 0}, Math.PI/2, true, true, true, 0.7, 0.5, 0.03, 2);
-        tl.setZeroPowerBehavior(BRAKE);
-        tr.setZeroPowerBehavior(BRAKE);
-        br.setZeroPowerBehavior(BRAKE);
-        bl.setZeroPowerBehavior(BRAKE);
-
-        tr.setPower(0);
-        tl.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
 
 
 
-        /*
-        apGoTo(new double[]{5*24 - 6, 24, 0}, 3*Math.PI/4, true, true, false, 1.0, 0.5, 0.05);
-        apGoTo(new double[]{5*24 - 6 , 24, 0}, Math.PI/2, true, false, false, 1.0, 0.5, 0.05);
-        //apGoTo(new double[]{5*24 -3, 24, 0}, Math.PI/2, true, true, false, 1.0, 0.5, 0.05);
-
-        apGoTo(new double[]{2*24, 28, 0}, Math.PI/2, true, true, true, 0.7, 0.15, 0.03);
-
-         */
-
-
-
-
-
-
-        /*
-
-        while (out.currentState != OuttakeController2.OuttakeState.HUMAN) {
-            idleStateMachines();
-        }
-        triggerRelease = true;
-        apGoTo(new double[]{5*24, 32, 0}, Math.PI, true, true, true);
-        apGoTo(new double[]{72, 32, 0}, Math.PI/2, true, true, true);
-        */
-
-
-
-
+        
         while (opModeIsActive()) {
             autopilot.communicate(tracker);
             autopilot.telemetryUpdate();
@@ -522,6 +511,7 @@ public class AutoCommonFaster extends LinearOpMode {
         }
     }
 
+    //Controls state machines for intake and outtake 
     public void idleStateMachines() {
         in.tick(intakeGo, false, false);
         if (intakeGo) { intakeGo = false; }
