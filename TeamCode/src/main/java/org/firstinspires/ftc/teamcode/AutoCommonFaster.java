@@ -71,7 +71,7 @@ public class AutoCommonFaster extends LinearOpMode {
 
     
     
-    public static int AP_COUNTS_TO_STABLE = 10;
+    public static int AP_COUNTS_TO_STABLE = 10; //The number of loop iterations that need to pass with the robot within AP_NAV_UNITS_TO_STABLE of the target before we can move on
     public static double AP_NAV_UNITS_TO_STABLE = 1; // inch, Distance to the target position before we go to the next move
     public static double AP_ORIENT_UNITS_TO_STABLE = 0.05; // rad, Difference between current angle and desired angle before we go to the next move
 
@@ -96,6 +96,7 @@ public class AutoCommonFaster extends LinearOpMode {
         seg.orientationMax = 0.5; //Maximum rotation power 
         seg.useOrientation = useOrientation; //Set this to false to do a move that only cares about robot position and not angle
         seg.useTranslation = useTranslation; //Set this to false to do a turn
+        
         //Fullstop controls whether autopilot tries to stop the robot completely at a certain point, or continues to the next point.
         //On a path consisting of multiple points that we want to zoom through, fullstop should be false
         seg.fullStop = fullStop; 
@@ -106,7 +107,8 @@ public class AutoCommonFaster extends LinearOpMode {
         double [] yxh = null;
         long lastTime = System.currentTimeMillis();
 
-        while (autopilot.getNavigationStatus() == AutopilotHost.NavigationStatus.RUNNING && opModeIsActive()) {
+        //autopilot.getNavigationStatus switches to STOPPED once we've determined that the target point is reached, and then this loop ends
+        while (autopilot.getNavigationStatus() == AutopilotHost.NavigationStatus.RUNNING && opModeIsActive()) { 
 
             idleStateMachines(); 
             
@@ -122,7 +124,7 @@ public class AutoCommonFaster extends LinearOpMode {
             autopilot.communicate(tracker); //Updates the robot position based on odometry tracking
 
             long timeNow = System.currentTimeMillis();
-            telemetry.addData("FPS", 1000.0 / (timeNow - lastTime));
+            telemetry.addData("FPS", 1000.0 / (timeNow - lastTime)); //Tracking loop iteration time
             lastTime = timeNow;
 
             //AutopilotSystem.visualizerBroadcastRoutine(autopilot);
@@ -134,7 +136,7 @@ public class AutoCommonFaster extends LinearOpMode {
 
     }
     
-    //Some more apGoTo methods that allow more parameters to be set 
+    //Some similar apGoTo methods that allow more parameters to be set 
     
     public void apGoTo(double[] pos, double hdg, boolean useOrientation, boolean useTranslation, boolean fullStop, double navigationMax, double navigationMin, double navigationGain) {
         apGoTo(pos, hdg, useOrientation, useTranslation, fullStop, navigationMax, navigationMin, navigationGain, AP_NAV_UNITS_TO_STABLE);
@@ -301,7 +303,7 @@ public class AutoCommonFaster extends LinearOpMode {
         capstone.setPosition(0);
 
         
-        //Instantiate autopilot
+        //Instantiate autopilot, and create the tracker
         autopilot = new AutopilotHost(telemetry);
         tracker = new AutopilotTrackerTripleOdo(
                 myDrivetrain.getXOdometer(),
@@ -312,7 +314,7 @@ public class AutoCommonFaster extends LinearOpMode {
         );
 
         
-        ((AutopilotTrackerTripleOdo) tracker).setInverts(false, true, false);
+        ((AutopilotTrackerTripleOdo) tracker).setInverts(false, true, false); //Controls whether we need to invert the direction of our odometry encoders
         autopilot.setCountsToStable(AP_COUNTS_TO_STABLE);
         autopilot.setNavigationUnitsToStable(AP_NAV_UNITS_TO_STABLE);
         autopilot.setOrientationUnitsToStable(AP_ORIENT_UNITS_TO_STABLE);
@@ -323,7 +325,7 @@ public class AutoCommonFaster extends LinearOpMode {
             autopilot.setOrientationTargetInvert(true);
         }
 
-        // record any drift that happened while waiting, and zero it out
+        // record any drift that happened while waiting in init, and zero it out
         autopilot.communicate(tracker);
         if (!invert) {
             tracker.setRobotAttitude(ROBOT_INIT_ATTITUDE);
