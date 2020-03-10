@@ -91,12 +91,14 @@ public class AutoCommonFaster extends LinearOpMode {
         seg.orientationTarget = hdg;
         seg.navigationGain = 0.015; //Gain for translation, lower gain
         seg.orientationGain = 1.25; //Gain for rotation
-        seg.navigationMax = 1.0; 
-        seg.navigationMin = 0.25;
-        seg.orientationMax = 0.5;
+        seg.navigationMax = 1.0; //Maximum translation power
+        seg.navigationMin = 0.25; //Minimum translation power
+        seg.orientationMax = 0.5; //Maximum rotation power 
         seg.useOrientation = useOrientation; //Set this to false to do a move that only cares about robot position and not angle
         seg.useTranslation = useTranslation; //Set this to false to do a turn
-        seg.fullStop = fullStop;
+        //Fullstop controls whether autopilot tries to stop the robot completely at a certain point, or continues to the next point.
+        //On a path consisting of multiple points that we want to zoom through, fullstop should be false
+        seg.fullStop = fullStop; 
 
         autopilot.setNavigationTarget(seg);
         autopilot.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
@@ -107,14 +109,17 @@ public class AutoCommonFaster extends LinearOpMode {
         while (autopilot.getNavigationStatus() == AutopilotHost.NavigationStatus.RUNNING && opModeIsActive()) {
 
             idleStateMachines(); 
-
+            
+            //yxh is returned by autopilot after each iteration of this loop
+            //It is essentially a vector for x and y translation, as well as rotation
+            //In our setup, we put these values into global variables and then tell the drivetrain to update motor powers based on them
             if (yxh != null) {
                 /*GlobalMovement.*/movement_y = yxh[0];
                 /*GlobalMovement.*/movement_x = yxh[1];
                 /*GlobalMovement.*/movement_turn = yxh[2];
                 myDrivetrain.updatePowers();
             }
-            autopilot.communicate(tracker); 
+            autopilot.communicate(tracker); //Updates the robot position based on odometry tracking
 
             long timeNow = System.currentTimeMillis();
             telemetry.addData("FPS", 1000.0 / (timeNow - lastTime));
@@ -124,7 +129,7 @@ public class AutoCommonFaster extends LinearOpMode {
             autopilot.telemetryUpdate();
             telemetry.update();
 
-            yxh = autopilot.navigationTick();
+            yxh = autopilot.navigationTick(); //Get the new vector for robot translation and rotation
         }
 
     }
